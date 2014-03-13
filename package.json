@@ -1,6 +1,6 @@
 {
     "name": "jformatter",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "A JavaScript formatter",
     "main": "jformatter.js",
     "repository": {
@@ -8,7 +8,7 @@
         "url": "https://github.com/ishowshao/jformatter"
     },
     "bin": {
-        "jformatter": "jformat.js"
+        "jformatter": "./bin/jformat.js"
     },
     "directories": {
         "test": "test"
