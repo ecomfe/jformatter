@@ -25,4 +25,4 @@ if (typeof targetFile !== 'string') {
     process.exit(1);
 }
 
-jformatter.formatFile(targetFile);
+console.log(jformatter.formatFile(targetFile));
