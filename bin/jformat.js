@@ -21,7 +21,7 @@ process.argv.forEach(function(arg, index) {
 });
 
 if (typeof targetFile !== 'string') {
-    console.log('Error: no input file.');
+    showUsage();
     process.exit(1);
 }
 
