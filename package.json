@@ -12,8 +12,13 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
+    "devDependencies": {
+        "esprima": "~1.1.0"
+    },
     "keywords": [
-        "javascript"
+        "javascript",
+        "formatter",
+        "ast"
     ],
     "author": "ishowshao",
     "license": "BSD-2-Clause"
