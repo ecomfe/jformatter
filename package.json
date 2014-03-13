@@ -1,0 +1,20 @@
+{
+    "name": "jformatter",
+    "version": "0.0.1",
+    "description": "A JavaScript formatter",
+    "main": "jformatter.js",
+    "bin": {
+        "jformatter": "jformat.js"
+    },
+    "directories": {
+        "test": "test"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "javascript"
+    ],
+    "author": "ishowshao",
+    "license": "BSD-2-Clause"
+}
