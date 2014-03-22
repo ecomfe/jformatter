@@ -1,4 +1,4 @@
-if ((doSomething())) {
+if (doSomething()) {
     doSomething();
 } else {
     doSomething();
