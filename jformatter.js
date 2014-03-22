@@ -3,6 +3,7 @@
         //TODO if while 自动加大括号
         //TODO 自动加分号
 
+        //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
         var INDENT = '    ';
         var indentLevel = 0;
 
@@ -178,8 +179,7 @@
                     arg.onExit = function () {
                         toLastToken(arg);
                         var token;
-                        while (true) {
-                            token = forwardToken();
+                        while (token = forwardToken()) {
                             if (token.value === ',') {
                                 obPush(' ');
                                 break;
@@ -276,7 +276,7 @@
                         var token;
                         while (true) {
                             token = forwardToken();
-                            if (token.value === ',') {
+                            if (token.value === ',') { //TODO here maybe a bug
                                 obPush(' ');
                                 break;
                             }
@@ -288,10 +288,17 @@
                 });
             },
             'BlockStatement': function (node) {
-                indentLevel++;
+                if (node.body.length > 0) {
+                    indentLevel++;
 
-                toPrevToken(node);
-                obPush(' ');
+//                    node.body[node.body.length - 1].isBlockBodyLast = true;
+                    node.body[node.body.length - 1].onExit = function () {
+//                        console.log('//' + outputBuffer[outputBuffer.length - 1]);
+                        outputBuffer.pop(); //TODO here should be the indent, but need test
+                    }
+                }
+
+                obPush(' '); //param
                 forwardToken();
                 obPush('\n');
                 obIndent();
@@ -303,22 +310,16 @@
             },
             'ObjectExpression': function (node) {
                 indentLevel++;
-
-                toPrevToken(node);
+                if (node.properties.length > 0) {
+                    node.properties[node.properties.length - 1].isLastObjectProperty = true;
+                }
             },
             'Property': function (node) {
-                toPrevToken(node, function (token) {
-                    if (token.type === 'Punctuator' && token.value === ',') {
-                        obPush('\n');
-                        obIndent();
-                    }
-                });
-
-                dynamicInsert.push({
-                    type: 'Punctuator',
-                    value: ':',
-                    insert: ' '
-                });
+                node.key.onExit = function () {
+                    toNextToken(node.key);
+                    forwardToken();
+                    obPush(' ');
+                }
             },
             'ArrayExpression': function (node) {
                 indentLevel++;
@@ -345,6 +346,44 @@
                     isArrayMultiLine = multiLine;
 
                     node.isArrayMultiLine = multiLine;
+                }
+            },
+            'SwitchStatement': function (node) {
+                indentLevel++;
+                node.discriminant.onExit = function () {
+                    toNextToken(node.discriminant);
+                    var token;
+                    while (true) {
+                        token = forwardToken();
+                        if (tokens[tokenIndex].value.charAt(0) === '{') {
+                            obPush(' ');
+                            break;
+                        }
+                    }
+                };
+
+                if (node.cases[0]) {
+                    node.cases[0].isSwitchCaseFirst = true;
+                }
+            },
+            'SwitchCase': function (node) {
+//                if (node.isSwitchCaseFirst) {
+                    obPush('\n');
+                    obIndent();
+//                }
+                indentLevel++;
+                if (node.test) {
+                    node.test.onExit = function () {
+                        toNextToken(node.test);
+                        forwardToken();
+                        obPush('\n');
+                        obIndent();
+                    }
+                } else {
+                    forwardToken();
+                    forwardToken();
+                    obPush('\n');
+                    obIndent();
                 }
             }
         };
@@ -425,17 +464,8 @@
                 }
             },
             'BlockStatement': function (node) {
-                indentLevel--;
-
-                toNextToken(node);
-                backwardToken();
-                var pop = obPop();
-                if (pop !== INDENT) {
-                    obPush(pop);
-                }
-                if (tokens[tokenIndex + 1].value === 'else') {
-                    forwardToken();
-                    obPush(' ');
+                if (node.body.length > 0) {
+                    indentLevel--;
                 }
             },
             'IfStatement': function (node) {
@@ -489,6 +519,14 @@
                     }
                 }
             },
+            'Property': function (node) {
+                if (!node.isLastObjectProperty) {
+                    toNextToken(node);
+                    forwardToken();
+                    obPush('\n');
+                    obIndent();
+                }
+            },
             'ArrayExpression': function (node) {
                 indentLevel--;
 
@@ -527,7 +565,6 @@
             'FunctionDeclaration': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
                 obPush('\n');
                 obIndent();
             },
@@ -544,6 +581,15 @@
                     obPop(); //this should be ' ' before op
                     obPush(op);
                 }
+            },
+            'SwitchStatement': function (node) {
+                indentLevel--;
+                toNextToken(node);
+                obPush('\n');
+                obIndent();
+            },
+            'SwitchCase': function (node) {
+                indentLevel--;
             }
         };
 
@@ -597,7 +643,9 @@
                 'in': ' ',
                 'typeof': ' ',
                 'instanceof': ' ',
-                'catch': ' '
+                'catch': ' ',
+                'switch': ' ',
+                'case': ' '
             },
             'Punctuator': {
                 '+': ' ',
@@ -645,16 +693,12 @@
         };
 
         var onEnterNode = function (node, keyName) {
-            deep++;
-
             if (enterHandlers[node.type]) {
                 toPrevToken(node);
                 enterHandlers[node.type](node, keyName);
             }
         };
         var onExitNode = function (node, keyName) {
-            deep--;
-
             if (exitHandlers[node.type]) {
                 exitHandlers[node.type](node, keyName);
             }
@@ -715,9 +759,7 @@
         tokenLen = tempTokens.length;
 
         if (obj.type === 'Program') {
-            var deep = 0;
             obj.body.forEach(function (node) {
-                deep = 0;
                 exec(node, 'root');
             });
         }
