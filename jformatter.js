@@ -284,10 +284,7 @@
             'BlockStatement': function (node) {
                 if (node.body.length > 0) {
                     indentLevel++;
-
-//                    node.body[node.body.length - 1].isBlockBodyLast = true;
                     node.body[node.body.length - 1].onExit = function () {
-//                        console.log('//' + outputBuffer[outputBuffer.length - 1]);
                         outputBuffer.pop(); //TODO here should be the indent, but need test
                     }
                 }
