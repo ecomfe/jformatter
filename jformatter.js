@@ -56,17 +56,21 @@
             onExitNode(node, keyName);
         };
 
+        /**
+         * @param token
+         * @param callback
+         */
         var operateToken = function (token, callback) {
+            if (outputBuffer[outputBuffer.length - 1] === '\n') {
+                obIndent();
+            }
             if (token.type == 'Block' || token.type == 'Line') {
-//                    console.log(token);
                 obPush(token.value);
                 obPush('\n');
-                obIndent();
             } else {
                 doInsertBefore(token);
                 obPush(token.value);
                 doInsertAfter(token);
-                doDynamicInsert(token);
                 if (callback) {
                     callback(token);
                 }
@@ -124,7 +128,7 @@
 
         var forwardToken = function () {
             var token = tokens[tokenIndex];
-            obPush(token.value);
+            operateToken(token);
             tokenIndex++;
             return token;
         };
@@ -146,30 +150,20 @@
 
         var handlers = {
             'ForStatement': function () {
-                dynamicInsert.push({
-                    type: 'Punctuator',
-                    value: ';',
-                    insert: ' '
-                });
-                dynamicInsert.push({
-                    type: 'Punctuator',
-                    value: ';',
-                    insert: ' '
-                });
             },
             'ObjectExpression': function (node) {
                 if (node.properties.length > 0) {
                     forwardToken();
                     obPush('\n');
-                    obIndent();
                 }
             },
             'ArrayExpression': function (node) {
                 if (node.isArrayMultiLine) {
                     forwardToken();
                     obPush('\n');
-                    obIndent();
                 }
+            },
+            'SwitchCase': function (node) {
             }
         };
 
@@ -301,7 +295,6 @@
                 obPush(' '); //param
                 forwardToken();
                 obPush('\n');
-                obIndent();
             },
             'IfStatement': function (node) {
                 if (node.alternate) {
@@ -357,33 +350,32 @@
                         token = forwardToken();
                         if (tokens[tokenIndex].value.charAt(0) === '{') {
                             obPush(' ');
+                            forwardToken();
+                            obPush('\n');
                             break;
                         }
                     }
                 };
 
-                if (node.cases[0]) {
-                    node.cases[0].isSwitchCaseFirst = true;
-                }
+                node.cases.forEach(function (c) {
+                    c.onExit = function () {
+                        indentLevel--;
+                    }
+                });
             },
             'SwitchCase': function (node) {
-//                if (node.isSwitchCaseFirst) {
-                    obPush('\n');
-                    obIndent();
-//                }
-                indentLevel++;
                 if (node.test) {
                     node.test.onExit = function () {
                         toNextToken(node.test);
                         forwardToken();
                         obPush('\n');
-                        obIndent();
+                        indentLevel++;
                     }
                 } else {
                     forwardToken();
                     forwardToken();
                     obPush('\n');
-                    obIndent();
+                    indentLevel++;
                 }
             }
         };
@@ -392,12 +384,10 @@
             'ContinueStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'DoWhileStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'Literal': function (node) {
                 if (node.isArrayEl && !node.isLastEl) {
@@ -405,7 +395,6 @@
                     if (isArrayMultiLine) {
                         forwardToken();
                         obPush('\n');
-                        obIndent();
                     } else {
                         forwardToken();
                         obPush(' ');
@@ -418,7 +407,6 @@
                     if (isArrayMultiLine) {
                         forwardToken();
                         obPush('\n');
-                        obIndent();
                     } else {
                         forwardToken();
                         obPush(' ');
@@ -428,29 +416,21 @@
             'ForStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
 
                 isForStatement = false;
             },
             'ForInStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'VariableDeclaration': function (node, key) {
                 toNextToken(node);
                 if ((!isForStatement || key !== 'init') && !node.isForInLeft) {
                     obPush('\n');
-                    obIndent();
                 }
             },
             'VariableDeclarator': function (node) {
                 if (!node.isLastDeclaration) {
-                    dynamicInsert.push({
-                        type: 'Punctuator',
-                        value: ',',
-                        insert: ' '
-                    });
                 }
             },
             'FunctionExpression': function (node) {
@@ -459,7 +439,6 @@
                     if (!node.isLastEl) {
                         forwardToken();
                         obPush('\n');
-                        obIndent();
                     }
                 }
             },
@@ -472,33 +451,27 @@
                 if (!node.isIfStatementAlternate) {
                     toNextToken(node);
                     obPush('\n');
-                    obIndent();
                 }
             },
             'ExpressionStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'ThrowStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'ReturnStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'WhileStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'BreakStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'ObjectExpression': function (node) {
                 indentLevel--;
@@ -507,7 +480,6 @@
                     toNextToken(node);
                     backwardToken();
                     obPush('\n');
-                    obIndent();
                 }
 
                 if (node.isArrayEl && isArrayMultiLine) {
@@ -515,7 +487,6 @@
                     if (!node.isLastEl) {
                         forwardToken();
                         obPush('\n');
-                        obIndent();
                     }
                 }
             },
@@ -524,7 +495,6 @@
                     toNextToken(node);
                     forwardToken();
                     obPush('\n');
-                    obIndent();
                 }
             },
             'ArrayExpression': function (node) {
@@ -536,7 +506,6 @@
                 toLastToken(node);
                 if (node.isArrayMultiLine) {
                     obPush('\n');
-                    obIndent();
                 }
 
                 //作为数组成员，那所在数组一定是多行的，自身结束之后要换行
@@ -545,7 +514,6 @@
                     if (!node.isLastEl) {
                         forwardToken();
                         obPush('\n');
-                        obIndent();
                     }
                 }
 
@@ -558,7 +526,6 @@
                     if (!node.isLastEl) {
                         forwardToken();
                         obPush('\n');
-                        obIndent();
                     }
                 }
             },
@@ -566,12 +533,10 @@
                 toNextToken(node);
                 obPush('\n');
                 obPush('\n');
-                obIndent();
             },
             'TryStatement': function (node) {
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'UnaryExpression': function (node) {
                 toLastToken(node);
@@ -586,14 +551,11 @@
                 indentLevel--;
                 toNextToken(node);
                 obPush('\n');
-                obIndent();
             },
             'SwitchCase': function (node) {
-                indentLevel--;
             }
         };
 
-        var dynamicInsert = [];
 
         var insertBefore = {
             'Keyword': {
@@ -685,24 +647,23 @@
                 obPush(insertAfter[token.type][token.value]);
             }
         };
-        var doDynamicInsert = function (token) {
-            if (dynamicInsert.length > 0 && token.type === dynamicInsert[0].type && token.value === dynamicInsert[0].value) {
-                obPush(dynamicInsert[0].insert);
-                dynamicInsert.shift();
-            }
-        };
 
+        //在处理此节点和子节点之前进行的逻辑
         var onEnterNode = function (node, keyName) {
+            if (node.onBeforeEnter) {
+                node.onBeforeEnter();
+            }
+            toPrevToken(node);
             if (enterHandlers[node.type]) {
-                toPrevToken(node);
                 enterHandlers[node.type](node, keyName);
             }
         };
+
+        //logic after this node and all sub node
         var onExitNode = function (node, keyName) {
             if (exitHandlers[node.type]) {
                 exitHandlers[node.type](node, keyName);
             }
-
             if (node.onExit) {
                 node.onExit();
             }
@@ -719,44 +680,44 @@
         var tokenIndex = 0;
         var tokenLen = tokens.length;
 
-        var comments = obj.comments;
-
-        var tempTokens = [];
-        for (var i = 0, j = 0; i < tokenLen && j < comments.length;) {
-            var token = tokens[i];
-            var comment = comments[j];
-
-            if (token.range[0] < comment.range[0]) {
-                tempTokens.push(token);
-                i++;
-            } else {
-                if (comment.type == 'Block') {
-                    comment.value = '/*' + comment.value + '*/';
-                } else {
-                    comment.value = '//' + comment.value;
-                }
-
-                //检查跟在行尾的注释
-                if (i > 0 && comment.loc.start.line === tokens[i - 1].loc.end.line) {
-                    comment.inline = true;
-                    //合并这个注释到它紧跟的token
-                    var lastToken = tempTokens.pop();
-                    lastToken.value = lastToken.value + ' ' + comment.value;
-                    tempTokens.push(lastToken);
-                } else {
-                    tempTokens.push(comment);
-                }
-                j++;
-            }
-        }
-        for (; i < tokenLen; i++) {
-            tempTokens.push(tokens[i]);
-        }
-        for (; j < comments.length; j++) {
-            tempTokens.push(comments[j]);
-        }
-        tokens = tempTokens;
-        tokenLen = tempTokens.length;
+//        var comments = obj.comments;
+//
+//        var tempTokens = [];
+//        for (var i = 0, j = 0; i < tokenLen && j < comments.length;) {
+//            var token = tokens[i];
+//            var comment = comments[j];
+//
+//            if (token.range[0] < comment.range[0]) {
+//                tempTokens.push(token);
+//                i++;
+//            } else {
+//                if (comment.type == 'Block') {
+//                    comment.value = '/*' + comment.value + '*/';
+//                } else {
+//                    comment.value = '//' + comment.value;
+//                }
+//
+//                检查跟在行尾的注释
+//                if (i > 0 && comment.loc.start.line === tokens[i - 1].loc.end.line) {
+//                    comment.inline = true;
+//                    合并这个注释到它紧跟的token
+//                    var lastToken = tempTokens.pop();
+//                    lastToken.value = lastToken.value + ' ' + comment.value;
+//                    tempTokens.push(lastToken);
+//                } else {
+//                    tempTokens.push(comment);
+//                }
+//                j++;
+//            }
+//        }
+//        for (; i < tokenLen; i++) {
+//            tempTokens.push(tokens[i]);
+//        }
+//        for (; j < comments.length; j++) {
+//            tempTokens.push(comments[j]);
+//        }
+//        tokens = tempTokens;
+//        tokenLen = tempTokens.length;
 
         if (obj.type === 'Program') {
             obj.body.forEach(function (node) {
