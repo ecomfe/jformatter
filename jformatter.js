@@ -457,6 +457,9 @@
             },
             'VariableDeclarator': function (node) {
                 if (!node.isLastDeclaration) {
+                    toNextToken(node);
+                    forwardToken();
+                    obPush(' ');
                 }
             },
             'FunctionExpression': function (node) {
