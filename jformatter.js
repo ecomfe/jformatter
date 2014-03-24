@@ -284,18 +284,47 @@
             'BlockStatement': function (node) {
                 if (node.body.length > 0) {
                     indentLevel++;
-                    node.body[node.body.length - 1].onExit = function () {
-                        outputBuffer.pop(); //TODO here should be the indent, but need test
-                    }
                 }
 
-                obPush(' '); //param
+                if (!node.isIfStatementAlternate) {
+                    //here push space before { and then forward { then next line
+                    obPush(' '); //param
+                }
                 forwardToken();
                 obPush('\n');
             },
             'IfStatement': function (node) {
                 if (node.alternate) {
                     node.alternate.isIfStatementAlternate = true;
+                }
+
+                //if if has alternate, should insert space after consequent(before else)
+                if (node.consequent && node.consequent.type === 'BlockStatement') {
+                    node.consequent.onExit = function () {
+                        toNextToken(node.consequent);
+                        obPush(' ');
+                    }
+                }
+
+                //if consequent is not a block, should insert next line before it
+                if (node.consequent && node.consequent.type !== 'BlockStatement') {
+                    node.consequent.onBeforeEnter = function () {
+                        obPush('\n');
+                        indentLevel++;
+                    };
+                    node.consequent.onExit = function () {
+                        indentLevel--;
+                    };
+                }
+                //if alternate is not a block, should insert next line before it
+                if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
+                    node.alternate.onBeforeEnter = function () {
+                        obPush('\n');
+                        indentLevel++;
+                    };
+                    node.alternate.onExit = function () {
+                        indentLevel--;
+                    };
                 }
             },
             'ObjectExpression': function (node) {
@@ -647,10 +676,12 @@
 
         //在处理此节点和子节点之前进行的逻辑
         var onEnterNode = function (node, keyName) {
+            toPrevToken(node);
+
             if (node.onBeforeEnter) {
                 node.onBeforeEnter();
             }
-            toPrevToken(node);
+
             if (enterHandlers[node.type]) {
                 enterHandlers[node.type](node, keyName);
             }
