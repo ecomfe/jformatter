@@ -14,7 +14,7 @@ var array3 = [
     null,
     undefined,
     NaN,
-        {
+    {
         key: 'value1'
     },
     [
@@ -26,7 +26,7 @@ var array3 = [
     ],
     [
         'a',
-            {
+        {
             b: 'c'
         }
     ],

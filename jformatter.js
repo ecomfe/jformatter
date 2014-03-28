@@ -31,9 +31,6 @@
          */
         var exec = function (node, keyName) {
             onEnterNode(node, keyName);
-            if (handlers[node.type]) {
-                handlers[node.type](node, keyName);
-            }
             //遍历当前节点寻找下属节点递归
             for (var key in node) {
                 if (node.hasOwnProperty(key)) {
@@ -143,16 +140,6 @@
             }
 
             return token;
-        };
-
-        var handlers = {
-            'ObjectExpression': function (node) {
-                //go to { and next line
-                if (node.properties.length > 0) {
-                    forwardToken();
-                    obPush('\n');
-                }
-            }
         };
 
         var enterHandlers = {
@@ -316,6 +303,11 @@
                 }
             },
             'ObjectExpression': function (node) {
+                //go to { and next line
+                if (node.properties.length > 0) {
+                    forwardToken();
+                    obPush('\n');
+                }
                 indentLevel++;
                 if (node.properties.length > 0) {
                     node.properties[node.properties.length - 1].isLastObjectProperty = true;
