@@ -9,9 +9,6 @@
 
         var isForStatement = false;
 
-        var isArrayExpression = false;
-        var isArrayMultiLine = false;
-
         var outputBuffer = [];
 
         var obPush = function (value) {
@@ -149,21 +146,12 @@
         };
 
         var handlers = {
-            'ForStatement': function () {
-            },
             'ObjectExpression': function (node) {
+                //go to { and next line
                 if (node.properties.length > 0) {
                     forwardToken();
                     obPush('\n');
                 }
-            },
-            'ArrayExpression': function (node) {
-                if (node.isArrayMultiLine) {
-                    forwardToken();
-                    obPush('\n');
-                }
-            },
-            'SwitchCase': function (node) {
             }
         };
 
@@ -341,30 +329,22 @@
                 }
             },
             'ArrayExpression': function (node) {
-                indentLevel++;
-                isArrayExpression = true;
-                isArrayMultiLine = false;
+                if (node.elements.length > 0) {
+                    forwardToken(); //[
+                    obPush('\n');
+                    indentLevel++;
 
-                toPrevToken(node);
-
-                if (node.elements.length == 0) {
-                    node.isArrayEmpty = true;
-                } else {
-                    node.isArrayEmpty = false;
-
-                    var multiLine = false;
-                    node.elements.forEach(function (el) {
-                        if (el.type !== 'Literal' && el.type !== 'Identifier') {
-                            multiLine = true;
-                        }
-                        el.isArrayEl = true;
-                        el.isLastEl = false;
+                    node.elements.forEach(function (e, index, arr) {
+                        e.onBeforeEnter = function () {
+                        };
+                        e.onExit = function () {
+                            toNextToken(e);
+                            if (index !== arr.length - 1) {
+                                forwardToken();
+                            }
+                            obPush('\n');
+                        };
                     });
-                    node.elements[node.elements.length - 1].isLastEl = true; //last
-
-                    isArrayMultiLine = multiLine;
-
-                    node.isArrayMultiLine = multiLine;
                 }
             },
             'SwitchStatement': function (node) {
@@ -506,8 +486,7 @@
                 indentLevel--;
 
                 if (node.properties.length > 0) {
-                    toNextToken(node);
-                    backwardToken();
+                    toLastToken(node);
                     obPush('\n');
                 }
 
@@ -520,34 +499,16 @@
                 }
             },
             'Property': function (node) {
+                toNextToken(node);
                 if (!node.isLastObjectProperty) {
-                    toNextToken(node);
                     forwardToken();
                     obPush('\n');
                 }
             },
             'ArrayExpression': function (node) {
-                indentLevel--;
-
-                //先完成自身使命，再完成作为数组成员的使命
-
-                //如果自己是个多行数组，那要把结束]换行
-                toLastToken(node);
-                if (node.isArrayMultiLine) {
-                    obPush('\n');
+                if (node.elements.length > 0) {
+                    indentLevel--;
                 }
-
-                //作为数组成员，那所在数组一定是多行的，自身结束之后要换行
-                forwardToken();
-                if (node.isArrayEl) {
-                    if (!node.isLastEl) {
-                        forwardToken();
-                        obPush('\n');
-                    }
-                }
-
-                isArrayExpression = node.isArrayEl;
-                isArrayMultiLine = node.isArrayEl;
             },
             'CallExpression': function (node) {
                 if (node.isArrayEl) {
