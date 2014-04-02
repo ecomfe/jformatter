@@ -13,6 +13,7 @@ switch (doSomething()) {
 
 doSomething([1, 2, 4]);
 doSomething([1, 2, 4]);
+doSomething([1, 2, 4]);
 
 var obj = {
     IdeaName: {
