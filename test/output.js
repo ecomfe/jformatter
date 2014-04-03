@@ -15,6 +15,16 @@ doSomething([
     2,
     4
 ]);
+doSomething([
+    1,
+    2,
+    4
+]);
+doSomething([
+    1,
+    2,
+    4
+]);
 var obj = {
     IdeaName: {
         exMaxLength: langUnit.UNIT_NAME_MAX_LENTH,
