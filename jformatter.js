@@ -353,8 +353,8 @@
                 }
             },
             'SwitchStatement': function (node) {
-                indentLevel++;
                 node.discriminant.onExit = function () {
+                    indentLevel++;
                     toNextToken(node.discriminant);
                     var token;
                     while (true) {

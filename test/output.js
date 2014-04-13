@@ -1,5 +1,5 @@
 //run
-    switch (doSomething()) {
+switch (doSomething()) {
     case 1:
         doSomething();
         break;
