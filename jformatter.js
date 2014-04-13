@@ -70,36 +70,6 @@
                     callback(token);
                 }
             }
-
-
-//            doInsertBefore(token);
-//            obPush(token.value);
-//            doInsertAfter(token);
-
-//            for (commentIndex = 0; commentIndex < commentLen; commentIndex++) {
-//                var comment = comments[commentIndex];
-//                console.log('//' + comment['range'][0], '//' + token['range'][1]);
-//                if (comment['range'][0] > token['range'][1] && comment['range'][1] < tokens[tokenIndex + 1]['range'][0]) {
-//                    console.log('//done');
-//                    if (comment.type == 'Line') {
-//
-//                        if (token.loc.start.line == comment.loc.start.line) {
-//                            obPush(' ');
-//                        } else {
-//                            obIndent();
-//                        }
-//                        obPush('//');
-//                        obPush(comment.value);
-//                        obPush('\n');
-//
-//                    } else if (comment.type == 'Block') {
-//                    }
-//                }
-//            }
-
-//            if (callback) {
-//                callback(token);
-//            }
         };
 
         /**
@@ -707,10 +677,6 @@
         var tokens = obj.tokens;
         var tokenIndex = 0;
         var tokenLen = tokens.length;
-
-//        var comments = obj.comments;
-//        var commentIndex = 0;
-//        var commentLen = comments.length;
 
         var comments = obj.comments;
 
