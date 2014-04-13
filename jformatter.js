@@ -555,7 +555,8 @@
             'Keyword': {
                 'in': ' ',
                 'instanceof': ' ',
-                'catch': ' '
+                'catch': ' ',
+                'finally': ' '
             },
             'Punctuator': {
                 '+': ' ',
