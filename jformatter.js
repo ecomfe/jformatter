@@ -208,8 +208,20 @@
                     toLastToken(node.test);
                 };
             },
-            'ForStatement': function () {
+            'ForStatement': function (node) {
                 isForStatement = true;
+
+                if (node.test) {
+                    node.test.onBeforeEnter = function () {
+                        obPush(' ');
+                    };
+                }
+
+                if (node.update) {
+                    node.update.onBeforeEnter = function () {
+                        obPush(' ');
+                    };
+                }
             },
             'ForInStatement': function (node) {
                 node.left.isForInLeft = true;
