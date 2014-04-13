@@ -58,16 +58,11 @@
             if (outputBuffer[outputBuffer.length - 1] === '\n') {
                 obIndent();
             }
-            if (token.type == 'Block' || token.type == 'Line') {
-                obPush(token.value);
-                obPush('\n');
-            } else {
-                doInsertBefore(token);
-                obPush(token.value);
-                doInsertAfter(token);
-                if (callback) {
-                    callback(token);
-                }
+            doInsertBefore(token);
+            obPush(token.value);
+            doInsertAfter(token);
+            if (callback) {
+                callback(token);
             }
         };
 
