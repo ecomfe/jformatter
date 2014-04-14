@@ -1,14 +1,18 @@
-_actionDialog[uniId] = esui.create('ActionDialog', {
-    id: args.id,
-    title: args.title,
-    url: args.url,
-    actionOptions: util.mix(args.actionOptions || {}, {
-        dialogId: uniId
-    }),
-    width: args.width || 400,
-    draggable: 0,
-    closeOnHide: 1,
-    mask: 1,
-    needFoot: 0
-});
+if (doSomething()) //1
+ { //4
+
+    doSomething()
+} //2
+ else //3
+{ //5
+
+}
+if (doSomething()) { //1
+
+//4
+//2
+} else { //3
+
+//5
+}
 

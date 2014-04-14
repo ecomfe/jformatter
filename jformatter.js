@@ -700,7 +700,7 @@
                     comment.inline = true;
                     //合并这个注释到它紧跟的token
                     var lastToken = tempTokens.pop();
-                    lastToken.value = lastToken.value + ' ' + comment.value;
+                    lastToken.value = lastToken.value + ' ' + comment.value + '\n'; //行注释结尾一定是换行
                     tempTokens.push(lastToken);
                 } else {
                     tempTokens.push(comment);
