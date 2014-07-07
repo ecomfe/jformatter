@@ -1,18 +1,9 @@
-if (doSomething()) //1
- { //4
-
+if (doSomething()) {
     doSomething()
-} //2
- else //3
-{ //5
-
+} else {
 }
-if (doSomething()) { //1
-
-//4
-//2
-} else { //3
-
-//5
+if (doSomething()) {
+} else {
 }
+doSomething(p1, p2);
 

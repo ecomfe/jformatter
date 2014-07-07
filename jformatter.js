@@ -59,16 +59,11 @@
                 obIndent();
             }
 
-            if (token.type == 'Block' || token.type == 'Line') {
-                obPush(token.value);
-                obPush('\n');
-            } else {
-                doInsertBefore(token);
-                obPush(token.value);
-                doInsertAfter(token);
-                if (callback) {
-                    callback(token);
-                }
+            doInsertBefore(token);
+            obPush(token.value);
+            doInsertAfter(token);
+            if (callback) {
+                callback(token);
             }
         };
 
@@ -551,7 +546,6 @@
             }
         };
 
-
         var insertBefore = {
             'Keyword': {
                 'in': ' ',
@@ -677,45 +671,6 @@
         var tokens = obj.tokens;
         var tokenIndex = 0;
         var tokenLen = tokens.length;
-
-        var comments = obj.comments;
-
-        var tempTokens = [];
-        for (var i = 0, j = 0; i < tokenLen && j < comments.length;) {
-            var token = tokens[i];
-            var comment = comments[j];
-
-            if (token.range[0] < comment.range[0]) {
-                tempTokens.push(token);
-                i++;
-            } else {
-                if (comment.type == 'Block') {
-                    comment.value = '/*' + comment.value + '*/';
-                } else {
-                    comment.value = '//' + comment.value;
-                }
-
-                //检查跟在行尾的注释
-                if (i > 0 && comment.loc.start.line === tokens[i - 1].loc.end.line) {
-                    comment.inline = true;
-                    //合并这个注释到它紧跟的token
-                    var lastToken = tempTokens.pop();
-                    lastToken.value = lastToken.value + ' ' + comment.value + '\n'; //行注释结尾一定是换行
-                    tempTokens.push(lastToken);
-                } else {
-                    tempTokens.push(comment);
-                }
-                j++;
-            }
-        }
-        for (; i < tokenLen; i++) {
-            tempTokens.push(tokens[i]);
-        }
-        for (; j < comments.length; j++) {
-            tempTokens.push(comments[j]);
-        }
-        tokens = tempTokens;
-        tokenLen = tempTokens.length;
 
         if (obj.type === 'Program') {
             obj.body.forEach(function (node) {

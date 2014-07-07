@@ -13,3 +13,5 @@ if (doSomething()) {//1
 } else {//3
     //5
 }
+doSomething(p1, //a
+p2);
