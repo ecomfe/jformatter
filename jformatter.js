@@ -52,7 +52,7 @@
 
         /**
          * @param token
-         * @param callback
+         * @param {function} [callback]
          */
         var operateToken = function (token, callback) {
             if (outputBuffer[outputBuffer.length - 1] === '\n') {

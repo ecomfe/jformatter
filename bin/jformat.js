@@ -4,7 +4,7 @@ var jformatter = require('jformatter');
 
 function showUsage() {
     console.log('Usage:');
-    console.log('   jfromat file.js');
+    console.log('   jformatter file.js');
     console.log();
     process.exit(1);
 }
