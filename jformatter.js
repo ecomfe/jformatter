@@ -4,6 +4,48 @@
         //TODO 自动加分号
         //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
 
+        var codeStyle = {
+            lineSeparator: '\n',
+            maxLength: 120,
+            wrapIfLong: false,
+            useTabCharacterIndent: false,
+            indents: 4,
+            spaces: {
+                around: {
+                    unaryOperators: false,
+                    binaryOperators: true,
+                    ternaryOperators: true
+                },
+                before: {
+                    functionDeclarationParentheses: false, //function foo() {
+                    functionExpressionParentheses: true, //var foo = function () {
+                    functionCallParentheses: false, //foo();
+                    keywordsParentheses: true, //if (), for (), while (), ...
+                    keywordsLeftBrace: true, // function () {, if () {, do {, try { ...
+                    keywords: true // if {} else {}, do {} while (), try {} catch () {} finally
+                },
+                after: {
+
+                },
+                within: {
+                    parentheses: false //( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+                },
+                other: {
+                    beforeComma: false,
+                    afterComma: true,
+                    beforePropertyNameValueSeparator: false, // {key: value}
+                    afterPropertyNameValueSeparator: true
+                }
+            },
+            bracesPlacement: { //1. same line 2. next line
+                functionDeclaration: 1,
+                other: 1
+            },
+            functionCallArguments: {
+
+            }
+        };
+
         var INDENT = '    ';
         var indentLevel = 0;
 
