@@ -2,8 +2,8 @@
     var format = function (string) {
         //TODO if while 自动加大括号
         //TODO 自动加分号
-
         //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
+
         var INDENT = '    ';
         var indentLevel = 0;
 
@@ -59,11 +59,20 @@
                 obIndent();
             }
 
-            doInsertBefore(token);
-            obPush(token.value);
-            doInsertAfter(token);
-            if (callback) {
-                callback(token);
+            if (token.type !== 'WhiteSpace' && token.type !== 'LineBreak' && token.type !== 'LineComment' && token.type !== 'BlockComment') {
+                doInsertBefore(token);
+                obPush(token.value);
+                doInsertAfter(token);
+                if (callback) {
+                    callback(token);
+                }
+            } else if (token.type === 'LineComment') {
+//                obPush((token.prev.type == 'WhiteSpace' ? token.prev.value : '') + token.raw + '\n');
+                obPush(token.raw);
+                obPush(token.next.value);
+            } else if (token.type === 'BlockComment') {
+                obPush(token.raw);
+                obPush(token.next.value);
             }
         };
 
@@ -271,13 +280,27 @@
 
                 if (!node.isIfStatementAlternate) {
                     //here push space before { and then forward { then next line
-                    obPush(' '); //param
+//                    var hasCommentBefore = false;
+//                    var token = tokens[tokenIndex];
+//                    while (token.value !== ')') {
+//                        if (token.type === 'LineComment') {
+//                            hasCommentBefore = true;
+//                            break;
+//                        }
+//                        token = token.prev;
+//                    }
+//                    !hasCommentBefore && obPush(' '); //param
+                    obPush(' ');
                 }
                 forwardToken();
                 obPush('\n');
             },
             'IfStatement': function (node) {
                 if (node.alternate) {
+                    /**
+                     * @usage BlockStatement
+                     * @type {boolean}
+                     */
                     node.alternate.isIfStatementAlternate = true;
                 }
 
@@ -663,12 +686,12 @@
 
         var obj = require('esprima').parse(string, {
             range: true,
-            comment: true,
-            tokens: true,
-            loc: true
+            tokens: true
         });
 
-        var tokens = obj.tokens;
+        var astRocambole = require('rocambole').parse(string);
+
+        var tokens = astRocambole.tokens;
         var tokenIndex = 0;
         var tokenLen = tokens.length;
 
