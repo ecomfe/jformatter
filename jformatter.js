@@ -11,9 +11,9 @@
             indents: '    ', //done
             spaces: {
                 around: {
-                    unaryOperators: false,
-                    binaryOperators: true,
-                    ternaryOperators: true
+                    unaryOperators: false, //todo
+                    binaryOperators: true, //done
+                    ternaryOperators: true //done
                 },
                 before: {
                     functionDeclarationParentheses: false, //function foo() {
@@ -210,37 +210,37 @@
                 });
             },
             'ConditionalExpression': function (node) {
-                //TODO:给下属node直接增加额外的onEnter和onExit，这样子可以避免为每个node类型增加条件判断，只需要统一处理onEnter和onExit，之前的实现可以改成这种
-
-                node.test.onExit = function () {
-                    toLastToken(node.test);
-                    var token;
-                    while (true) {
-                        token = forwardToken();
-                        if (token.value === '?') {
-                            backwardToken();
-                            obPush(' ');
-                            forwardToken();
-                            obPush(' ');
-                            break;
+                if (codeStyle.spaces.around.ternaryOperators) {
+                    node.test.onExit = function () {
+                        toLastToken(node.test);
+                        var token;
+                        while (true) {
+                            token = forwardToken();
+                            if (token.value === '?') {
+                                backwardToken();
+                                obPush(' ');
+                                forwardToken();
+                                obPush(' ');
+                                break;
+                            }
                         }
-                    }
-                };
+                    };
 
-                node.consequent.onExit = function () {
-                    toLastToken(node.consequent);
-                    var token;
-                    while (true) {
-                        token = forwardToken();
-                        if (token.value === ':') {
-                            backwardToken();
-                            obPush(' ');
-                            forwardToken();
-                            obPush(' ');
-                            break;
+                    node.consequent.onExit = function () {
+                        toLastToken(node.consequent);
+                        var token;
+                        while (true) {
+                            token = forwardToken();
+                            if (token.value === ':') {
+                                backwardToken();
+                                obPush(' ');
+                                forwardToken();
+                                obPush(' ');
+                                break;
+                            }
                         }
-                    }
-                };
+                    };
+                }
             },
             'DoWhileStatement': function (node) {
                 node.test.onExit = function () {
@@ -718,6 +718,12 @@
                 '!': ''
             }
         };
+
+        //codeStyle
+        if (!codeStyle.spaces.around.binaryOperators) {
+            delete insertBefore.Punctuator;
+            delete insertAfter.Punctuator;
+        }
 
         var doInsertBefore = function (token) {
             if (insertBefore[token.type] && insertBefore[token.type][token.value]) {
