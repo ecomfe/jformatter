@@ -5,11 +5,10 @@
         //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
 
         var codeStyle = {
-            lineSeparator: '\n',
-            maxLength: 120,
-            wrapIfLong: false,
-            useTabCharacterIndent: false,
-            indents: 4,
+            lineSeparator: '\n', //done
+            maxLength: 120, //todo
+            wrapIfLong: false, //todo
+            indents: '    ', //done
             spaces: {
                 around: {
                     unaryOperators: false,
@@ -46,7 +45,9 @@
             }
         };
 
-        var INDENT = '    ';
+        var NEXT_LINE = codeStyle.lineSeparator;
+        var INDENT = codeStyle.indents;
+
         var indentLevel = 0;
 
         var isForStatement = false;
@@ -97,7 +98,7 @@
          * @param {function} [callback]
          */
         var operateToken = function (token, callback) {
-            if (outputBuffer[outputBuffer.length - 1] === '\n') {
+            if (outputBuffer[outputBuffer.length - 1] === NEXT_LINE) {
                 obIndent();
             }
 
@@ -109,7 +110,7 @@
                     callback(token);
                 }
             } else if (token.type === 'LineComment') {
-//                obPush((token.prev.type == 'WhiteSpace' ? token.prev.value : '') + token.raw + '\n');
+//                obPush((token.prev.type == 'WhiteSpace' ? token.prev.value : '') + token.raw + NEXT_LINE);
                 obPush(token.raw);
                 obPush(token.next.value);
             } else if (token.type === 'BlockComment') {
@@ -335,7 +336,7 @@
                     obPush(' ');
                 }
                 forwardToken();
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'IfStatement': function (node) {
                 if (node.alternate) {
@@ -357,7 +358,7 @@
                 //if consequent is not a block, should insert next line before it
                 if (node.consequent && node.consequent.type !== 'BlockStatement') {
                     node.consequent.onBeforeEnter = function () {
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                         indentLevel++;
                     };
                     node.consequent.onExit = function () {
@@ -367,7 +368,7 @@
                 //if alternate is not a block, should insert next line before it
                 if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
                     node.alternate.onBeforeEnter = function () {
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                         indentLevel++;
                     };
                     node.alternate.onExit = function () {
@@ -379,7 +380,7 @@
                 //go to { and next line
                 if (node.properties.length > 0) {
                     forwardToken();
-                    obPush('\n');
+                    obPush(NEXT_LINE);
                 }
                 indentLevel++;
                 if (node.properties.length > 0) {
@@ -396,7 +397,7 @@
             'ArrayExpression': function (node) {
                 if (node.elements.length > 0) {
                     forwardToken(); //[
-                    obPush('\n');
+                    obPush(NEXT_LINE);
                     indentLevel++;
 
                     node.elements.forEach(function (e, index, arr) {
@@ -407,7 +408,7 @@
                             if (index !== arr.length - 1) {
                                 forwardToken();
                             }
-                            obPush('\n');
+                            obPush(NEXT_LINE);
                         };
                     });
                 }
@@ -422,7 +423,7 @@
                         if (tokens[tokenIndex].value.charAt(0) === '{') {
                             obPush(' ');
                             forwardToken();
-                            obPush('\n');
+                            obPush(NEXT_LINE);
                             break;
                         }
                     }
@@ -439,13 +440,13 @@
                     node.test.onExit = function () {
                         toNextToken(node.test);
                         forwardToken();
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                         indentLevel++;
                     }
                 } else {
                     forwardToken();
                     forwardToken();
-                    obPush('\n');
+                    obPush(NEXT_LINE);
                     indentLevel++;
                 }
             }
@@ -454,18 +455,18 @@
         var exitHandlers = {
             'ContinueStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'DoWhileStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'Literal': function (node) {
                 if (node.isArrayEl && !node.isLastEl) {
                     toNextToken(node);
                     if (isArrayMultiLine) {
                         forwardToken();
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                     } else {
                         forwardToken();
                         obPush(' ');
@@ -477,7 +478,7 @@
                     toNextToken(node);
                     if (isArrayMultiLine) {
                         forwardToken();
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                     } else {
                         forwardToken();
                         obPush(' ');
@@ -486,18 +487,18 @@
             },
             'ForStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
 
                 isForStatement = false;
             },
             'ForInStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'VariableDeclaration': function (node, key) {
                 toNextToken(node);
                 if ((!isForStatement || key !== 'init') && !node.isForInLeft) {
-                    obPush('\n');
+                    obPush(NEXT_LINE);
                 }
             },
             'VariableDeclarator': function (node) {
@@ -512,7 +513,7 @@
                     toNextToken(node);
                     if (!node.isLastEl) {
                         forwardToken();
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                     }
                 }
             },
@@ -524,42 +525,42 @@
             'IfStatement': function (node) {
                 if (!node.isIfStatementAlternate) {
                     toNextToken(node);
-                    obPush('\n');
+                    obPush(NEXT_LINE);
                 }
             },
             'ExpressionStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'ThrowStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'ReturnStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'WhileStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'BreakStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'ObjectExpression': function (node) {
                 indentLevel--;
 
                 if (node.properties.length > 0) {
                     toLastToken(node);
-                    obPush('\n');
+                    obPush(NEXT_LINE);
                 }
 
                 if (node.isArrayEl && isArrayMultiLine) {
                     toNextToken(node);
                     if (!node.isLastEl) {
                         forwardToken();
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                     }
                 }
             },
@@ -567,7 +568,7 @@
                 toNextToken(node);
                 if (!node.isLastObjectProperty) {
                     forwardToken();
-                    obPush('\n');
+                    obPush(NEXT_LINE);
                 }
             },
             'ArrayExpression': function (node) {
@@ -580,18 +581,18 @@
                     toNextToken(node);
                     if (!node.isLastEl) {
                         forwardToken();
-                        obPush('\n');
+                        obPush(NEXT_LINE);
                     }
                 }
             },
             'FunctionDeclaration': function (node) {
                 toNextToken(node);
-                obPush('\n');
-                obPush('\n');
+                obPush(NEXT_LINE);
+                obPush(NEXT_LINE);
             },
             'TryStatement': function (node) {
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'UnaryExpression': function (node) {
                 toLastToken(node);
@@ -605,7 +606,7 @@
             'SwitchStatement': function (node) {
                 indentLevel--;
                 toNextToken(node);
-                obPush('\n');
+                obPush(NEXT_LINE);
             },
             'SwitchCase': function (node) {
             }
@@ -619,30 +620,43 @@
                 'finally': ' '
             },
             'Punctuator': {
-                '+': ' ',
-                '-': ' ',
-                '*': ' ',
-                '/': ' ',
-                '%': ' ',
-                '=': ' ',
-                '>': ' ',
-                '<': ' ',
-                '^': ' ',
-                '&': ' ',
-                '|': ' ',
-                '&&': ' ',
-                '||': ' ',
-                '==': ' ',
+                '=': ' ', //Assignment operators
                 '+=': ' ',
                 '-=': ' ',
                 '*=': ' ',
                 '/=': ' ',
                 '%=': ' ',
+                '<<=': ' ',
+                '>>=': ' ',
+                '>>>=': ' ',
+                '&=': ' ',
+                '^=': ' ',
+                '|=': ' ',
+                '==': ' ', //Comparison operators
                 '!=': ' ',
-                '>=': ' ',
-                '<=': ' ',
                 '===': ' ',
-                '!==': ' '
+                '!==': ' ',
+                '>': ' ',
+                '>=': ' ',
+                '<': ' ',
+                '<=': ' ',
+                '+': ' ', //Arithmetic operators
+                '-': ' ',
+                '*': ' ',
+                '/': ' ',
+                '%': ' ',
+                '++': '',
+                '--': '',
+                '&': ' ', //Bitwise operators
+                '|': ' ',
+                '^': ' ',
+                '~': ' ',
+                '<<': ' ',
+                '>>': ' ',
+                '>>>': ' ',
+                '&&': ' ', //Logical operators
+                '||': ' ',
+                '!': ''
             }
         };
         var insertAfter = {
@@ -665,30 +679,43 @@
                 'case': ' '
             },
             'Punctuator': {
-                '+': ' ',
-                '-': ' ',
-                '*': ' ',
-                '/': ' ',
-                '%': ' ',
-                '=': ' ',
-                '>': ' ',
-                '<': ' ',
-                '^': ' ',
-                '&': ' ',
-                '|': ' ',
-                '&&': ' ',
-                '||': ' ',
-                '==': ' ',
+                '=': ' ', //Assignment operators
                 '+=': ' ',
                 '-=': ' ',
                 '*=': ' ',
                 '/=': ' ',
                 '%=': ' ',
+                '<<=': ' ',
+                '>>=': ' ',
+                '>>>=': ' ',
+                '&=': ' ',
+                '^=': ' ',
+                '|=': ' ',
+                '==': ' ', //Comparison operators
                 '!=': ' ',
-                '>=': ' ',
-                '<=': ' ',
                 '===': ' ',
-                '!==': ' '
+                '!==': ' ',
+                '>': ' ',
+                '>=': ' ',
+                '<': ' ',
+                '<=': ' ',
+                '+': ' ', //Arithmetic operators
+                '-': ' ',
+                '*': ' ',
+                '/': ' ',
+                '%': ' ',
+                '++': '',
+                '--': '',
+                '&': ' ', //Bitwise operators
+                '|': ' ',
+                '^': ' ',
+                '~': ' ',
+                '<<': ' ',
+                '>>': ' ',
+                '>>>': ' ',
+                '&&': ' ', //Logical operators
+                '||': ' ',
+                '!': ''
             }
         };
 

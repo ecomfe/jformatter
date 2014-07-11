@@ -1,3 +1,7 @@
+var a = -3;
+var b = 3;
+var c = a >>> b;
+var d = ++a;
 if(doSomething()) //1
  { //4
     doSomething()
