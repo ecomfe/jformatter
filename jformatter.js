@@ -18,7 +18,7 @@
                 before: {
                     functionDeclarationParentheses: false, //done function foo() {
                     functionExpressionParentheses: true, //done var foo = function () {
-                    keywordsParentheses: true, //if (), for (), while (), ...
+                    parentheses: true, //if (), for (), while (), ...
                     leftBrace: true, // function () {, if () {, do {, try { ...
                     keywords: true // if {} else {}, do {} while (), try {} catch () {} finally
                 },
@@ -659,20 +659,20 @@
         var insertAfter = {
             'Keyword': {
                 'var': ' ',
-                'if': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
+                'if': codeStyle.spaces.before.parentheses ? ' ' : '',
                 'else': ' ',
                 'function': codeStyle.spaces.before.functionExpressionParentheses ? ' ' : '',
                 'throw': ' ',
                 'return': ' ',
                 'delete': ' ',
-                'for': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
-                'while': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
+                'for': codeStyle.spaces.before.parentheses ? ' ' : '',
+                'while': codeStyle.spaces.before.parentheses ? ' ' : '',
                 'new': ' ',
                 'in': ' ',
                 'typeof': ' ',
                 'instanceof': ' ',
                 'catch': ' ',
-                'switch': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
+                'switch': codeStyle.spaces.before.parentheses ? ' ' : '',
                 'case': ' '
             },
             'Punctuator': {
