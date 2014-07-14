@@ -106,7 +106,6 @@
                     callback(token);
                 }
             } else if (token.type === 'LineComment') {
-//                obPush((token.prev.type == 'WhiteSpace' ? token.prev.value : '') + token.raw + NEXT_LINE);
                 obPush(token.raw);
                 obPush(token.next.value);
             } else if (token.type === 'BlockComment') {
@@ -331,16 +330,6 @@
 
                 if (!node.isIfStatementAlternate) {
                     //here push space before { and then forward { then next line
-//                    var hasCommentBefore = false;
-//                    var token = tokens[tokenIndex];
-//                    while (token.value !== ')') {
-//                        if (token.type === 'LineComment') {
-//                            hasCommentBefore = true;
-//                            break;
-//                        }
-//                        token = token.prev;
-//                    }
-//                    !hasCommentBefore && obPush(' '); //param
                     obPush(' ');
                 }
                 forwardToken();
