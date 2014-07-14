@@ -16,15 +16,11 @@
                     ternaryOperators: true //done
                 },
                 before: {
-                    functionDeclarationParentheses: false, //function foo() {
-                    functionExpressionParentheses: true, //var foo = function () {
-                    functionCallParentheses: false, //foo();
+                    functionDeclarationParentheses: false, //done function foo() {
+                    functionExpressionParentheses: true, //done var foo = function () {
                     keywordsParentheses: true, //if (), for (), while (), ...
-                    keywordsLeftBrace: true, // function () {, if () {, do {, try { ...
+                    leftBrace: true, // function () {, if () {, do {, try { ...
                     keywords: true // if {} else {}, do {} while (), try {} catch () {} finally
-                },
-                after: {
-
                 },
                 within: {
                     parentheses: false //( a, b, c ) , if ( true ) or (a, b, c) , if (true)
@@ -281,6 +277,12 @@
                 }
             },
             'FunctionDeclaration': function (node) {
+                if (codeStyle.spaces.before.functionDeclarationParentheses) {
+                    node.id.onExit = function () {
+                        toNextToken(node.id);
+                        obPush(' ');
+                    };
+                }
                 node.params.forEach(function (param, index, arr) {
                     param.onExit = function () {
                         toLastToken(param);
@@ -299,6 +301,12 @@
                 });
             },
             'FunctionExpression': function (node) {
+                //if node has id function keyword must have space after
+                if (!codeStyle.spaces.before.functionExpressionParentheses && node.id) {
+                    node.id.onExit = function () {
+                        obPush(' ');
+                    };
+                }
                 node.params.forEach(function (param, index, arr) {
                     param.onExit = function () {
                         toLastToken(param);
@@ -489,7 +497,7 @@
                 toNextToken(node);
                 obPush(NEXT_LINE);
 
-                isForStatement = false;
+                isForStatement = false; //todo 去掉这个全局变量用别的解决方法
             },
             'ForInStatement': function (node) {
                 toNextToken(node);
@@ -662,20 +670,20 @@
         var insertAfter = {
             'Keyword': {
                 'var': ' ',
-                'if': ' ',
+                'if': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
                 'else': ' ',
-                'function': ' ',
+                'function': codeStyle.spaces.before.functionExpressionParentheses ? ' ' : '',
                 'throw': ' ',
                 'return': ' ',
                 'delete': ' ',
-                'for': ' ',
-                'while': ' ',
+                'for': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
+                'while': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
                 'new': ' ',
                 'in': ' ',
                 'typeof': ' ',
                 'instanceof': ' ',
                 'catch': ' ',
-                'switch': ' ',
+                'switch': codeStyle.spaces.before.keywordsParentheses ? ' ' : '',
                 'case': ' '
             },
             'Punctuator': {
