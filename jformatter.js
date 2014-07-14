@@ -1,9 +1,10 @@
 (function () {
-    var format = function (string) {
+    var format = function (string, config) {
         //TODO if while 自动加大括号
         //TODO 自动加分号
         //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
 
+        config = config || {};
         var codeStyle = {
             lineSeparator: '\n', //done
             maxLength: 120, //todo
@@ -18,9 +19,9 @@
                 before: {
                     functionDeclarationParentheses: false, //done function foo() {
                     functionExpressionParentheses: true, //done var foo = function () {
-                    parentheses: true, //if (), for (), while (), ...
-                    leftBrace: true, // function () {, if () {, do {, try { ...
-                    keywords: true // if {} else {}, do {} while (), try {} catch () {} finally
+                    parentheses: true, //done if (), for (), while (), ...
+                    leftBrace: true, //todo function () {, if () {, do {, try { ...
+                    keywords: true //todo if {} else {}, do {} while (), try {} catch () {} finally
                 },
                 within: {
                     parentheses: false //( a, b, c ) , if ( true ) or (a, b, c) , if (true)
@@ -40,6 +41,27 @@
 
             }
         };
+
+        //defaults the config
+        var overwriteConfig = function (defaults, configure) {
+            for (var key in defaults) {
+                if (defaults.hasOwnProperty(key)) {
+                    if (typeof defaults[key] == 'object') {
+                        //递归
+                        if (typeof configure[key] == 'object') {
+                            overwriteConfig(defaults[key], configure[key]);
+                        }
+                    } else {
+                        //直接复制
+                        if (typeof configure[key] !== 'undefined') {
+                            defaults[key] = configure[key];
+                        }
+                    }
+                }
+            }
+        };
+        overwriteConfig(codeStyle, config); //用外部config覆盖默认配置
+
 
         var NEXT_LINE = codeStyle.lineSeparator;
         var INDENT = codeStyle.indents;
