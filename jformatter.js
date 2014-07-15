@@ -20,8 +20,8 @@
                     functionDeclarationParentheses: false, //done function foo() {
                     functionExpressionParentheses: true, //done var foo = function () {
                     parentheses: true, //done if (), for (), while (), ...
-                    leftBrace: true, //todo function () {, if () {, do {, try { ...
-                    keywords: true //todo if {} else {}, do {} while (), try {} catch () {} finally
+                    leftBrace: true, //done function () {, if () {, do {, try { ...
+                    keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
                 },
                 within: {
                     parentheses: false //( a, b, c ) , if ( true ) or (a, b, c) , if (true)
@@ -261,13 +261,15 @@
             },
             'DoWhileStatement': function (node) {
                 node.test.onExit = function () {
-                    toLastToken(node.test);
-                    var token;
-                    while (true) {
-                        token = backwardToken();
-                        if (token.value === 'while') {
-                            obPush(' ');
-                            break;
+                    if (codeStyle.spaces.before.keywords) {
+                        toLastToken(node.test);
+                        var token;
+                        while (true) {
+                            token = backwardToken();
+                            if (token.value === 'while') {
+                                obPush(' ');
+                                break;
+                            }
                         }
                     }
                     toLastToken(node.test);
@@ -352,7 +354,9 @@
 
                 if (!node.isIfStatementAlternate) {
                     //here push space before { and then forward { then next line
-                    obPush(' ');
+                    if (codeStyle.spaces.before.leftBrace) {
+                        obPush(' ');
+                    }
                 }
                 forwardToken();
                 obPush(NEXT_LINE);
@@ -368,9 +372,11 @@
 
                 //if if has alternate, should insert space after consequent(before else)
                 if (node.consequent && node.consequent.type === 'BlockStatement') {
-                    node.consequent.onExit = function () {
-                        toNextToken(node.consequent);
-                        obPush(' ');
+                    if (codeStyle.spaces.before.keywords) {
+                        node.consequent.onExit = function () {
+                            toNextToken(node.consequent);
+                            obPush(' ');
+                        }
                     }
                 }
 
@@ -635,8 +641,8 @@
             'Keyword': {
                 'in': ' ',
                 'instanceof': ' ',
-                'catch': ' ',
-                'finally': ' '
+                'catch': codeStyle.spaces.before.keywords ? ' ' : '',
+                'finally': codeStyle.spaces.before.keywords ? ' ': ''
             },
             'Punctuator': {
                 '=': ' ', //Assignment operators
