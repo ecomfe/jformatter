@@ -24,21 +24,16 @@
                     keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
                 },
                 within: {
-                    parentheses: false //( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+                    parentheses: false //todo 这个配置比较麻烦( a, b, c ) , if ( true ) or (a, b, c) , if (true)
                 },
                 other: {
-                    beforeComma: false,
-                    afterComma: true,
-                    beforePropertyNameValueSeparator: false, // {key: value}
-                    afterPropertyNameValueSeparator: true
+                    beforePropertyNameValueSeparator: false, // {key: value} {key : value} {key:value}
+                    afterPropertyNameValueSeparator: true //done
                 }
             },
             bracesPlacement: { //1. same line 2. next line
                 functionDeclaration: 1,
                 other: 1
-            },
-            functionCallArguments: {
-
             }
         };
 
@@ -413,10 +408,15 @@
                 }
             },
             'Property': function (node) {
+                node.key.onBeforeEnter = function () {
+
+                };
                 node.key.onExit = function () {
                     toNextToken(node.key);
                     forwardToken();
-                    obPush(' ');
+                    if (codeStyle.spaces.other.afterPropertyNameValueSeparator) {
+                        obPush(' ');
+                    }
                 }
             },
             'ArrayExpression': function (node) {
@@ -632,8 +632,6 @@
                 indentLevel--;
                 toNextToken(node);
                 obPush(NEXT_LINE);
-            },
-            'SwitchCase': function (node) {
             }
         };
 
