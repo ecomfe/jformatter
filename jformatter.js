@@ -127,7 +127,7 @@
                 obPush(token.next.value);
             } else if (token.type === 'BlockComment') {
                 obPush(token.raw);
-                obPush(token.next.value);
+                obPush(NEXT_LINE);
             }
         };
 
