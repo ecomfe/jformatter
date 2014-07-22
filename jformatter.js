@@ -3,6 +3,7 @@
         //TODO if while 自动加大括号
         //TODO 自动加分号
         //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
+        //注释：如果注释独占一行，原样保留这些注释
 
         config = config || {};
         var codeStyle = {
@@ -211,6 +212,37 @@
             return token;
         };
 
+        var isWholeRowComment = function (token) {
+            var whole = true;
+            if (token.type === 'LineComment' && token.type === 'BlockComment') {
+                var prev = token.prev;
+                while (prev) {
+                    if (prev.type == 'WhiteSpace') {
+                        prev = prev.prev;
+                    } else {
+                        if (prev.type !== 'LineBreak') {
+                            whole = false;
+                        }
+                        break;
+                    }
+                }
+                if (whole) {
+                    var next = token.next;
+                    while (next) {
+                        if (next.type == 'WhiteSpace') {
+                            next = next.next;
+                        } else {
+                            if (next.type !== 'LineBreak') {
+                                whole = false;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            return whole;
+        };
+
         var enterHandlers = {
             'CallExpression': function (node) {
                 node['arguments'].forEach(function (arg, index, arr) {
@@ -299,6 +331,24 @@
                 node.right.isForInRight = true;
             },
             'VariableDeclaration': function (node) {
+                //检查startToken接下来的是不是注释，如果是注释，增加缩进，并把注释放在下一行
+                /*这部分代码逻辑特殊，注释还是使用统一规则吧var token = node.startToken.next;
+                while (token) {
+                    if (token.type == 'WhiteSpace' || token.type == 'LineBreak') {
+                        token = token.next;
+                    } else {
+                        if (token.type == 'LineComment' || token.type == 'BlockComment') {
+                            forwardToken();
+                            indentLevel++;
+                            node.onExit = function () {
+                                indentLevel--;
+                            };
+                            obPush(NEXT_LINE);
+                        }
+                        break;
+                    }
+                }*/
+
                 if (node.declarations.length > 0) {
                     node.declarations[node.declarations.length - 1].isLastDeclaration = true;
                 }
