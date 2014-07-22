@@ -34,6 +34,9 @@
             bracesPlacement: { //1. same line 2. next line
                 functionDeclaration: 1,
                 other: 1
+            },
+            other: {
+                onlyVariableDeclarator: false //todo 一个var只声明一个变量，如果true将会拆分一个var多个变量
             }
         };
 
@@ -127,7 +130,13 @@
                 obPush(token.next.value);
             } else if (token.type === 'BlockComment') {
                 obPush(token.raw);
-                obPush(NEXT_LINE);
+                if (token.next.type == 'LineBreak') {
+                    obPush(NEXT_LINE);
+                } else if (token.next && token.next.type == 'WhiteSpace') {
+                    if (token.next.next.type == 'LineBreak') {
+                        obPush(NEXT_LINE);
+                    }
+                }
             }
         };
 

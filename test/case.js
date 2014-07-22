@@ -1,17 +1,13 @@
-//codeStyle.spaces.before.keywords
+//test case for VariableDeclaration
+var x = 1;
+var y;
+var z = x;
+var d, e;
+var f, g = 2, h = z;
 
-if (a) {
-} else {
-}
-
-do {
-
-} while (a);
-
-try {
-
-} catch (e) {
-
-} finally {
-
-}
+var // a
+a = 10, // b
+b = 20, /**
+ * c
+ */
+c = 30;
