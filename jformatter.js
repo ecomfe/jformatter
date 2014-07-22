@@ -92,7 +92,7 @@
             onEnterNode(node, keyName);
             //遍历当前节点寻找下属节点递归
             for (var key in node) {
-                if (node.hasOwnProperty(key)) {
+                if (node.hasOwnProperty(key) && !/parent|prev|next|depth|toString|startToken|endToken/.test(key)) {
                     if (node[key] && node[key].type) {
                         exec(node[key], key);
                     } else {
@@ -791,19 +791,13 @@
             }
         };
 
-        var obj = require('esprima').parse(string, {
-            range: true,
-            tokens: true
-        });
-
-        var astRocambole = require('rocambole').parse(string);
-
-        var tokens = astRocambole.tokens;
+        var ast = require('rocambole').parse(string);
+        var tokens = ast.tokens;
         var tokenIndex = 0;
         var tokenLen = tokens.length;
 
-        if (obj.type === 'Program') {
-            obj.body.forEach(function (node) {
+        if (ast.type === 'Program') {
+            ast.body.forEach(function (node) {
                 exec(node, 'root');
             });
         }
