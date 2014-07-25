@@ -137,6 +137,7 @@
                 } else {
                     obPush(token.raw);
                 }
+                //todo  /** 的注释应该在新行
 //                if (token.next.type == 'LineBreak') {
 //                    obPush(NEXT_LINE);
 //                } else if (token.next && token.next.type == 'WhiteSpace') {
