@@ -18,3 +18,7 @@ var
 var d,
     //e
     e = 40;
+
+var a = function () {
+    return /* */ a;
+};

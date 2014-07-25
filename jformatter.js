@@ -130,14 +130,20 @@
                 obPush(token.raw);
                 obPush(token.next.value);
             } else if (token.type === 'BlockComment') {
-                obPush(token.raw);
-                if (token.next.type == 'LineBreak') {
+                if (isWholeRowComment(token)) {
                     obPush(NEXT_LINE);
-                } else if (token.next && token.next.type == 'WhiteSpace') {
-                    if (token.next.next.type == 'LineBreak') {
-                        obPush(NEXT_LINE);
-                    }
+                    obPush(token.raw);
+                    obPush(NEXT_LINE);
+                } else {
+                    obPush(token.raw);
                 }
+//                if (token.next.type == 'LineBreak') {
+//                    obPush(NEXT_LINE);
+//                } else if (token.next && token.next.type == 'WhiteSpace') {
+//                    if (token.next.next.type == 'LineBreak') {
+//                        obPush(NEXT_LINE);
+//                    }
+//                }
             }
         };
 
@@ -214,7 +220,7 @@
 
         var isWholeRowComment = function (token) {
             var whole = true;
-            if (token.type === 'LineComment' && token.type === 'BlockComment') {
+            if (token.type === 'LineComment' || token.type === 'BlockComment') {
                 var prev = token.prev;
                 while (prev) {
                     if (prev.type == 'WhiteSpace') {
