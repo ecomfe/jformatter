@@ -2,6 +2,7 @@ var a = -3;
 var b = 3;
 var c = a >>> b;
 var d = ++a;
+//alsll
 if(doSomething()) //1
  { //4
     doSomething()
@@ -20,7 +21,7 @@ var str = '\
  * test
  */
 
-if (doSomething()) {//1
+if (doSomething() /*  */) {//1
     //4
     //2
 } else {//3

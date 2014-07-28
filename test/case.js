@@ -1,9 +1,1 @@
-var a = {
-
-}
-/**
- * @param {string}
- */
-var e = function(){
-};
-
+var a = 1 == 0 ? true : false;
