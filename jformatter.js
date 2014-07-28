@@ -142,7 +142,9 @@
             } else if (token.type === 'BlockComment') {
                 if (isWholeRowComment(token)) {
                     obPush(NEXT_LINE);
-                    obPush(token.originalIndent);
+                    if (token.originalIndent) {
+                        obPush(token.originalIndent);
+                    }
                     obPush(token.raw);
                     obPush(NEXT_LINE);
                 }
@@ -608,7 +610,7 @@
             'VariableDeclaration': function (node, key) {
                 toNextToken(node);
                 if ((!isForStatement || key !== 'init') && !node.isForInLeft) {
-                    obPush(NEXT_LINE);
+                    obPush(NEXT_LINE); //todo 已知bug var a = {}如果没有分号结束会在下一句之后插入一个\n
                 }
             },
             'VariableDeclarator': function (node) {

@@ -1,1 +1,5 @@
-var a = 1 == 0 ? true : false;
+var a = {
+
+}
+//a
+var b;
