@@ -1,6 +1,6 @@
 {
     "name": "jformatter",
-    "version": "0.0.17",
+    "version": "0.0.18",
     "description": "A JavaScript formatter",
     "main": "jformatter.js",
     "repository": {
@@ -25,7 +25,8 @@
     "keywords": [
         "javascript",
         "formatter",
-        "ast"
+        "ast",
+        "code style"
     ],
     "author": "ishowshao",
     "license": "BSD-2-Clause"
