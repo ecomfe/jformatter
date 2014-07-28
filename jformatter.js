@@ -136,12 +136,11 @@
          * @param token
          * @param {function} [callback]
          */
-        var operateToken = function (token, callback) {
+        var doStuffWithToken = function (token, callback) {
             if (buffer[buffer.length - 1] === NEXT_LINE) {
                 obIndent();
             }
 
-            //TODO 这里可以switch
             switch (token.type) {
                 case 'LineComment':
                     if (isInlineComment(token)) {
@@ -155,10 +154,10 @@
                     }
                     break;
                 case 'BlockComment':
-                    //todo  /** 的注释应该在新行
                     if (isInlineComment(token)) {
                         bufferPush(token);
                     } else {
+                        //todo  /** 的注释应该在新行
                         bufferPush(NEXT_LINE);
                         if (token.originalIndent) {
                             bufferPush(token);
@@ -195,7 +194,7 @@
                     break;
                 }
 
-                operateToken(token, callback);
+                doStuffWithToken(token, callback);
             }
         };
 
@@ -213,7 +212,7 @@
                     break;
                 }
 
-                operateToken(token, callback);
+                doStuffWithToken(token, callback);
             }
         };
 
@@ -226,13 +225,13 @@
                     break;
                 }
 
-                operateToken(token, callback);
+                doStuffWithToken(token, callback);
             }
         };
 
         var forwardToken = function () {
             var token = tokens[tokenIndex];
-            operateToken(token);
+            doStuffWithToken(token);
             tokenIndex++;
             return token;
         };
@@ -246,48 +245,6 @@
             return last;
         };
 
-        //todo 这个逻辑可以优化，利用空白和换行
-        var isWholeRowComment = function (token) {
-            var whole = true;
-            if (token.type === 'LineComment' || token.type === 'BlockComment') {
-                var prev = token.prev;
-                while (prev) {
-                    if (prev.type == 'WhiteSpace') {
-                        prev = prev.prev;
-                    } else {
-                        if (prev.type !== 'LineBreak') {
-                            whole = false;
-                        }
-                        break;
-                    }
-                }
-                if (whole) {
-                    var next = token.next;
-                    while (next) {
-                        if (next.type == 'WhiteSpace') {
-                            next = next.next;
-                        } else {
-                            if (next.type !== 'LineBreak') {
-                                whole = false;
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-            return whole;
-        };
-
-        //TODO 这里可以改成isFollowComment(commentToken) operateToken的逻辑就可以清晰
-        var commentFollow = function (token) {
-            var follow = false;
-            if (token.next.type == 'LineComment' || token.next.type == 'BlockComment') {
-                follow = token.next;
-            } else if (token.next.type == 'WhiteSpace' && (token.next.next.type == 'LineComment' || token.next.next.type == 'BlockComment')) {
-                follow = token.next.next;
-            }
-            return follow;
-        };
         /**
          * 全部或者部分和代码所在同一行
          * @param token
