@@ -134,9 +134,8 @@
 
         /**
          * @param token
-         * @param {function} [callback]
          */
-        var doStuffWithToken = function (token, callback) {
+        var doStuffWithToken = function (token) {
             if (buffer[buffer.length - 1] === NEXT_LINE) {
                 obIndent();
             }
@@ -174,18 +173,14 @@
                     doInsertBefore(token);
                     bufferPush(token);
                     doInsertAfter(token);
-                    if (callback) {
-                        callback(token);
-                    }
             }
         };
 
         /**
          * 同步range范围之前所有tokens
          * @param {object} node
-         * @param {function} [callback]
          */
-        var toPrevToken = function (node, callback) {
+        var toPrevToken = function (node) {
             var range = node.range;
             for (var token; tokenIndex < tokenLen; tokenIndex++) {
                 token = tokens[tokenIndex];
@@ -194,16 +189,15 @@
                     break;
                 }
 
-                doStuffWithToken(token, callback);
+                doStuffWithToken(token);
             }
         };
 
         /**
          * 同步range范围内所有tokens，同步之后tokenIndex已经到达下一个token
          * @param {object} node
-         * @param {function} [callback]
          */
-        var toNextToken = function (node, callback) {
+        var toNextToken = function (node) {
             var range = node.range;
             for (var token; tokenIndex < tokenLen; tokenIndex++) {
                 token = tokens[tokenIndex];
@@ -212,11 +206,11 @@
                     break;
                 }
 
-                doStuffWithToken(token, callback);
+                doStuffWithToken(token);
             }
         };
 
-        var toLastToken = function (node, callback) {
+        var toLastToken = function (node) {
             var range = node.range;
             for (var token; tokenIndex < tokenLen; tokenIndex++) {
                 token = tokens[tokenIndex];
@@ -225,7 +219,7 @@
                     break;
                 }
 
-                doStuffWithToken(token, callback);
+                doStuffWithToken(token);
             }
         };
 
