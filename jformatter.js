@@ -123,19 +123,28 @@
                 doInsertBefore(token);
                 obPush(token.value);
                 doInsertAfter(token);
+                var comment = commentFollow(token);
+                if (comment) {
+                    if (!isWholeRowComment(comment)) {
+                        obPush(' ');
+                        obPush(comment.raw);
+                    }
+                }
                 if (callback) {
                     callback(token);
                 }
             } else if (token.type === 'LineComment') {
-                obPush(token.raw);
-                obPush(token.next.value);
-            } else if (token.type === 'BlockComment') {
                 if (isWholeRowComment(token)) {
                     obPush(NEXT_LINE);
                     obPush(token.raw);
                     obPush(NEXT_LINE);
-                } else {
+                }
+            } else if (token.type === 'BlockComment') {
+                if (isWholeRowComment(token)) {
+                    obPush(NEXT_LINE);
+                    obPush(token.originalIndent);
                     obPush(token.raw);
+                    obPush(NEXT_LINE);
                 }
                 //todo  /** 的注释应该在新行
 //                if (token.next.type == 'LineBreak') {
@@ -248,6 +257,16 @@
                 }
             }
             return whole;
+        };
+
+        var commentFollow = function (token) {
+            var follow = false;
+            if (token.next.type == 'LineComment' || token.next.type == 'BlockComment') {
+                follow = token.next;
+            } else if (token.next.type == 'WhiteSpace' && (token.next.next.type == 'LineComment' || token.next.next.type == 'BlockComment')) {
+                follow = token.next.next;
+            }
+            return follow;
         };
 
         var enterHandlers = {
@@ -678,7 +697,6 @@
             },
             'FunctionDeclaration': function (node) {
                 toNextToken(node);
-                obPush(NEXT_LINE);
                 obPush(NEXT_LINE);
             },
             'TryStatement': function (node) {

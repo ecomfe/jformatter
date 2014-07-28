@@ -1,6 +1,6 @@
 {
     "name": "jformatter",
-    "version": "0.0.14",
+    "version": "0.0.15",
     "description": "A JavaScript formatter",
     "main": "jformatter.js",
     "repository": {
@@ -17,11 +17,9 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "esprima": "~1.0.4",
         "rocambole": "0.3.6"
     },
     "devDependencies": {
-        "esprima": "~1.0.4",
         "rocambole": "0.3.6"
     },
     "keywords": [
