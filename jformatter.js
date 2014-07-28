@@ -4,6 +4,12 @@
         //TODO 自动加分号
         //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
         //注释：如果注释独占一行，原样保留这些注释
+        // To loop between all tokens inside a node you can do like this:
+        // var token = node.startToken;
+        // while (token !== node.endToken.next) {
+        //     doStuffWithToken(token);
+        //     token = token.next;
+        // }
 
         config = config || {};
         var codeStyle = {
@@ -60,7 +66,6 @@
             }
         };
         overwriteConfig(codeStyle, config); //用外部config覆盖默认配置
-
 
         var NEXT_LINE = {
             type: 'LineBreak',
@@ -136,41 +141,43 @@
                 obIndent();
             }
 
-            if (token.type !== 'WhiteSpace' && token.type !== 'LineBreak' && token.type !== 'LineComment' && token.type !== 'BlockComment') {
-                doInsertBefore(token);
-                bufferPush(token);
-                doInsertAfter(token);
-                var comment = commentFollow(token);
-                if (comment) {
-                    if (!isWholeRowComment(comment)) {
-                        bufferPush(' ');
-                        bufferPush(comment);
-                        if (comment.type === 'LineComment') {
+            //TODO 这里可以switch
+            switch (token.type) {
+                case 'LineComment':
+                    if (isInlineComment(token)) {
+                        bufferPush(token);
+                    } else {
+                        if (buffer[buffer.length - 1].type !== 'Indent') {
                             bufferPush(NEXT_LINE);
                         }
-                    }
-                }
-                if (callback) {
-                    callback(token);
-                }
-            } else if (token.type === 'LineComment') {
-                if (isWholeRowComment(token)) {
-                    if (buffer[buffer.length - 1].type !== 'Indent') {
+                        bufferPush(token);
                         bufferPush(NEXT_LINE);
                     }
-                    bufferPush(token);
-                    bufferPush(NEXT_LINE);
-                }
-            } else if (token.type === 'BlockComment') {
-                if (isWholeRowComment(token)) {
-                    bufferPush(NEXT_LINE);
-                    if (token.originalIndent) {
+                    break;
+                case 'BlockComment':
+                    //todo  /** 的注释应该在新行
+                    if (isInlineComment(token)) {
                         bufferPush(token);
+                    } else {
+                        bufferPush(NEXT_LINE);
+                        if (token.originalIndent) {
+                            bufferPush(token);
+                        }
+                        bufferPush(token);
+                        bufferPush(NEXT_LINE);
                     }
+                    break;
+                case 'WhiteSpace':
+                    break;
+                case 'LineBreak':
+                    break;
+                default:
+                    doInsertBefore(token);
                     bufferPush(token);
-                    bufferPush(NEXT_LINE);
-                }
-                //todo  /** 的注释应该在新行
+                    doInsertAfter(token);
+                    if (callback) {
+                        callback(token);
+                    }
             }
         };
 
@@ -233,12 +240,13 @@
         var backwardToken = function () {
             tokenIndex--;
             var last = bufferPop();
-            while (last.formatter) { //略过由formatter自己插入的token
+            while (last.formatter) { //同时去除由formatter自己插入的token
                 last = bufferPop();
             }
             return last;
         };
 
+        //todo 这个逻辑可以优化，利用空白和换行
         var isWholeRowComment = function (token) {
             var whole = true;
             if (token.type === 'LineComment' || token.type === 'BlockComment') {
@@ -270,6 +278,7 @@
             return whole;
         };
 
+        //TODO 这里可以改成isFollowComment(commentToken) operateToken的逻辑就可以清晰
         var commentFollow = function (token) {
             var follow = false;
             if (token.next.type == 'LineComment' || token.next.type == 'BlockComment') {
@@ -278,6 +287,26 @@
                 follow = token.next.next;
             }
             return follow;
+        };
+        /**
+         * 全部或者部分和代码所在同一行
+         * @param token
+         */
+        var isInlineComment = function (token) {
+            var inline = true;
+            if (token.type === 'LineComment') {
+                if (token.prev.type === 'LineBreak' || (token.prev.type === 'WhiteSpace' && token.prev.prev.type === 'LineBreak')) {
+                    inline = false;
+                }
+            }
+            if (token.type === 'BlockComment') {
+                if (token.prev.type === 'LineBreak' || (token.prev.type === 'WhiteSpace' && token.prev.prev.type === 'LineBreak')) {
+                    if (token.next.type === 'LineBreak' || (token.next.type === 'WhiteSpace' && token.next.next.type === 'LineBreak')) {
+                        inline = false;
+                    }
+                }
+            }
+            return inline;
         };
 
         var enterHandlers = {
@@ -370,21 +399,21 @@
             'VariableDeclaration': function (node) {
                 //检查startToken接下来的是不是注释，如果是注释，增加缩进，并把注释放在下一行
                 /*这部分代码逻辑特殊，注释还是使用统一规则吧var token = node.startToken.next;
-                while (token) {
-                    if (token.type == 'WhiteSpace' || token.type == 'LineBreak') {
-                        token = token.next;
-                    } else {
-                        if (token.type == 'LineComment' || token.type == 'BlockComment') {
-                            forwardToken();
-                            indentLevel++;
-                            node.onExit = function () {
-                                indentLevel--;
-                            };
-                            bufferPush(NEXT_LINE);
-                        }
-                        break;
-                    }
-                }*/
+                 while (token) {
+                 if (token.type == 'WhiteSpace' || token.type == 'LineBreak') {
+                 token = token.next;
+                 } else {
+                 if (token.type == 'LineComment' || token.type == 'BlockComment') {
+                 forwardToken();
+                 indentLevel++;
+                 node.onExit = function () {
+                 indentLevel--;
+                 };
+                 bufferPush(NEXT_LINE);
+                 }
+                 break;
+                 }
+                 }*/
 
                 if (node.declarations.length > 0) {
                     node.declarations[node.declarations.length - 1].isLastDeclaration = true;
@@ -736,7 +765,7 @@
                 'in': ' ',
                 'instanceof': ' ',
                 'catch': codeStyle.spaces.before.keywords ? ' ' : '',
-                'finally': codeStyle.spaces.before.keywords ? ' ': ''
+                'finally': codeStyle.spaces.before.keywords ? ' ' : ''
             },
             'Punctuator': {
                 '=': ' ', //Assignment operators
