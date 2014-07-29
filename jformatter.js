@@ -145,7 +145,7 @@
                     if (isInlineComment(token)) {
                         bufferPush(token);
                     } else {
-                        if (buffer[buffer.length - 1].type !== 'Indent') {
+                        if (buffer.length > 0 && buffer[buffer.length - 1].type !== 'Indent') {
                             bufferPush(NEXT_LINE);
                         }
                         bufferPush(token);
@@ -246,7 +246,7 @@
         var isInlineComment = function (token) {
             var inline = true;
             if (token.type === 'LineComment') {
-                if (token.prev.type === 'LineBreak' || (token.prev.type === 'WhiteSpace' && token.prev.prev.type === 'LineBreak')) {
+                if (!token.prev || token.prev.type === 'LineBreak' || (token.prev.type === 'WhiteSpace' && token.prev.prev.type === 'LineBreak')) {
                     inline = false;
                 }
             }
@@ -484,9 +484,6 @@
                 }
             },
             'Property': function (node) {
-                node.key.onBeforeEnter = function () {
-
-                };
                 node.key.onExit = function () {
                     toNextToken(node.key);
                     forwardToken();
@@ -668,7 +665,10 @@
             'Property': function (node) {
                 toNextToken(node);
                 if (!node.isLastObjectProperty) {
-                    forwardToken();
+                    var token = forwardToken();
+                    while (!(token.type === 'Punctuator' && token.value === ',')) {
+                        token = forwardToken();
+                    }
                     bufferPush(NEXT_LINE);
                 }
             },
