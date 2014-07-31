@@ -136,12 +136,11 @@
          * @param token
          */
         var doStuffWithToken = function (token) {
-            if (buffer[buffer.length - 1] === NEXT_LINE) {
-                obIndent();
-            }
-
             switch (token.type) {
                 case 'LineComment':
+                    if (buffer[buffer.length - 1] === NEXT_LINE) {
+                        obIndent();
+                    }
                     if (isInlineComment(token)) {
                         bufferPush(token);
                     } else {
@@ -153,13 +152,20 @@
                     }
                     break;
                 case 'BlockComment':
+                    if (buffer[buffer.length - 1] === NEXT_LINE) {
+                        obIndent();
+                    }
                     if (isInlineComment(token)) {
                         bufferPush(token);
                     } else {
                         //todo  /** 的注释应该在新行
                         bufferPush(NEXT_LINE);
                         if (token.originalIndent) {
-                            bufferPush(token);
+                            bufferPush({
+                                type: 'OriginalIndent',
+                                value: token.originalIndent,
+                                formatter: true
+                            });
                         }
                         bufferPush(token);
                         bufferPush(NEXT_LINE);
@@ -170,6 +176,9 @@
                 case 'LineBreak':
                     break;
                 default:
+                    if (buffer[buffer.length - 1] === NEXT_LINE) {
+                        obIndent();
+                    }
                     doInsertBefore(token);
                     bufferPush(token);
                     doInsertAfter(token);
@@ -616,6 +625,7 @@
                 }
             },
             'BlockStatement': function (node) {
+                toLastToken(node);
                 if (node.body.length > 0) {
                     indentLevel--;
                 }

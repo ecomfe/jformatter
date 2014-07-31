@@ -1,12 +1,18 @@
-var obj = {
-    IdeaName: {
-        exMaxLength: langUnit.UNIT_NAME_MAX_LENTH,
-        required: 1    /* comment 1 */,
-        requiredErrorMessage: '创意名称不能为空' /*
-        test*/ ,
-        exMaxLengthErrorMessage: '创意名称不能超过30个字符'
-    },
-    'key': {
+if (true) {
+} else {
+    doSomething();
+    Dialog.alert({
+        title: '提示',content: args.content,type: 'success'
+    }).on('ok', function () {
+        doSomething();
+        /*var urls = {
+         pid:querys.pid,
+         uid:querys.id
+         };
 
-    }
-};
+         var url = buildUrl('idea/list', urls.uid, 'idea', {'pid':urls.pid});
+         locator.redirect(url);*/
+        //accountTree.refresh(0, 'user', true);
+    });
+}
+
