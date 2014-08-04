@@ -568,8 +568,6 @@
                     indentLevel--;
                 }
             },
-            'CallExpression': function (node) {
-            },
             'FunctionDeclaration': function (node) {
                 toNextToken(node);
                 bufferPush(NEXT_LINE);
