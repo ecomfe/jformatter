@@ -111,18 +111,18 @@
          * @param {object} node 一定是个含有type属性的节点对象
          * @param {string} keyName
          */
-        var exec = function (node, keyName) {
+        var recursive = function (node, keyName) {
             onEnterNode(node, keyName);
             //遍历当前节点寻找下属节点递归
             for (var key in node) {
                 if (node.hasOwnProperty(key) && !/parent|prev|next|depth|toString|startToken|endToken/.test(key)) {
                     if (node[key] && node[key].type) {
-                        exec(node[key], key);
+                        recursive(node[key], key);
                     } else {
                         if (Object.prototype.toString.call(node[key]) === '[object Array]') {
                             node[key].forEach(function (sub) {
                                 if (sub.type) {
-                                    exec(sub, key);
+                                    recursive(sub, key);
                                 }
                             });
                         }
@@ -369,24 +369,6 @@
                 node.right.isForInRight = true;
             },
             'VariableDeclaration': function (node) {
-                //检查startToken接下来的是不是注释，如果是注释，增加缩进，并把注释放在下一行
-                /*这部分代码逻辑特殊，注释还是使用统一规则吧var token = node.startToken.next;
-                 while (token) {
-                 if (token.type == 'WhiteSpace' || token.type == 'LineBreak') {
-                 token = token.next;
-                 } else {
-                 if (token.type == 'LineComment' || token.type == 'BlockComment') {
-                 forwardToken();
-                 indentLevel++;
-                 node.onExit = function () {
-                 indentLevel--;
-                 };
-                 bufferPush(NEXT_LINE);
-                 }
-                 break;
-                 }
-                 }*/
-
                 if (node.declarations.length > 0) {
                     node.declarations[node.declarations.length - 1].isLastDeclaration = true;
                 }
@@ -905,7 +887,7 @@
 
         if (ast.type === 'Program') {
             ast.body.forEach(function (node) {
-                exec(node, 'root');
+                recursive(node, 'root');
             });
         }
 
