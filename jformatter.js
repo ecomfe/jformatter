@@ -2,6 +2,7 @@
     var format = function (string, config) {
         //TODO if while 自动加大括号
         //TODO 自动加分号
+        //TODO Array可以加个配置，倾向于单行还是多行
 
         config = config || {};
         var codeStyle = {
@@ -287,8 +288,6 @@
                 };
             },
             'ForStatement': function (node) {
-                isForStatement = true;
-
                 if (node.test) {
                     node.test.onBeforeEnter = function () {
                         bufferPush(' ');
@@ -435,11 +434,9 @@
                     indentLevel++;
 
                     node.elements.forEach(function (e, index, arr) {
-                        e.onBeforeEnter = function () {
-                        };
                         e.onExit = function () {
                             toNextToken(e);
-                            if (index !== arr.length - 1) {
+                            if (index !== arr.length - 1) { //here is ,
                                 forwardToken();
                             }
                             bufferPush(NEXT_LINE);
@@ -495,30 +492,6 @@
                 toNextToken(node);
                 bufferPush(NEXT_LINE);
             },
-            'Literal': function (node) {
-                if (node.isArrayEl && !node.isLastEl) {
-                    toNextToken(node);
-                    if (isArrayMultiLine) {
-                        forwardToken();
-                        bufferPush(NEXT_LINE);
-                    } else {
-                        forwardToken();
-                        bufferPush(' ');
-                    }
-                }
-            },
-            'Identifier': function (node) {
-                if (node.isArrayEl && !node.isLastEl) {
-                    toNextToken(node);
-                    if (isArrayMultiLine) {
-                        forwardToken();
-                        bufferPush(NEXT_LINE);
-                    } else {
-                        forwardToken();
-                        bufferPush(' ');
-                    }
-                }
-            },
             'ForStatement': function (node) {
                 toNextToken(node);
                 bufferPush(NEXT_LINE);
@@ -538,15 +511,6 @@
                     toNextToken(node);
                     forwardToken();
                     bufferPush(' ');
-                }
-            },
-            'FunctionExpression': function (node) {
-                if (node.isArrayEl) {
-                    toNextToken(node);
-                    if (!node.isLastEl) {
-                        forwardToken();
-                        bufferPush(NEXT_LINE);
-                    }
                 }
             },
             'BlockStatement': function (node) {
@@ -588,14 +552,6 @@
                     toLastToken(node);
                     bufferPush(NEXT_LINE);
                 }
-
-                if (node.isArrayEl && isArrayMultiLine) {
-                    toNextToken(node);
-                    if (!node.isLastEl) {
-                        forwardToken();
-                        bufferPush(NEXT_LINE);
-                    }
-                }
             },
             'Property': function (node) {
                 toNextToken(node);
@@ -613,13 +569,6 @@
                 }
             },
             'CallExpression': function (node) {
-                if (node.isArrayEl) {
-                    toNextToken(node);
-                    if (!node.isLastEl) {
-                        forwardToken();
-                        bufferPush(NEXT_LINE);
-                    }
-                }
             },
             'FunctionDeclaration': function (node) {
                 toNextToken(node);
