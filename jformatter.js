@@ -68,8 +68,6 @@
 
         var indentLevel = 0;
 
-        var isForStatement = false;
-
         var buffer = [];
 
         var bufferPush = function (token) {
@@ -303,10 +301,6 @@
                     };
                 }
             },
-            'ForInStatement': function (node) {
-                node.left.isForInLeft = true;
-                node.right.isForInRight = true;
-            },
             'VariableDeclaration': function (node) {
                 if (node.declarations.length > 0) {
                     node.declarations[node.declarations.length - 1].isLastDeclaration = true;
@@ -528,16 +522,14 @@
             'ForStatement': function (node) {
                 toNextToken(node);
                 bufferPush(NEXT_LINE);
-
-                isForStatement = false; //todo 去掉这个全局变量用别的解决方法
             },
             'ForInStatement': function (node) {
                 toNextToken(node);
                 bufferPush(NEXT_LINE);
             },
-            'VariableDeclaration': function (node, key) {
+            'VariableDeclaration': function (node) {
                 toNextToken(node);
-                if ((!isForStatement || key !== 'init') && !node.isForInLeft) {
+                if (node.parent.type !== 'ForStatement' && node.parent.type !== 'ForInStatement') {
                     bufferPush(NEXT_LINE); //todo 已知bug var a = {}如果没有分号结束会在下一句之后插入一个\n
                 }
             },

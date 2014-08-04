@@ -1,7 +1,15 @@
-if (err) {
-    throw err;
+for (var i = 0, j = doSomething(); i < length; i++) {
+    doSomething();
 }
-
-//TODO:多个else if 会有多换行的bug
-//TODO:多个else if 会有多换行的bug
-var a = 0;
+for (; i < length; i++) {
+    doSomething();
+}
+for (; i < length;) {
+    doSomething();
+}
+for (var i = 0;; i++) {
+    doSomething();
+}
+for (var key in document) {
+    doSomething();
+}

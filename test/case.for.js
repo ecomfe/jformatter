@@ -10,6 +10,9 @@ for (; i < length;) {
 for (var i = 0;; i++) {
     doSomething();
 }
+for (;;) {
+    doSomething();
+}
 for (var key in document) {
     doSomething();
 }
