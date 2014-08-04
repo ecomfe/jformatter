@@ -227,27 +227,6 @@
             return token.type === 'LineComment' || token.type === 'BlockComment';
         };
 
-        /**
-         * 全部或者部分和代码所在同一行
-         * @param token
-         */
-        var isInlineComment = function (token) {
-            var inline = true;
-            if (token.type === 'LineComment') {
-                if (!token.prev || token.prev.type === 'LineBreak' || (token.prev.type === 'WhiteSpace' && token.prev.prev.type === 'LineBreak')) {
-                    inline = false;
-                }
-            }
-            if (token.type === 'BlockComment') {
-                if (token.prev.type === 'LineBreak' || (token.prev.type === 'WhiteSpace' && token.prev.prev.type === 'LineBreak')) {
-                    if (token.next.type === 'LineBreak' || (token.next.type === 'WhiteSpace' && token.next.next.type === 'LineBreak')) {
-                        inline = false;
-                    }
-                }
-            }
-            return inline;
-        };
-
         var enterHandlers = {
             'CallExpression': function (node) {
                 node['arguments'].forEach(function (arg, index, arr) {
