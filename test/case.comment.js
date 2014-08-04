@@ -1,31 +1,41 @@
-var a = -3;
-var b = 3;
-var c = a >>> b;
-var d = ++a;
-//alsll
-if(doSomething()) //1
- { //4
-    doSomething()
-} //2
-else  //3
-{ //5
+var
+    //a
+    a,
+    //b
+    b, //c
+    c; //d
 
-}
-
-var str = '\
-\
-//\
-';
+//0
+if (doSomething()) //1
+{ //2
+    doSomething() //3
+} //4
+else //5
+{ //6
+    //7
+} //8
 
 /**
  * test
  */
-
-if (doSomething() /*  */) {//1
+if (doSomething()/*  */) {//1
     //4
     //2
 } else {//3
     //5
+} /* */
+doSomething(p1 //a
+, p2); /**
+ */
+
+doSomething(p1, /* p2 */ p2); /* do */
+
+/**
+ * foo
+ * @param p1
+ * @returns {number}
+ */
+function foo(p1) {
+    /* num */
+    return Number(p1);
 }
-doSomething(p1//a
-, p2);
