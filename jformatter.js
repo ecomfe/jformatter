@@ -138,39 +138,8 @@
         var doStuffWithToken = function (token) {
             switch (token.type) {
                 case 'LineComment':
-                    /*if (buffer[buffer.length - 1] === NEXT_LINE) {
-                        obIndent();
-                    }
-                    if (isInlineComment(token)) {
-                        bufferPush(token);
-                        bufferPush(NEXT_LINE);
-                    } else {
-                        if (buffer.length > 0 && buffer[buffer.length - 1].type !== 'Indent') {
-                            bufferPush(NEXT_LINE);
-                        }
-                        bufferPush(token);
-                        bufferPush(NEXT_LINE);
-                    }*/
                     break;
                 case 'BlockComment':
-                    /*if (buffer[buffer.length - 1] === NEXT_LINE) {
-                        obIndent();
-                    }
-                    if (isInlineComment(token)) {
-                        bufferPush(token);
-                    } else {
-                        //todo  /** 的注释应该在新行，但是很难判断/**，暂时不考虑做了
-                        bufferPush(NEXT_LINE);
-                        if (token.originalIndent) {
-                            bufferPush({
-                                type: 'OriginalIndent',
-                                value: token.originalIndent,
-                                formatter: true
-                            });
-                        }
-                        bufferPush(token);
-                        bufferPush(NEXT_LINE);
-                    }*/
                     break;
                 case 'WhiteSpace':
                     break;
@@ -183,8 +152,6 @@
                     doInsertBefore(token);
                     bufferPush(token);
                     doInsertAfter(token);
-                    //如果token紧接着comment，或者token+空白+comment，那么直接push+换行，这个有问题吗？
-                    //有问题BlockComment不一定可以换行
             }
         };
 
@@ -432,20 +399,8 @@
                         bufferPush(' ');
                     }
                 }
-                var token = forwardToken();
-//                if (isComment(token.next)) {
-//                    forwardToken();
-//                    bufferPush(NEXT_LINE);
-//                } else if (isComment(token.next.next)) {
-//                    forwardToken();
-//                    forwardToken();
-//                    bufferPush(NEXT_LINE);
-//                } else {
-                    bufferPush(NEXT_LINE);
-//                }
-//                if (!isComment(token.next) && !isComment(token.next.next)) {
-//                    bufferPush(NEXT_LINE);
-//                }
+                forwardToken();
+                bufferPush(NEXT_LINE);
             },
             'IfStatement': function (node) {
                 if (node.alternate) {
@@ -461,7 +416,7 @@
                     if (codeStyle.spaces.before.keywords) {
                         node.consequent.onExit = function () {
                             toNextToken(node.consequent);
-                            bufferPush(' ');
+                            node.alternate && bufferPush(' ');
                         }
                     }
                 }
@@ -891,14 +846,78 @@
             });
         }
 
-        var formattedString = '';
-        var bufferLength = buffer.length;
-        for (var i = 0; i < bufferLength; i++) {
-            var bufferI = buffer[i];
-            if (bufferI.type === 'LineComment' || bufferI.type === 'BlockComment') {
-                formattedString += buffer[i].raw;
+        //buffer现在没有注释，链接注释进入buffer
+        var output = [];
+        var token;
+        for (var i = 0, j = 0; i < tokenLen && j < buffer.length; i++) {
+            token = tokens[i];
+            if (token.type === 'WhiteSpace' || token.type === 'LineBreak') {
+                continue;
+            }
+            if (isComment(token)) {
+                if (token.prev) {
+                    switch (token.prev.type) {
+                        case 'WhiteSpace':
+                            if (token.prev.prev && token.prev.prev.type === 'LineBreak') {
+                                output.push(NEXT_LINE);
+                                output.push(token.prev);
+                            } else {
+                                output.push(token.prev);
+                            }
+                            break;
+                        case 'LineBreak':
+                            output.push(NEXT_LINE);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                output.push(token);
+                if (token.type === 'LineComment') {
+                    //LineComment不需要向右扫描了
+                    if (!(buffer[j] && buffer[j].type === 'LineBreak')) {
+                        output.push(NEXT_LINE);
+                    }
+                } else {
+                    //BlockComment
+                    if (token.next) {
+                        if (token.next.type === 'WhiteSpace') {
+                            output.push(token.next);
+                            if (token.next.next && token.next.next.type === 'LineBreak') {
+                                if (!(buffer[j] && buffer[j].type === 'LineBreak')) {
+                                    output.push(NEXT_LINE);
+                                }
+                            }
+                        } else if (token.next.type === 'LineBreak') {
+                            if (!(buffer[j] && buffer[j].type === 'LineBreak')) {
+                                output.push(NEXT_LINE);
+                            }
+                        }
+                    }
+                }
             } else {
-                formattedString += buffer[i].value;
+                while (buffer[j].type !== token.type || buffer[j].value !== token.value) {
+                    output.push(buffer[j]);
+                    j++;
+                }
+                output.push(buffer[j]);
+                j++;
+            }
+        }
+        while (j < buffer.length) {
+            output.push(buffer[j]);
+            j++;
+        }
+
+//        output = buffer;
+        var formattedString = '';
+        var bufferLength = output.length;
+        for (i = 0; i < bufferLength; i++) {
+            var bufferI = output[i];
+            if (bufferI.type === 'LineComment' || bufferI.type === 'BlockComment') {
+                formattedString += output[i].raw;
+            } else {
+                formattedString += output[i].value;
             }
         }
         return formattedString;
