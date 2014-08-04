@@ -143,6 +143,7 @@
                     }
                     if (isInlineComment(token)) {
                         bufferPush(token);
+                        bufferPush(NEXT_LINE);
                     } else {
                         if (buffer.length > 0 && buffer[buffer.length - 1].type !== 'Indent') {
                             bufferPush(NEXT_LINE);
@@ -158,7 +159,7 @@
                     if (isInlineComment(token)) {
                         bufferPush(token);
                     } else {
-                        //todo  /** 的注释应该在新行
+                        //todo  /** 的注释应该在新行，但是很难判断/**，暂时不考虑做了
                         bufferPush(NEXT_LINE);
                         if (token.originalIndent) {
                             bufferPush({
@@ -182,6 +183,8 @@
                     doInsertBefore(token);
                     bufferPush(token);
                     doInsertAfter(token);
+                    //如果token紧接着comment，或者token+空白+comment，那么直接push+换行，这个有问题吗？
+                    //有问题BlockComment不一定可以换行
             }
         };
 
@@ -246,6 +249,15 @@
                 last = bufferPop();
             }
             return last;
+        };
+
+        /**
+         * if a token is comment
+         * @param token
+         * @returns {boolean}
+         */
+        var isComment = function (token) {
+            return token.type === 'LineComment' || token.type === 'BlockComment';
         };
 
         /**
@@ -438,8 +450,20 @@
                         bufferPush(' ');
                     }
                 }
-                forwardToken();
-                bufferPush(NEXT_LINE);
+                var token = forwardToken();
+                if (isComment(token.next)) {
+                    forwardToken();
+//                    bufferPush(NEXT_LINE);
+                } else if (isComment(token.next.next)) {
+                    forwardToken();
+                    forwardToken();
+//                    bufferPush(NEXT_LINE);
+                } else {
+                    bufferPush(NEXT_LINE);
+                }
+//                if (!isComment(token.next) && !isComment(token.next.next)) {
+//                    bufferPush(NEXT_LINE);
+//                }
             },
             'IfStatement': function (node) {
                 if (node.alternate) {
