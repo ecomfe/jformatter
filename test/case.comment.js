@@ -19,8 +19,8 @@ else //5
  * test
  */
 if (doSomething()/*  */) {//1
-    //4
-    //2
+    //j1k
+    //jjj
 } else {//3
     //5
 } /* */

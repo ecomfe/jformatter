@@ -138,7 +138,7 @@
         var doStuffWithToken = function (token) {
             switch (token.type) {
                 case 'LineComment':
-                    if (buffer[buffer.length - 1] === NEXT_LINE) {
+                    /*if (buffer[buffer.length - 1] === NEXT_LINE) {
                         obIndent();
                     }
                     if (isInlineComment(token)) {
@@ -150,10 +150,10 @@
                         }
                         bufferPush(token);
                         bufferPush(NEXT_LINE);
-                    }
+                    }*/
                     break;
                 case 'BlockComment':
-                    if (buffer[buffer.length - 1] === NEXT_LINE) {
+                    /*if (buffer[buffer.length - 1] === NEXT_LINE) {
                         obIndent();
                     }
                     if (isInlineComment(token)) {
@@ -170,7 +170,7 @@
                         }
                         bufferPush(token);
                         bufferPush(NEXT_LINE);
-                    }
+                    }*/
                     break;
                 case 'WhiteSpace':
                     break;
@@ -433,16 +433,16 @@
                     }
                 }
                 var token = forwardToken();
-                if (isComment(token.next)) {
-                    forwardToken();
+//                if (isComment(token.next)) {
+//                    forwardToken();
 //                    bufferPush(NEXT_LINE);
-                } else if (isComment(token.next.next)) {
-                    forwardToken();
-                    forwardToken();
+//                } else if (isComment(token.next.next)) {
+//                    forwardToken();
+//                    forwardToken();
 //                    bufferPush(NEXT_LINE);
-                } else {
+//                } else {
                     bufferPush(NEXT_LINE);
-                }
+//                }
 //                if (!isComment(token.next) && !isComment(token.next.next)) {
 //                    bufferPush(NEXT_LINE);
 //                }
