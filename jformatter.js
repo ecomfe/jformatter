@@ -2,14 +2,6 @@
     var format = function (string, config) {
         //TODO if while 自动加大括号
         //TODO 自动加分号
-        //TODO 换行之后加缩进是不对的，要在当前一行开始的时候加缩进（通常就是一个语句开始）
-        //注释：如果注释独占一行，原样保留这些注释
-        // To loop between all tokens inside a node you can do like this:
-        // var token = node.startToken;
-        // while (token !== node.endToken.next) {
-        //     doStuffWithToken(token);
-        //     token = token.next;
-        // }
 
         config = config || {};
         var codeStyle = {
@@ -133,6 +125,7 @@
         };
 
         /**
+         * 除了这里，其他任何地方不要直接操作buffer
          * @param token
          */
         var doStuffWithToken = function (token) {
