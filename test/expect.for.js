@@ -16,4 +16,3 @@ for (;;) {
 for (var key in document) {
     doSomething();
 }
-
