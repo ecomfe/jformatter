@@ -112,7 +112,7 @@
                     } else {
                         if (Object.prototype.toString.call(node[key]) === '[object Array]') {
                             node[key].forEach(function (sub) {
-                                if (sub.type) {
+                                if (sub && sub.type) {
                                     recursive(sub, key);
                                 }
                             });
@@ -141,11 +141,13 @@
                     if (buffer[buffer.length - 1] === NEXT_LINE) {
                         obIndent();
                     }
-                    doInsertBefore(token);
+                    insertFlag && doInsertBefore(token);
                     bufferPush(token);
-                    doInsertAfter(token);
+                    insertFlag && doInsertAfter(token);
             }
         };
+        //只有UnaryExpression的"operator"这里才用的到，目前只发现这一个例外操作符两侧不加空白
+        var insertFlag = true;
 
         /**
          * 同步range范围之前所有tokens
@@ -198,6 +200,15 @@
             var token = tokens[tokenIndex];
             doStuffWithToken(token);
             tokenIndex++;
+            return token;
+        };
+
+        var forwardTokenUntil = function (type, value) {
+            do {
+                var token = tokens[tokenIndex];
+                doStuffWithToken(token);
+                tokenIndex++;
+            } while (token.type !== type || token.value !== value);
             return token;
         };
 
@@ -433,14 +444,20 @@
                     bufferPush(NEXT_LINE);
                     indentLevel++;
 
+                    //[1, 2, ,,,,] this is 合法的，语法树上多几个null
                     node.elements.forEach(function (e, index, arr) {
-                        e.onExit = function () {
-                            toNextToken(e);
-                            if (index !== arr.length - 1) { //here is ,
-                                forwardToken();
-                            }
-                            bufferPush(NEXT_LINE);
-                        };
+                        if (e) {
+                            e.onExit = function () {
+                                toNextToken(e);
+                                if (index !== arr.length - 1) { //here is ,
+                                    forwardTokenUntil('Punctuator', ',');
+                                } else {
+                                    forwardTokenUntil('Punctuator', ']');
+                                    backwardToken();
+                                }
+                                bufferPush(NEXT_LINE);
+                            };
+                        }
                     });
                 }
             },
@@ -480,6 +497,11 @@
                     bufferPush(NEXT_LINE);
                     indentLevel++;
                 }
+            },
+            'UnaryExpression': function () {
+                insertFlag = false;
+                forwardToken(); //这里一定是operator吗？
+                insertFlag = true;
             }
         };
 
@@ -578,13 +600,13 @@
             },
             'UnaryExpression': function (node) {
                 //todo 检查这里
-                toLastToken(node);
-                if (node.operator === '+' || node.operator === '-') { //delete is unary expression
-                    bufferPop(); //this should be ' '
-                    var op = bufferPop();
-                    bufferPop(); //this should be ' ' before op
-                    bufferPush(op);
-                }
+//                toLastToken(node);
+//                if (node.operator === '+' || node.operator === '-') { //delete is unary expression
+//                    bufferPop(); //this should be ' '
+//                    var op = bufferPop();
+//                    bufferPop(); //this should be ' ' before op
+//                    bufferPush(op);
+//                }
             },
             'SwitchStatement': function (node) {
                 indentLevel--;

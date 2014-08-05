@@ -78,6 +78,14 @@ function doSomething(p1, p2) {
 var d = null, e = {};
 
 var fs = require('fs')
+temp = +(temp.slice(0, point) + temp.slice(point + 1)) + '';
+var array = [
+    1 /* a */,
+    2, //fuck
+];
+var array = [
+    2, //what a fuck
+,,];
 
 fs.readFile('tokens.json', function (err, data) { //aa
     //ab
