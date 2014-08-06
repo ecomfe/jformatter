@@ -38,6 +38,7 @@ var getConfig = function (targetFile) {
             configPath = currentDir + '/.jformatterrc';
             break;
         }
+        currentDir = path.dirname(currentDir);
     }
 
     if (configPath) {
