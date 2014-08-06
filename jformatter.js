@@ -57,7 +57,7 @@
                 }
             }
         };
-        overwriteConfig(codeStyle, config); //用外部config覆盖默认配置
+        overwriteConfig(codeStyle, config); //overwrite codeStyle with user config
 
         var NEXT_LINE = {
             type: 'LineBreak',
