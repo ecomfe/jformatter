@@ -1,41 +1,41 @@
 (function () {
     var format = function (string, config) {
-        //TODO if while 自动加大括号
-        //TODO 自动加分号
-        //TODO Array可以加个配置，倾向于单行还是多行
-
         config = config || {};
+
         var codeStyle = {
             lineSeparator: '\n', //done
-            maxLength: 120, //todo
-            wrapIfLong: false, //todo
+            maxLength: 120, //TODO
+            wrapIfLong: false, //TODO
             indents: '    ', //done
             spaces: {
                 around: {
-                    unaryOperators: false, //todo
+                    unaryOperators: false, //TODO
                     binaryOperators: true, //done
                     ternaryOperators: true //done
                 },
                 before: {
                     functionDeclarationParentheses: false, //done function foo() {
-                    functionExpressionParentheses: true, //done var foo = function () {
+                    functionExpressionParentheses: true, //TODO has a bug var foo = function () {
                     parentheses: true, //done if (), for (), while (), ...
                     leftBrace: true, //done function () {, if () {, do {, try { ...
                     keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
                 },
                 within: {
-                    parentheses: false //todo 这个配置比较麻烦( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+                    parentheses: false //TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
                 },
                 other: {
-                    beforePropertyNameValueSeparator: false, // {key: value} {key : value} {key:value}
+                    beforePropertyNameValueSeparator: false, //TODO {key: value} {key : value} {key:value}
                     afterPropertyNameValueSeparator: true //done
                 }
             },
             bracesPlacement: { //1. same line 2. next line
-                functionDeclaration: 1,
-                other: 1
+                functionDeclaration: 1, //TODO
+                other: 1 //TODO
             },
             other: {
+                autoFixSemicolonMissing: false, //TODO 自动加分号
+                forceBraces: false, //TODO if while 自动加大括号
+                keepArraySingleLine: false //TODO Array可以加个配置，倾向于单行还是多行
             }
         };
 
