@@ -25,4 +25,25 @@ if (typeof targetFile !== 'string') {
     process.exit(1);
 }
 
-console.log(jformatter.formatFile(targetFile));
+var getConfig = function (targetFile) {
+    var config = {};
+    var path = require('path');
+    var fs = require('fs');
+    var absolutePath = path.resolve(targetFile);
+    var currentDir = path.dirname(absolutePath);
+    var configPath = null;
+
+    while (currentDir !== '/') {
+        if (fs.existsSync(currentDir + '/.jformatterrc')) {
+            configPath = currentDir + '/.jformatterrc';
+            break;
+        }
+    }
+
+    if (configPath) {
+        config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+    }
+    return config ? config : {};
+};
+
+console.log(jformatter.formatFile(targetFile, getConfig(targetFile)));
