@@ -598,16 +598,6 @@
                 toNextToken(node);
                 bufferPush(NEXT_LINE);
             },
-            'UnaryExpression': function (node) {
-                //todo 检查这里
-//                toLastToken(node);
-//                if (node.operator === '+' || node.operator === '-') { //delete is unary expression
-//                    bufferPop(); //this should be ' '
-//                    var op = bufferPop();
-//                    bufferPop(); //this should be ' ' before op
-//                    bufferPush(op);
-//                }
-            },
             'SwitchStatement': function (node) {
                 indentLevel--;
                 toNextToken(node);
