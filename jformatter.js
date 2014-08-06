@@ -33,9 +33,9 @@
                 other: 1 //TODO
             },
             other: {
-                autoFixSemicolonMissing: false, //TODO 自动加分号
-                forceBraces: false, //TODO if while 自动加大括号
-                keepArraySingleLine: false //TODO Array可以加个配置，倾向于单行还是多行
+                autoFixMissingSemicolon: false, //TODO auto fix missing semicolon
+                forceBraces: false, //TODO force if while braces
+                keepArraySingleLine: false //TODO default formatted array multi line
             }
         };
 
@@ -44,12 +44,12 @@
             for (var key in defaults) {
                 if (defaults.hasOwnProperty(key)) {
                     if (typeof defaults[key] === 'object') {
-                        //递归
+                        //recursive
                         if (typeof configure[key] === 'object') {
                             overwriteConfig(defaults[key], configure[key]);
                         }
                     } else {
-                        //直接复制
+                        //copy directly
                         if (typeof configure[key] !== 'undefined') {
                             defaults[key] = configure[key];
                         }
@@ -98,12 +98,12 @@
         };
 
         /**
-         * @param {object} node 一定是个含有type属性的节点对象
+         * recursive walk all nodes
+         * @param {object} node
          * @param {string} keyName
          */
         var recursive = function (node, keyName) {
             onEnterNode(node, keyName);
-            //遍历当前节点寻找下属节点递归
             for (var key in node) {
                 if (node.hasOwnProperty(key) && !/parent|prev|next|depth|toString|startToken|endToken/.test(key)) {
                     if (node[key] && node[key].type) {
@@ -123,7 +123,7 @@
         };
 
         /**
-         * 除了这里，其他任何地方不要直接操作buffer
+         * don't write buffer except here
          * @param token
          */
         var doStuffWithToken = function (token) {
@@ -145,11 +145,11 @@
                     insertFlag && doInsertAfter(token);
             }
         };
-        //只有UnaryExpression的"operator"这里才用的到，目前只发现这一个例外操作符两侧不加空白
+        //only operator of UnaryExpression use this flag
         var insertFlag = true;
 
         /**
-         * 同步range范围之前所有tokens
+         * move all tokens to buffer before this node
          * @param {object} node
          */
         var toPrevToken = function (node) {
@@ -166,7 +166,7 @@
         };
 
         /**
-         * 同步range范围内所有tokens，同步之后tokenIndex已经到达下一个token
+         * move all tokens of this node to buffer, then tokenIndex points to the next token
          * @param {object} node
          */
         var toNextToken = function (node) {
@@ -215,7 +215,7 @@
         var backwardToken = function () {
             tokenIndex--;
             var last = bufferPop();
-            while (last.formatter) { //同时去除由formatter自己插入的token
+            while (last.formatter) { //remove tokens created by formatter
                 last = bufferPop();
             }
             return last;
@@ -444,7 +444,7 @@
                     bufferPush(NEXT_LINE);
                     indentLevel++;
 
-                    //[1, 2, ,,,,] this is 合法的，语法树上多几个null
+                    //[1, 2, ,,,,] this is legal，makes some null elements of array in ast, what a fuck
                     node.elements.forEach(function (e, index, arr) {
                         if (e) {
                             e.onExit = function () {
@@ -500,7 +500,7 @@
             },
             'UnaryExpression': function () {
                 insertFlag = false;
-                forwardToken(); //这里一定是operator吗？
+                forwardToken(); //must this operator？
                 insertFlag = true;
             }
         };
@@ -525,7 +525,7 @@
             'VariableDeclaration': function (node) {
                 toNextToken(node);
                 if (node.parent.type !== 'ForStatement' && node.parent.type !== 'ForInStatement') {
-                    bufferPush(NEXT_LINE); //todo 已知bug var a = {}如果没有分号结束会在下一句之后插入一个\n
+                    bufferPush(NEXT_LINE); //todo bug var a = {} check if redundant \n
                 }
             },
             'VariableDeclarator': function (node) {
@@ -769,7 +769,7 @@
             });
         }
 
-        //buffer现在没有注释，链接注释进入buffer
+        //before here, buffer has no comment tokens, following logic link comment tokens to buffer
         var output = [];
         var token;
         for (var i = 0, j = 0; i < tokenLen && j < buffer.length; i++) {
@@ -797,7 +797,7 @@
                 }
                 output.push(token);
                 if (token.type === 'LineComment') {
-                    //LineComment不需要向右扫描了
+                    //LineComment don't need look right
                     if (!(buffer[j] && buffer[j].type === 'LineBreak')) {
                         output.push(NEXT_LINE);
                     }
