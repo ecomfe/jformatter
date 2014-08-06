@@ -15,35 +15,38 @@ Default config, developing, not stable
 
     {
         lineSeparator: '\n', //done
-        maxLength: 120, //todo
-        wrapIfLong: false, //todo
+        maxLength: 120, //TODO
+        wrapIfLong: false, //TODO
         indents: '    ', //done
         spaces: {
             around: {
-                unaryOperators: false, //todo
+                unaryOperators: false, //TODO
                 binaryOperators: true, //done
                 ternaryOperators: true //done
             },
             before: {
                 functionDeclarationParentheses: false, //done function foo() {
-                functionExpressionParentheses: true, //done var foo = function () {
+                functionExpressionParentheses: true, //TODO has a bug var foo = function () {
                 parentheses: true, //done if (), for (), while (), ...
                 leftBrace: true, //done function () {, if () {, do {, try { ...
                 keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
             },
             within: {
-                parentheses: false //todo 这个配置比较麻烦( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+                parentheses: false //TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
             },
             other: {
-                beforePropertyNameValueSeparator: false, // {key: value} {key : value} {key:value}
+                beforePropertyNameValueSeparator: false, //TODO {key: value} {key : value} {key:value}
                 afterPropertyNameValueSeparator: true //done
             }
         },
         bracesPlacement: { //1. same line 2. next line
-            functionDeclaration: 1,
-            other: 1
+            functionDeclaration: 1, //TODO
+            other: 1 //TODO
         },
         other: {
+            autoFixMissingSemicolon: false, //TODO auto fix missing semicolon
+            forceBraces: false, //TODO force if while braces
+            keepArraySingleLine: false //TODO default formatted array multi line
         }
     }
 
