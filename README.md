@@ -1,5 +1,4 @@
-jformatter
-==========
+#jformatter
 
 A JavaScript formatter
 
@@ -47,3 +46,13 @@ Default config, developing, not stable
         other: {
         }
     }
+
+##Changelog
+
+###next
+
+* make all configure work
+
+###v0.1.0 (2014/08/07)
+
+* Initial release

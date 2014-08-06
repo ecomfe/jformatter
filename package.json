@@ -1,6 +1,6 @@
 {
     "name": "jformatter",
-    "version": "0.0.21",
+    "version": "0.1.0",
     "description": "A JavaScript formatter",
     "main": "jformatter.js",
     "repository": {
