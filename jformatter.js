@@ -856,8 +856,8 @@
         return formattedString;
     };
 
-    var formatFile = function (file) {
-        return format(require('fs').readFileSync(file, 'utf-8'));
+    var formatFile = function (file, config) {
+        return format(require('fs').readFileSync(file, 'utf-8'), config);
     };
 
     exports.format = format;
