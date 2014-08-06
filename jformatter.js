@@ -43,9 +43,9 @@
         var overwriteConfig = function (defaults, configure) {
             for (var key in defaults) {
                 if (defaults.hasOwnProperty(key)) {
-                    if (typeof defaults[key] == 'object') {
+                    if (typeof defaults[key] === 'object') {
                         //递归
-                        if (typeof configure[key] == 'object') {
+                        if (typeof configure[key] === 'object') {
                             overwriteConfig(defaults[key], configure[key]);
                         }
                     } else {
@@ -203,8 +203,9 @@
         };
 
         var forwardTokenUntil = function (type, value) {
+            var token;
             do {
-                var token = tokens[tokenIndex];
+                token = tokens[tokenIndex];
                 doStuffWithToken(token);
                 tokenIndex++;
             } while (token.type !== type || token.value !== value);
@@ -392,7 +393,7 @@
                         node.consequent.onExit = function () {
                             toNextToken(node.consequent);
                             node.alternate && bufferPush(' ');
-                        }
+                        };
                     }
                 }
 
@@ -435,7 +436,7 @@
                     if (codeStyle.spaces.other.afterPropertyNameValueSeparator) {
                         bufferPush(' ');
                     }
-                }
+                };
             },
             'ArrayExpression': function (node) {
                 if (node.elements.length > 0) {
@@ -479,7 +480,7 @@
                 node.cases.forEach(function (c) {
                     c.onExit = function () {
                         indentLevel--;
-                    }
+                    };
                 });
             },
             'SwitchCase': function (node) {
@@ -489,7 +490,7 @@
                         forwardToken();
                         bufferPush(NEXT_LINE);
                         indentLevel++;
-                    }
+                    };
                 } else {
                     forwardToken();
                     forwardToken();
