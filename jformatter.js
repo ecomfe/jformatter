@@ -36,7 +36,6 @@
                 other: 1
             },
             other: {
-                onlyVariableDeclarator: false //todo 一个var只声明一个变量，如果true将会拆分一个var多个变量
             }
         };
 
