@@ -17,10 +17,10 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "rocambole": ">0.3.6"
+        "rocambole": ">=0.3.6"
     },
     "devDependencies": {
-        "rocambole": ">0.3.6"
+        "rocambole": ">=0.3.6"
     },
     "keywords": [
         "javascript",
