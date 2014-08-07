@@ -123,7 +123,7 @@
         };
 
         /**
-         * don't write buffer except here
+         * don't write token except here
          * @param token
          */
         var doStuffWithToken = function (token) {
@@ -221,6 +221,14 @@
             return last;
         };
 
+        /*var backwardTokenUntil = function (type, value) {
+            var token;
+            do {
+                token = backwardToken();
+            } while (token.type !== type || token.value !== value);
+            return token;
+        };*/
+
         /**
          * if a token is comment
          * @param token
@@ -283,20 +291,21 @@
                 }
             },
             'DoWhileStatement': function (node) {
-                node.test.onExit = function () {
-                    if (codeStyle.spaces.before.keywords) {
-                        toLastToken(node.test);
-                        var token;
-                        while (true) {
-                            token = backwardToken();
-                            if (token.value === 'while') {
-                                bufferPush(' ');
-                                break;
-                            }
+                if (node.body && node.body.type === 'BlockStatement') {
+                    node.body.onExit = function () {
+                        if (codeStyle.spaces.before.keywords) {
+                            forwardToken();
+                            bufferPush(' ');
                         }
-                    }
-                    toLastToken(node.test);
-                };
+                    };
+                } else if (node.body) {
+                    forwardToken();
+                    indentLevel++;
+                    bufferPush(NEXT_LINE);
+                    node.body.onExit = function () {
+                        indentLevel--;
+                    };
+                }
             },
             'ForStatement': function (node) {
                 if (node.test) {
