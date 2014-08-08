@@ -56,6 +56,10 @@ Default config, developing, not stable
 
 * make all configure work
 
+###v0.1.2 (2014/08/08)
+
+* Fix DoWhileStatement bug
+
 ###v0.1.0 (2014/08/07)
 
 * Initial release
