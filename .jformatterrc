@@ -30,5 +30,6 @@
         "other": 1
     },
     "other": {
+        "keepArraySingleLine": false
     }
 }

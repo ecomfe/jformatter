@@ -17,7 +17,8 @@ Default config, developing, not stable
         lineSeparator: '\n', //done
         maxLength: 120, //TODO
         wrapIfLong: false, //TODO
-        indents: '    ', //done
+        indent: 4, //done
+        useTabIndent: false, //done
         spaces: {
             around: {
                 unaryOperators: false, //TODO
@@ -44,8 +45,6 @@ Default config, developing, not stable
             other: 1 //TODO
         },
         other: {
-            autoFixMissingSemicolon: false, //TODO auto fix missing semicolon
-            forceBraces: false, //TODO force if while braces
             keepArraySingleLine: false //TODO default formatted array multi line
         }
     }
@@ -55,6 +54,12 @@ Default config, developing, not stable
 ###next
 
 * make all configure work
+
+###v0.1.4 (2014/08/19)
+
+* remove config not relate to code style
+* change config editable with common config editor
+* support npm test
 
 ###v0.1.2 (2014/08/08)
 
