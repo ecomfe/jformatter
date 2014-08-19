@@ -6,7 +6,8 @@
             lineSeparator: '\n', //done
             maxLength: 120, //TODO
             wrapIfLong: false, //TODO
-            indents: '    ', //done
+            indent: 4, //done
+            useTabIndent: false, //done
             spaces: {
                 around: {
                     unaryOperators: false, //TODO
@@ -62,7 +63,17 @@
             value: codeStyle.lineSeparator,
             formatter: true
         };
-        var INDENT = codeStyle.indents;
+
+        //deal with indent
+        var INDENT = (function () {
+            var indentStr = '';
+            var space = codeStyle.useTabIndent ? '\t' : ' ';
+            var indent = codeStyle.indent ? Number(codeStyle.indent) : 4;
+            while (indent--) {
+                indentStr += space;
+            }
+            return indentStr;
+        })();
 
         var indentLevel = 0;
 

@@ -2,7 +2,8 @@
     "lineSeparator": "\n",
     "maxLength": 120,
     "wrapIfLong": false,
-    "indents": "    ",
+    "indent": 4,
+    "useTabIndent": false,
     "spaces": {
         "around": {
             "unaryOperators": false,
