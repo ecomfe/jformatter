@@ -33,8 +33,6 @@
                 other: 1 //TODO
             },
             other: {
-                autoFixMissingSemicolon: false, //TODO auto fix missing semicolon
-                forceBraces: false, //TODO force if while braces
                 keepArraySingleLine: false //TODO default formatted array multi line
             }
         };
