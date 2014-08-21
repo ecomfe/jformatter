@@ -64,7 +64,7 @@
             formatter: true
         };
 
-        //deal with indent
+        //deal with indent (new Array(indent + 1)).join(' ')
         var INDENT = (function () {
             var indentStr = '';
             var space = codeStyle.useTabIndent ? '\t' : ' ';
