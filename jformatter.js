@@ -698,7 +698,8 @@
                 'instanceof': ' ',
                 'catch': ' ',
                 'switch': codeStyle.spaces.before.parentheses ? ' ' : '',
-                'case': ' '
+                'case': ' ',
+                'void': ' '
             },
             'Punctuator': {
                 '=': ' ', //Assignment operators

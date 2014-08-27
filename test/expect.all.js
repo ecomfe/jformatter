@@ -218,7 +218,7 @@ fs.readFile('tokens.json', function (err, data) { //aa
             continue;
         }
         func();
-        deletemap.key;
+        delete map.key;
     }
     while (number > 0) {
         func();

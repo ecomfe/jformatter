@@ -61,6 +61,10 @@ fixed a bug cause syntax error
 
 * make all configure work
 
+###v0.1.6 (2014/08/27)
+
+* fix bug: lost space after `void`
+
 ###v0.1.5 (2014/08/27)
 
 * fix bug: lost space after `typeof`
