@@ -49,11 +49,22 @@ Default config, developing, not stable
         }
     }
 
+##Important Note
+
+please update to `v0.1.5`, see version change log
+
+fixed a bug cause syntax error
+
 ##Changelog
 
 ###next
 
 * make all configure work
+
+###v0.1.5 (2014/08/27)
+
+* fix bug: lost space after `typeof`
+* fix bug: lost space after comma expression
 
 ###v0.1.4 (2014/08/19)
 

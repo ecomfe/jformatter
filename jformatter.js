@@ -516,10 +516,21 @@
                     indentLevel++;
                 }
             },
-            'UnaryExpression': function () {
-                insertFlag = false;
+            'UnaryExpression': function (node) {
+                insertFlag = ['+', '-', '!'].indexOf(node.operator) === -1;
                 forwardToken(); //must this operator？
                 insertFlag = true;
+            },
+            'SequenceExpression': function (node) {
+                for (var i = 0; i < node.expressions.length - 1; i++) {
+                    node.expressions[i].onExit = (function (i) {
+                        return function () {
+                            toNextToken(node.expressions[i]);
+                            forwardToken();
+                            bufferPush(' ');
+                        }
+                    })(i);
+                }
             }
         };
 
