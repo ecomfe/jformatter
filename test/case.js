@@ -1,2 +1,1 @@
-var a, b, c;
-window.a = {}, window.b = 1, c = 3;
+for (var n in e)e.hasOwnProperty(n) && t.push(n);
