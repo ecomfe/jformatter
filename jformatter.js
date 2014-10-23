@@ -34,6 +34,7 @@
                 other: 1 //TODO
             },
             other: {
+                singleVar: true, //TODO config name singleVar ?
                 keepArraySingleLine: false //TODO default formatted array multi line
             }
         };

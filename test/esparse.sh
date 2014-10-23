@@ -1,2 +1,2 @@
 #!/bin/sh
-esparse case.js --comment --tokens --range --loc > tokens.json
+esparse case.js --comment --tokens --range > tokens.json
