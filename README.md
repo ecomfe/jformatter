@@ -11,6 +11,17 @@ A JavaScript formatter
 
 Github: <https://github.com/ishowshao/jformatter>
 
+##API
+
+    require('jformatter').format(code, configObj);
+    require('jformatter').formatFile(filePath, configObj);
+
+##Command Line
+
+    jformatter yourFile.js  //will load .jformatterrc 
+
+##Configure
+
 Default config, developing, not stable
 
     {
