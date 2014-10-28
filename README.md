@@ -15,6 +15,7 @@ Github: <https://github.com/ishowshao/jformatter>
 
     require('jformatter').format(code, configObj);
     require('jformatter').formatFile(filePath, configObj);
+    require('jformatter').version();
 
 ##Command Line
 
@@ -71,6 +72,10 @@ fixed a bug cause syntax error
 ###next
 
 * make all configure work
+
+###v0.1.7 (2014/10/28)
+
+* add version api
 
 ###v0.1.6 (2014/08/27)
 
