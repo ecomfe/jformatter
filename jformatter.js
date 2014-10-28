@@ -881,7 +881,7 @@
     };
 
     var version = function () {
-        return require('package.json').version;
+        return require('./package.json').version;
     };
 
     exports.format = format;
