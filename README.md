@@ -73,7 +73,7 @@ fixed a bug cause syntax error
 
 * make all configure work
 
-###v0.1.7 (2014/10/28)
+###v0.1.8 (2014/10/28)
 
 * add version api
 
