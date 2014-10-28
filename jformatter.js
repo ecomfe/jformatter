@@ -880,6 +880,11 @@
         return format(require('fs').readFileSync(file, 'utf-8'), config);
     };
 
+    var version = function () {
+        return require('package.json').version;
+    };
+
     exports.format = format;
     exports.formatFile = formatFile;
+    exports.version = version;
 })();
