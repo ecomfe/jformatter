@@ -18,7 +18,7 @@ Github: <https://github.com/ishowshao/jformatter>
 
 ##Command Line
 
-    jformatter yourFile.js  //will load .jformatterrc 
+    jformatter yourFile.js  //will load .jformatterrc
 
 ##Configure
 
