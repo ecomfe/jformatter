@@ -12,7 +12,7 @@ fs.readdir(ROOT + '/test.style/case', function (err, files) {
             pathArr[0] = 'check';
             var checkFile = ROOT + '/test.style/check/' + pathArr.join('.');
             if (fs.existsSync(checkFile)) {
-                var formattedString = jformatter.formatFile(ROOT + '/' + path);
+                var formattedString = jformatter.formatFile(ROOT + '/test.style/case/' + path);
                 if (formattedString === fs.readFileSync(checkFile, 'utf-8')) {
                     console.log(path + ' ... pass.');
                 } else {
