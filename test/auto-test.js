@@ -7,7 +7,7 @@ console.log('Testing code style cases ...\n');
 fs.readdir(ROOT + '/test.style/case', function (err, files) {
     var allPass = true;
     files.forEach(function (path) {
-        pathArr = path.split('.');
+        var pathArr = path.split('.');
         if (pathArr[0] === 'case' && pathArr[pathArr.length - 1] === 'js') {
             pathArr[0] = 'check';
             var checkFile = ROOT + '/test.style/check/' + pathArr.join('.');
@@ -30,3 +30,50 @@ fs.readdir(ROOT + '/test.style/case', function (err, files) {
 });
 
 // test for code style config
+var setByNamespace = function (obj, namespace, value) {
+    var props = namespace.split('.');
+    var pointer = obj;
+    try {
+        for (var i = 0; i < props.length - 1; i++) {
+            pointer = pointer[props[i]];
+        }
+        pointer[props.pop()] = value;
+    } catch (e) {
+    }
+};
+fs.readdir(ROOT + '/test.config/case', function (err, cases) {
+    var defaultConfig = jformatter.getDefaultConfig();
+    fs.readdir(ROOT + '/test.config/check', function (err, checks) {
+        var allPass = true;
+        cases.forEach(function (path) {
+            var id = path.slice(0, -3);
+            var compares = [];
+
+            checks.forEach(function (check) {
+                if (check.substr(0, id.length) === id) {
+                    compares.push(check);
+                }
+            });
+
+            compares.forEach(function (compare) {
+                var configValue = compare.slice(0, -3).split('.').pop();
+
+                if (configValue === 'true') {
+                    configValue = true;
+                } else if (configValue === 'false') {
+                    configValue = false;
+                }
+
+                setByNamespace(defaultConfig, path.slice(7, -3), configValue);
+
+                var formattedString = jformatter.formatFile(ROOT + '/test.config/case/' + path, defaultConfig);
+                if (formattedString === fs.readFileSync(ROOT + '/test.config/check/' + compare, 'utf-8')) {
+                    console.log(path + ' ' + configValue + ' ... pass.');
+                } else {
+                    allPass = false;
+                    console.log(path + ' ' + configValue + ' ... fail.');
+                }
+            });
+        });
+    });
+});

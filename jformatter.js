@@ -1,42 +1,48 @@
 (function () {
-    var format = function (string, config) {
-        config = config || {};
-
-        var codeStyle = {
-            lineSeparator: '\n', //done
-            maxLength: 120, //TODO
-            wrapIfLong: false, //TODO
-            indent: 4, //done
-            useTabIndent: false, //done
-            spaces: {
-                around: {
-                    unaryOperators: false, //TODO
-                    binaryOperators: true, //done
-                    ternaryOperators: true //done
-                },
-                before: {
-                    functionDeclarationParentheses: false, //done function foo() {
-                    functionExpressionParentheses: true, //TODO has a bug var foo = function () {
-                    parentheses: true, //done if (), for (), while (), ...
-                    leftBrace: true, //done function () {, if () {, do {, try { ...
-                    keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
-                },
-                within: {
-                    parentheses: false //TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
-                },
-                other: {
-                    beforePropertyNameValueSeparator: false, //TODO {key: value} {key : value} {key:value}
-                    afterPropertyNameValueSeparator: true //done
-                }
+    var codeStyle = {
+        lineSeparator: '\n', //done
+        maxLength: 120, //TODO
+        wrapIfLong: false, //TODO
+        indent: 4, //done
+        useTabIndent: false, //done
+        spaces: {
+            around: {
+                unaryOperators: false, //TODO
+                binaryOperators: true, //done
+                ternaryOperators: true //done
             },
-            bracesPlacement: { //1. same line 2. next line
-                functionDeclaration: 1, //TODO
-                other: 1 //TODO
+            before: {
+                functionDeclarationParentheses: false, //done function foo() {
+                functionExpressionParentheses: true, //TODO has a bug var foo = function () {
+                parentheses: true, //done if (), for (), while (), ...
+                leftBrace: true, //done function () {, if () {, do {, try { ...
+                keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
+            },
+            within: {
+                parentheses: false //TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
             },
             other: {
-                keepArraySingleLine: false //TODO default formatted array multi line
+                beforePropertyNameValueSeparator: false, //TODO {key: value} {key : value} {key:value}
+                afterPropertyNameValueSeparator: true //done
             }
-        };
+        },
+        bracesPlacement: { //1. same line 2. next line
+            functionDeclaration: 1, //TODO
+            other: 1 //TODO
+        },
+        other: {
+            keepArraySingleLine: false //TODO default formatted array multi line
+        }
+    };
+
+    /**
+     * format given string and return formatted string
+     * @param {string} string code string
+     * @param {Object} [config] config object
+     * @returns {string}
+     */
+    var format = function (string, config) {
+        config = config || {};
 
         //defaults the config
         var overwriteConfig = function (defaults, configure) {
@@ -56,7 +62,7 @@
                 }
             }
         };
-        overwriteConfig(codeStyle, config); //overwrite codeStyle with user config
+        overwriteConfig(codeStyle, config); // overwrite codeStyle with user config
 
         var NEXT_LINE = {
             type: 'LineBreak',
@@ -64,7 +70,7 @@
             formatter: true
         };
 
-        //deal with indent (new Array(indent + 1)).join(' ')
+        // deal with indent (new Array(indent + 1)).join(' ')
         var INDENT = (function () {
             var indentStr = '';
             var space = codeStyle.useTabIndent ? '\t' : ' ';
@@ -876,15 +882,34 @@
         return formattedString;
     };
 
+    /**
+     * format given file and returns formatted code
+     * @param {string} file file path
+     * @param {Object} [config] config object
+     * @returns {string}
+     */
     var formatFile = function (file, config) {
         return format(require('fs').readFileSync(file, 'utf-8'), config);
     };
 
+    /**
+     * returns version string
+     * @returns {string}
+     */
     var version = function () {
         return require('./package.json').version;
+    };
+
+    /**
+     * returns default config
+     * @returns {Object}
+     */
+    var getDefaultConfig = function () {
+        return codeStyle;
     };
 
     exports.format = format;
     exports.formatFile = formatFile;
     exports.version = version;
+    exports.getDefaultConfig = getDefaultConfig;
 })();
