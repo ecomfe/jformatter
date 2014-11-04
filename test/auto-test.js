@@ -65,6 +65,10 @@ fs.readdir(ROOT + '/test.config/case', function (err, cases) {
                     configValue = false;
                 }
 
+                if (/\d+/.test(configValue)) {
+                    configValue = Number(configValue);
+                }
+
                 setByNamespace(defaultConfig, path.slice(7, -3), configValue);
 
                 var formattedString = jformatter.formatFile(ROOT + '/test.config/case/' + path, defaultConfig);
@@ -77,5 +81,10 @@ fs.readdir(ROOT + '/test.config/case', function (err, cases) {
                 }
             });
         });
+        if (allPass) {
+            console.log('\nConfig: everything is ok.\n');
+        } else {
+            console.log('\nConfig: something wrong!\n');
+        }
     });
 });
