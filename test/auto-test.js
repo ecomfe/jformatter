@@ -1,4 +1,5 @@
 var jformatter = require('../jformatter.js');
+var differ = require('differ-cli/lib/differ');
 var fs = require('fs');
 var ROOT = require('path').dirname(__filename);
 
@@ -23,9 +24,9 @@ fs.readdir(ROOT + '/test.style/case', function (err, files) {
         }
     });
     if (allPass) {
-        console.log('\nEverything is ok.\n');
+        console.log('\nCode style: everything is ok.\n');
     } else {
-        console.log('\nSomething wrong!\n');
+        console.log('\nCode style: something wrong!\n');
     }
 });
 
@@ -72,6 +73,7 @@ fs.readdir(ROOT + '/test.config/case', function (err, cases) {
                 } else {
                     allPass = false;
                     console.log(path + ' ' + configValue + ' ... fail.');
+                    console.log(differ(formattedString, fs.readFileSync(ROOT + '/test.config/check/' + compare, 'utf-8')));
                 }
             });
         });
