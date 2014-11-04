@@ -493,7 +493,9 @@
                     while (true) {
                         token = forwardToken();
                         if (tokens[tokenIndex].value.charAt(0) === '{') {
-                            bufferPush(' ');
+                            if (codeStyle.spaces.before.leftBrace) {
+                                bufferPush(' ');
+                            }
                             forwardToken();
                             bufferPush(NEXT_LINE);
                             break;
