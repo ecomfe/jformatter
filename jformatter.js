@@ -1,5 +1,5 @@
 (function () {
-    var codeStyle = {
+    var config = {
         lineSeparator: '\n', //done
         maxLength: 120, //TODO
         wrapIfLong: false, //TODO
@@ -62,19 +62,19 @@
                 }
             }
         };
-        overwriteConfig(codeStyle, config); // overwrite codeStyle with user config
+        overwriteConfig(config, config); // overwrite codeStyle with user config
 
         var NEXT_LINE = {
             type: 'LineBreak',
-            value: codeStyle.lineSeparator,
+            value: config.lineSeparator,
             formatter: true
         };
 
         // deal with indent (new Array(indent + 1)).join(' ')
         var INDENT = (function () {
             var indentStr = '';
-            var space = codeStyle.useTabIndent ? '\t' : ' ';
-            var indent = codeStyle.indent ? Number(codeStyle.indent) : 4;
+            var space = config.useTabIndent ? '\t' : ' ';
+            var indent = config.indent ? Number(config.indent) : 4;
             while (indent--) {
                 indentStr += space;
             }
@@ -273,7 +273,7 @@
                 });
             },
             'ConditionalExpression': function (node) {
-                if (codeStyle.spaces.around.ternaryOperators) {
+                if (config.spaces.around.ternaryOperators) {
                     node.test.onExit = function () {
                         toLastToken(node.test);
                         var token;
@@ -308,7 +308,7 @@
             'DoWhileStatement': function (node) {
                 if (node.body && node.body.type === 'BlockStatement') {
                     node.body.onExit = function () {
-                        if (codeStyle.spaces.before.keywords) {
+                        if (config.spaces.before.keywords) {
                             forwardToken();
                             bufferPush(' ');
                         }
@@ -341,7 +341,7 @@
                 }
             },
             'FunctionDeclaration': function (node) {
-                if (codeStyle.spaces.before.functionDeclarationParentheses) {
+                if (config.spaces.before.functionDeclarationParentheses) {
                     node.id.onExit = function () {
                         toNextToken(node.id);
                         bufferPush(' ');
@@ -366,7 +366,7 @@
             },
             'FunctionExpression': function (node) {
                 //if node has id function keyword must have space after
-                if (!codeStyle.spaces.before.functionExpressionParentheses && node.id) {
+                if (!config.spaces.before.functionExpressionParentheses && node.id) {
                     node.id.onExit = function () {
                         bufferPush(' ');
                     };
@@ -395,7 +395,7 @@
 
                 if (!node.isIfStatementAlternate) {
                     //here push space before { and then forward { then next line
-                    if (codeStyle.spaces.before.leftBrace) {
+                    if (config.spaces.before.leftBrace) {
                         bufferPush(' ');
                     }
                 }
@@ -413,7 +413,7 @@
 
                 //if if has alternate, should insert space after consequent(before else)
                 if (node.consequent && node.consequent.type === 'BlockStatement') {
-                    if (codeStyle.spaces.before.keywords) {
+                    if (config.spaces.before.keywords) {
                         node.consequent.onExit = function () {
                             toNextToken(node.consequent);
                             node.alternate && bufferPush(' ');
@@ -457,7 +457,7 @@
                 node.key.onExit = function () {
                     toNextToken(node.key);
                     forwardToken();
-                    if (codeStyle.spaces.other.afterPropertyNameValueSeparator) {
+                    if (config.spaces.other.afterPropertyNameValueSeparator) {
                         bufferPush(' ');
                     }
                 };
@@ -493,7 +493,7 @@
                     while (true) {
                         token = forwardToken();
                         if (tokens[tokenIndex].value.charAt(0) === '{') {
-                            if (codeStyle.spaces.before.leftBrace) {
+                            if (config.spaces.before.leftBrace) {
                                 bufferPush(' ');
                             }
                             forwardToken();
@@ -646,8 +646,8 @@
             'Keyword': {
                 'in': ' ',
                 'instanceof': ' ',
-                'catch': codeStyle.spaces.before.keywords ? ' ' : '',
-                'finally': codeStyle.spaces.before.keywords ? ' ' : ''
+                'catch': config.spaces.before.keywords ? ' ' : '',
+                'finally': config.spaces.before.keywords ? ' ' : ''
             },
             'Punctuator': {
                 '=': ' ', //Assignment operators
@@ -692,20 +692,20 @@
         var insertAfter = {
             'Keyword': {
                 'var': ' ',
-                'if': codeStyle.spaces.before.parentheses ? ' ' : '',
+                'if': config.spaces.before.parentheses ? ' ' : '',
                 'else': ' ',
-                'function': codeStyle.spaces.before.functionExpressionParentheses ? ' ' : '',
+                'function': config.spaces.before.functionExpressionParentheses ? ' ' : '',
                 'throw': ' ',
                 'return': ' ',
                 'delete': ' ',
-                'for': codeStyle.spaces.before.parentheses ? ' ' : '',
-                'while': codeStyle.spaces.before.parentheses ? ' ' : '',
+                'for': config.spaces.before.parentheses ? ' ' : '',
+                'while': config.spaces.before.parentheses ? ' ' : '',
                 'new': ' ',
                 'in': ' ',
                 'typeof': ' ',
                 'instanceof': ' ',
-                'catch': codeStyle.spaces.before.parentheses ? ' ' : '',
-                'switch': codeStyle.spaces.before.parentheses ? ' ' : '',
+                'catch': config.spaces.before.parentheses ? ' ' : '',
+                'switch': config.spaces.before.parentheses ? ' ' : '',
                 'case': ' ',
                 'void': ' '
             },
@@ -751,7 +751,7 @@
         };
 
         //codeStyle
-        if (!codeStyle.spaces.around.binaryOperators) {
+        if (!config.spaces.around.binaryOperators) {
             delete insertBefore.Punctuator;
             delete insertAfter.Punctuator;
         }
@@ -907,7 +907,7 @@
      * @returns {Object}
      */
     var getDefaultConfig = function () {
-        return codeStyle;
+        return config;
     };
 
     exports.format = format;
