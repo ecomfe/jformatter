@@ -702,7 +702,7 @@
                 'in': ' ',
                 'typeof': ' ',
                 'instanceof': ' ',
-                'catch': ' ',
+                'catch': codeStyle.spaces.before.parentheses ? ' ' : '',
                 'switch': codeStyle.spaces.before.parentheses ? ' ' : '',
                 'case': ' ',
                 'void': ' '
