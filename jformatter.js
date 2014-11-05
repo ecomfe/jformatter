@@ -38,11 +38,11 @@
     /**
      * format given string and return formatted string
      * @param {string} string code string
-     * @param {Object} [config] config object
+     * @param {Object} [userConfig] config object
      * @returns {string}
      */
-    var format = function (string, config) {
-        config = config || {};
+    var format = function (string, userConfig) {
+        userConfig = userConfig || {};
 
         //defaults the config
         var overwriteConfig = function (defaults, configure) {
@@ -62,7 +62,7 @@
                 }
             }
         };
-        overwriteConfig(config, config); // overwrite codeStyle with user config
+        overwriteConfig(config, userConfig); // overwrite codeStyle with user config
 
         var NEXT_LINE = {
             type: 'LineBreak',
