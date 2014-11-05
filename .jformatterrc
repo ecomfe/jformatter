@@ -31,5 +31,11 @@
     },
     "other": {
         "keepArraySingleLine": false
+    },
+    "fix": {
+        "prefixSpaceToLineComment": false,
+        "alterCommonBlockCommentToLineComment": false,
+        "singleVariableDeclarator": false,
+        "fixInvalidTypeof": false
     }
 }

@@ -34,10 +34,10 @@
             keepArraySingleLine: false //TODO default formatted array multi line
         },
         fix: {
-            prefixSpaceToLineComment: false,
-            alterCommonBlockCommentToLineComment: false,
-            singleVariableDeclarator: false,
-            fixInvalidTypeof: false
+            prefixSpaceToLineComment: false, // done
+            alterCommonBlockCommentToLineComment: false, // done
+            singleVariableDeclarator: false, // done
+            fixInvalidTypeof: false // done
         }
     };
 

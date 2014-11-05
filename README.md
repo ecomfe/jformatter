@@ -21,7 +21,7 @@ Github: <https://github.com/ishowshao/jformatter>
 
     jformatter yourFile.js  //will load .jformatterrc
 
-##Configure
+##Config
 
 Default config, developing, not stable
 
@@ -58,6 +58,12 @@ Default config, developing, not stable
         },
         other: {
             keepArraySingleLine: false //TODO default formatted array multi line
+        },
+        fix: {
+            prefixSpaceToLineComment: false, // done
+            alterCommonBlockCommentToLineComment: false, // done
+            singleVariableDeclarator: false, // done
+            fixInvalidTypeof: false // done
         }
     }
 
@@ -71,7 +77,13 @@ fixed a bug cause syntax error
 
 ###next
 
-* make all configure work
+* make all config work
+
+###v0.1.9 (2014/11/05)
+
+* npm test: config auto test
+* npm test: style auto test
+* add four auto-fixer config
 
 ###v0.1.8 (2014/10/28)
 
