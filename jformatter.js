@@ -195,7 +195,6 @@
                 doStuffWithToken(token);
             }
         };
-
         var toNextToken = function (node) {
             var token = node.startToken;
             while (token !== tokens[tokenIndex]) {
