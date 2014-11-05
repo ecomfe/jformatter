@@ -1,6 +1,6 @@
 {
     "name": "jformatter",
-    "version": "0.1.9",
+    "version": "0.2.0",
     "description": "A JavaScript formatter",
     "main": "jformatter.js",
     "repository": {
@@ -17,7 +17,8 @@
         "test": "node test/auto-test.js"
     },
     "dependencies": {
-        "rocambole": "0.3.6"
+        "rocambole": "0.3.6",
+        "differ-cli": "0.2.2"
     },
     "devDependencies": {
         "rocambole": "0.3.6"
