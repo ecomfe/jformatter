@@ -115,26 +115,25 @@
         /**
          * recursive walk all nodes
          * @param {object} node
-         * @param {string} keyName
          */
-        var recursive = function (node, keyName) {
-            onEnterNode(node, keyName);
+        var recursive = function (node) {
+            onEnterNode(node);
             for (var key in node) {
                 if (node.hasOwnProperty(key) && !/parent|prev|next|depth|toString|startToken|endToken/.test(key)) {
                     if (node[key] && node[key].type) {
-                        recursive(node[key], key);
+                        recursive(node[key]);
                     } else {
                         if (Object.prototype.toString.call(node[key]) === '[object Array]') {
                             node[key].forEach(function (sub) {
                                 if (sub && sub.type) {
-                                    recursive(sub, key);
+                                    recursive(sub);
                                 }
                             });
                         }
                     }
                 }
             }
-            onExitNode(node, keyName);
+            onExitNode(node);
         };
 
         /**
@@ -184,7 +183,7 @@
          * move all tokens of this node to buffer, then tokenIndex points to the next token
          * @param {object} node
          */
-        var toNextToken = function (node) {
+        var toNextToken_ = function (node) {
             var range = node.range;
             for (var token; tokenIndex < tokenLen; tokenIndex++) {
                 token = tokens[tokenIndex];
@@ -197,7 +196,19 @@
             }
         };
 
-        var toLastToken = function (node) {
+        var toNextToken = function (node) {
+            var token = node.startToken;
+            while (token !== tokens[tokenIndex]) {
+                token = token.next;
+            }
+            while (token !== node.endToken.next) {
+                tokenIndex++;
+                doStuffWithToken(token);
+                token = token.next;
+            }
+        };
+
+        var toLastToken_ = function (node) {
             var range = node.range;
             for (var token; tokenIndex < tokenLen; tokenIndex++) {
                 token = tokens[tokenIndex];
@@ -207,6 +218,17 @@
                 }
 
                 doStuffWithToken(token);
+            }
+        };
+        var toLastToken = function (node) {
+            var token = node.startToken;
+            while (token !== tokens[tokenIndex]) {
+                token = token.next;
+            }
+            while (token !== node.endToken) {
+                tokenIndex++;
+                doStuffWithToken(token);
+                token = token.next;
             }
         };
 
@@ -526,7 +548,7 @@
             },
             'UnaryExpression': function (node) {
                 insertFlag = ['+', '-', '!'].indexOf(node.operator) === -1;
-                forwardToken(); //must this operator？
+                forwardToken(); // must this operator？
                 insertFlag = true;
             },
             'SequenceExpression': function (node) {
@@ -639,7 +661,11 @@
                 indentLevel--;
                 toNextToken(node);
                 bufferPush(NEXT_LINE);
-            }
+            }/*,
+            FunctionExpression: function (node) {
+                toNextToken(node);
+                bufferPush(NEXT_LINE);
+            }*/
         };
 
         var insertBefore = {
@@ -773,8 +799,8 @@
             }
         };
 
-        //在处理此节点和子节点之前进行的逻辑
-        var onEnterNode = function (node, keyName) {
+        // 在处理此节点和子节点之前进行的逻辑
+        var onEnterNode = function (node) {
             toPrevToken(node);
 
             if (node.onBeforeEnter) {
@@ -782,32 +808,33 @@
             }
 
             if (enterHandlers[node.type]) {
-                enterHandlers[node.type](node, keyName);
+                enterHandlers[node.type](node);
             }
         };
 
-        //logic after this node and all sub node
-        var onExitNode = function (node, keyName) {
+        // logic after this node and all sub node
+        var onExitNode = function (node) {
             if (exitHandlers[node.type]) {
-                exitHandlers[node.type](node, keyName);
+                exitHandlers[node.type](node);
             }
             if (node.onExit) {
                 node.onExit();
             }
         };
 
-        var ast = require('rocambole').parse(string);
-        var tokens = ast.tokens;
+        var _rocambole = require('rocambole');
+        var _ast = _rocambole.parse(string);
+        var tokens = _ast.tokens;
         var tokenIndex = 0;
         var tokenLen = tokens.length;
 
-        if (ast.type === 'Program') {
-            ast.body.forEach(function (node) {
-                recursive(node, 'root');
+        if (_ast.type === 'Program') {
+            _ast.body.forEach(function (node) {
+                recursive(node);
             });
         }
 
-        //before here, buffer has no comment tokens, following logic link comment tokens to buffer
+        // before here, buffer has no comment tokens, following logic link comment tokens to buffer
         var output = [];
         var token;
         for (var i = 0, j = 0; i < tokenLen && j < buffer.length; i++) {
