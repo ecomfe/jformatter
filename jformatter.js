@@ -844,7 +844,20 @@
         // before here, buffer has no comment tokens, following logic link comment tokens to buffer
         var output = [];
         var token;
-        for (var i = 0, j = 0; i < tokenLen && j < buffer.length; i++) {
+        var i = 0;
+
+        // 如果token序列里最前面是若干注释，先把这些注释直接挪到output
+        token = tokens[i];
+        while (token.type === 'LineComment' || token.type === 'BlockComment' || token.type === 'LineBreak' || token.type === 'WhiteSpace') {
+            output.push(token);
+            i++;
+            token = tokens[i];
+        }
+        if (tokens[i].type === 'LineBreak') {
+            output.push(token[i]);
+            i++;
+        }
+        for (var j = 0; i < tokenLen && j < buffer.length; i++) {
             token = tokens[i];
             if (token.type === 'WhiteSpace' || token.type === 'LineBreak') {
                 continue;

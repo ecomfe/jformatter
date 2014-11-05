@@ -1,6 +1,6 @@
+var fs = require('fs');
 var jformatter = require('../jformatter.js');
 var differ = require('differ-cli/lib/differ');
-var fs = require('fs');
 var ROOT = require('path').dirname(__filename);
 
 // test for default code style
@@ -19,6 +19,7 @@ fs.readdir(ROOT + '/test.style/case', function (err, files) {
                 } else {
                     allPass = false;
                     console.log(path + ' ... fail.');
+                    console.log(differ(formattedString, fs.readFileSync(checkFile, 'utf-8')));
                 }
             }
         }

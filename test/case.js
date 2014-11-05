@@ -1,6 +1,3 @@
-var foo = function () {
-
-};
-function bar() {
-
-}
+//var a
+// var a
+var a;
