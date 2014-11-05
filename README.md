@@ -1,4 +1,4 @@
-#jformatter
+# jformatter
 
 A JavaScript formatter
 
@@ -11,17 +11,17 @@ A JavaScript formatter
 
 Github: <https://github.com/ishowshao/jformatter>
 
-##API
+## API
 
     require('jformatter').format(code, configObj);
     require('jformatter').formatFile(filePath, configObj);
     require('jformatter').version();
 
-##Command Line
+## Command Line
 
     jformatter yourFile.js  //will load .jformatterrc
 
-##Config
+## Config
 
 Default config, developing, not stable
 
@@ -67,48 +67,49 @@ Default config, developing, not stable
         }
     }
 
-##Important Note
+## Important Note
 
 please update to `>=v0.1.6`, see version change log
 
 fixed a bug cause syntax error
 
-##Changelog
+## Changelog
 
-###next
+### next
 
 * make all config work
 
-###v0.1.9 (2014/11/05)
+### v0.2.0 (2014/11/05)
 
 * npm test: config auto test
 * npm test: style auto test
 * add four auto-fixer config
 * fix bug: Comment at first line cause redundant LineBreak
+* version rule
 
-###v0.1.8 (2014/10/28)
+### v0.1.8 (2014/10/28)
 
 * add version api
 
-###v0.1.6 (2014/08/27)
+### v0.1.6 (2014/08/27)
 
 * fix bug: lost space after `void`
 
-###v0.1.5 (2014/08/27)
+### v0.1.5 (2014/08/27)
 
 * fix bug: lost space after `typeof`
 * fix bug: lost space after comma expression
 
-###v0.1.4 (2014/08/19)
+### v0.1.4 (2014/08/19)
 
 * remove config not relate to code style
 * change config editable with common config editor
 * support npm test
 
-###v0.1.2 (2014/08/08)
+### v0.1.2 (2014/08/08)
 
 * Fix DoWhileStatement bug
 
-###v0.1.0 (2014/08/07)
+### v0.1.0 (2014/08/07)
 
 * Initial release
