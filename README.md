@@ -84,6 +84,7 @@ fixed a bug cause syntax error
 * npm test: config auto test
 * npm test: style auto test
 * add four auto-fixer config
+* fix bug: Comment at first line cause redundant LineBreak
 
 ###v0.1.8 (2014/10/28)
 
