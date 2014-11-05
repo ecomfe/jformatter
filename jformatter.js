@@ -32,6 +32,12 @@
         },
         other: {
             keepArraySingleLine: false //TODO default formatted array multi line
+        },
+        fix: {
+            prefixSpaceToLineComment: false,
+            alterCommonBlockCommentToLineComment: false,
+            singleVariableDeclarator: false,
+            fixInvalidTypeof: false
         }
     };
 
@@ -822,6 +828,8 @@
         };
 
         var _rocambole = require('rocambole');
+        string = require('./lib/fix').fix(string, config.fix);
+
         var _ast = _rocambole.parse(string);
         var tokens = _ast.tokens;
         var tokenIndex = 0;
