@@ -1,13 +1,12 @@
-var fs=require('fs'); var jformatter=require('../jformatter.js');
-var differ=require('differ-cli/lib/differ');
-var ROOT=require('path').dirname(__filename);
-var n = -1;
+var fs=
+require('fs'); // b
+var jformatter=require('../jformatter.js'); /* */var differ=require('differ-cli/lib/differ'); var ROOT=require('path').dirname(__filename); var b = 2; var n = -1;
 
 // test for default code style
 console.log('Testing code style cases ...\n');
 fs.readdir(ROOT+'/test.style/case', function (err, files) {
     var allPass = true;
-    files.forEach(function (path) {
+    files.forEach(function  (path) {
         var pathArr=path.split('.');
         if (pathArr[0]==='case' && pathArr[pathArr.length-1] === 'js') {
             pathArr[0] = 'check';

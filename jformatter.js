@@ -78,6 +78,14 @@
             formatter: true
         };
 
+        var nextLineFactory = function () {
+            return {
+                type: 'LineBreak',
+                value: _config.lineSeparator,
+                formatter: true
+            };
+        };
+
         // deal with indent (new Array(indent + 1)).join(' ')
         var INDENT = (function () {
             var indentStr = '';
@@ -89,6 +97,17 @@
             return indentStr;
         })();
 
+        var indentFactory = function () {
+            var indentStr = '';
+            for (var i = 0; i < indentLevel; i++) {
+                indentStr += INDENT;
+            }
+            return {
+                type: 'WhiteSpace',
+                value: indentStr
+            };
+        };
+
         /**
          * check if a token is comment
          * @param token
@@ -96,6 +115,15 @@
          */
         var isComment = function (token) {
             return token.type === 'LineComment' || token.type === 'BlockComment';
+        };
+
+        /**
+         * check if a token is white space
+         * @param token
+         * @returns {boolean}
+         */
+        var isWhiteSpace = function (token) {
+            return token.type === 'WhiteSpace';
         };
 
         var toInsertBefore = {
@@ -215,6 +243,37 @@
             '&&', '||'
         ];
 
+        /**
+         * @param token
+         * @returns {boolean}
+         */
+        var isInlineComment = function (token) {
+            var inline = false;
+            if (token) {
+                if (token.type === 'LineComment') {
+                    inline = true;
+                } else if (token.type === 'BlockComment') {
+                    inline = (token.value.indexOf('\n') === -1);
+                }
+            }
+            return inline;
+        };
+        /**
+         * 保证一个语句节点是在新起一行
+         * @param node
+         */
+        var guaranteeNewLine = function (node) {
+            if (node.startToken.prev) {
+                // 新起一行只有两种情况，前面就是nl或者前面是空白，再前面是nl
+                if (node.startToken.prev.type === 'LineBreak' || (node.startToken.prev.prev && node.startToken.prev.prev.type === 'LineBreak')) {
+                } else {
+                    insertBefore(node.startToken, nextLineFactory());
+                }
+            } else {
+                // startToken前面没有token，说明是文件头部，那一定是新行，不用处理
+            }
+        };
+
         var insertBefore = function (token, insertion) {
             if (!token.prev) { // insert at first
                 token.prev = insertion;
@@ -237,27 +296,38 @@
                 token.next = insertion;
             }
         };
+        var replaceToken = function (token, replace) {
+            for (var key in replace) {
+                if (replace.hasOwnProperty(key)) {
+                    token[key] = replace[key];
+                }
+            }
+        };
+        var removeToken = function (token) {
+            if (token.prev && token.next) {
+                token.prev.next = token.next;
+                token.next.prev = token.prev;
+            } else if (token.prev) {
+                token.prev.next = undefined;
+            } else if (token.next) {
+                token.next.prev = undefined;
+            }
+        };
 
         var _rocambole = require('rocambole');
         var _ast = _rocambole.parse(string);
 
-        // loop node
-        _rocambole.recursive(_ast, function (node) {
-            switch (node.type) {
-                case 'VariableDeclaration':
-                    if (node.endToken.next.type === 'WhiteSpace') {
-                        node.endToken.next.type = 'LineBreak';
-                        node.endToken.next.value = '\n';
-                    }
-                    break;
-                case 'VariableDeclarator':
-                    break;
-                default:
-                    break;
-            }
-        });
-
         // loop token
+        var clearToken = function (token) {
+            if (token.type === 'LineBreak' && token.prev && token.prev.type !== 'LineComment') {
+                removeToken(token);
+            }
+            if (token.type === 'WhiteSpace' && token.prev && token.prev.type !== 'Keyword') {
+                removeToken(token);
+            } else if (token.type === 'WhiteSpace') {
+                token.value = ' ';
+            }
+        };
         var processToken = function (token) {
             // check around = WhiteSpace
             if (token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
@@ -275,7 +345,56 @@
         };
         var token = _ast.startToken;
         while (token !== _ast.endToken.next) {
+            clearToken(token);
+            token = token.next;
+        }
+        token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
             processToken(token);
+            token = token.next;
+        }
+
+        // loop node
+        _rocambole.recursive(_ast, function (node) {
+            switch (node.type) {
+                case 'VariableDeclaration':
+                    guaranteeNewLine(node);
+                    break;
+                case 'ExpressionStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'IfStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'BlockStatement':
+                    node.startToken.indentIncrease = true;
+                    node.endToken.indentDecrease = true;
+                    insertBefore(node.endToken, nextLineFactory());
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        var indentLevel = 0;
+        var processIndent = function (token) {
+            if (token.indentIncrease) {
+                indentLevel++;
+            }
+            if (token.indentDecrease) {
+                indentLevel--;
+            }
+            if (token.type === 'LineBreak') {
+                if (token.next && token.next.indentDecrease) {
+                    indentLevel--;
+                    token.next.indentDecrease = false;
+                }
+                insertAfter(token, indentFactory());
+            }
+        };
+        token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            processIndent(token);
             token = token.next;
         }
 
