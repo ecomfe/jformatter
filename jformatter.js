@@ -72,12 +72,6 @@
         };
         overwriteConfig(_config, userConfig); // overwrite codeStyle with user config
 
-        var NEXT_LINE = {
-            type: 'LineBreak',
-            value: _config.lineSeparator,
-            formatter: true
-        };
-
         var nextLineFactory = function () {
             return {
                 type: 'LineBreak',
@@ -131,115 +125,6 @@
          */
         var isWhiteSpace = function (token) {
             return token.type === 'WhiteSpace';
-        };
-
-        var toInsertBefore = {
-            'Keyword': {
-                'in': ' ',
-                'instanceof': ' ',
-                'catch': _config.spaces.before.keywords ? ' ' : '',
-                'finally': _config.spaces.before.keywords ? ' ' : ''
-            },
-            'Punctuator': {
-                '=': ' ', //Assignment operators
-                '+=': ' ',
-                '-=': ' ',
-                '*=': ' ',
-                '/=': ' ',
-                '%=': ' ',
-                '<<=': ' ',
-                '>>=': ' ',
-                '>>>=': ' ',
-                '&=': ' ',
-                '^=': ' ',
-                '|=': ' ',
-                '==': ' ', //Comparison operators
-                '!=': ' ',
-                '===': ' ',
-                '!==': ' ',
-                '>': ' ',
-                '>=': ' ',
-                '<': ' ',
-                '<=': ' ',
-                '+': ' ', //Arithmetic operators
-                '-': ' ',
-                '*': ' ',
-                '/': ' ',
-                '%': ' ',
-                '++': '',
-                '--': '',
-                '&': ' ', //Bitwise operators
-                '|': ' ',
-                '^': ' ',
-                '~': ' ',
-                '<<': ' ',
-                '>>': ' ',
-                '>>>': ' ',
-                '&&': ' ', //Logical operators
-                '||': ' ',
-                '!': ''
-            }
-        };
-
-        var toInsertAfter = {
-            'Keyword': {
-                'var': ' ',
-                'if': _config.spaces.before.parentheses ? ' ' : '',
-                'else': ' ',
-                'function': _config.spaces.before.functionExpressionParentheses ? ' ' : '',
-                'throw': ' ',
-                'return': ' ',
-                'delete': ' ',
-                'for': _config.spaces.before.parentheses ? ' ' : '',
-                'while': _config.spaces.before.parentheses ? ' ' : '',
-                'new': ' ',
-                'in': ' ',
-                'typeof': ' ',
-                'instanceof': ' ',
-                'catch': _config.spaces.before.parentheses ? ' ' : '',
-                'switch': _config.spaces.before.parentheses ? ' ' : '',
-                'case': ' ',
-                'void': ' '
-            },
-            'Punctuator': {
-                '=': ' ', //Assignment operators
-                '+=': ' ',
-                '-=': ' ',
-                '*=': ' ',
-                '/=': ' ',
-                '%=': ' ',
-                '<<=': ' ',
-                '>>=': ' ',
-                '>>>=': ' ',
-                '&=': ' ',
-                '^=': ' ',
-                '|=': ' ',
-                '==': ' ', //Comparison operators
-                '!=': ' ',
-                '===': ' ',
-                '!==': ' ',
-                '>': ' ',
-                '>=': ' ',
-                '<': ' ',
-                '<=': ' ',
-                '+': ' ', //Arithmetic operators
-                '-': ' ',
-                '*': ' ',
-                '/': ' ',
-                '%': ' ',
-                '++': '',
-                '--': '',
-                '&': ' ', //Bitwise operators
-                '|': ' ',
-                '^': ' ',
-                '~': ' ',
-                '<<': ' ',
-                '>>': ' ',
-                '>>>': ' ',
-                '&&': ' ', //Logical operators
-                '||': ' ',
-                '!': ''
-            }
         };
 
         var SPACE_AROUND_PUNCTUATOR = [
@@ -386,11 +271,22 @@
                 case 'IfStatement':
                     guaranteeNewLine(node);
                     break;
+                case 'ReturnStatement':
+                    guaranteeNewLine(node);
+                    break;
                 case 'BlockStatement':
                     node.startToken.indentIncrease = true;
                     node.endToken.indentDecrease = true;
                     insertBefore(node.startToken, whiteSpaceFactory());
                     insertBefore(node.endToken, nextLineFactory());
+                    break;
+                case 'ObjectExpression':
+                    node.startToken.indentIncrease = true;
+                    node.endToken.indentDecrease = true;
+                    insertBefore(node.endToken, nextLineFactory());
+                    break;
+                case 'Property':
+                    guaranteeNewLine(node);
                     break;
                 case 'CallExpression':
                     node.arguments.forEach(function (arg) {
