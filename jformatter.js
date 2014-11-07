@@ -108,6 +108,13 @@
             };
         };
 
+        var whiteSpaceFactory = function () {
+            return {
+                type: 'WhiteSpace',
+                value: ' '
+            };
+        };
+
         /**
          * check if a token is comment
          * @param token
@@ -317,17 +324,29 @@
         var _rocambole = require('rocambole');
         var _ast = _rocambole.parse(string);
 
-        // loop token
+        // start clear
         var clearToken = function (token) {
-            if (token.type === 'LineBreak' && token.prev && token.prev.type !== 'LineComment') {
-                removeToken(token);
-            }
+            // 先去除空白
             if (token.type === 'WhiteSpace' && token.prev && token.prev.type !== 'Keyword') {
                 removeToken(token);
             } else if (token.type === 'WhiteSpace') {
                 token.value = ' ';
             }
+            // 注释前后的换行一律保留，其他一律删除
+            if (token.type === 'LineBreak') {
+                if (token.prev && !isComment(token.prev) && token.next && !isComment(token.next)) {
+                    removeToken(token);
+                }
+            }
         };
+        var token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            clearToken(token);
+            token = token.next;
+        }
+        // end clear
+
+        // start process
         var processToken = function (token) {
             // check around = WhiteSpace
             if (token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
@@ -343,22 +362,23 @@
                 }
             }
         };
-        var token = _ast.startToken;
-        while (token !== _ast.endToken.next) {
-            clearToken(token);
-            token = token.next;
-        }
         token = _ast.startToken;
         while (token !== _ast.endToken.next) {
             processToken(token);
             token = token.next;
         }
+        // end process
 
         // loop node
         _rocambole.recursive(_ast, function (node) {
             switch (node.type) {
                 case 'VariableDeclaration':
                     guaranteeNewLine(node);
+                    break;
+                case 'VariableDeclarator':
+                    if (node.endToken.next && node.endToken.next.type === 'Punctuator' && node.endToken.next.value === ',') {
+                        insertAfter(node.endToken.next, whiteSpaceFactory());
+                    }
                     break;
                 case 'ExpressionStatement':
                     guaranteeNewLine(node);
@@ -369,13 +389,43 @@
                 case 'BlockStatement':
                     node.startToken.indentIncrease = true;
                     node.endToken.indentDecrease = true;
+                    insertBefore(node.startToken, whiteSpaceFactory());
                     insertBefore(node.endToken, nextLineFactory());
+                    break;
+                case 'CallExpression':
+                    node.arguments.forEach(function (arg) {
+                        if (arg.endToken.next && arg.endToken.next.type === 'Punctuator' && arg.endToken.next.value === ',') {
+                            insertAfter(arg.endToken.next, whiteSpaceFactory());
+                        }
+                    });
+                    break;
+                case 'FunctionExpression':
+                    node.params.forEach(function (param) {
+                        if (param.endToken.next && param.endToken.next.type === 'Punctuator' && param.endToken.next.value === ',') {
+                            insertAfter(param.endToken.next, whiteSpaceFactory());
+                        }
+                    });
+                    break;
+                case 'SequenceExpression':
+                    node.expressions.forEach(function (exp) {
+                        if (exp.endToken.next && exp.endToken.next.type === 'Punctuator' && exp.endToken.next.value === ',') {
+                            insertAfter(exp.endToken.next, whiteSpaceFactory());
+                        }
+                    });
+                    break;
+                case 'UnaryExpression':
+                    if (['+', '-', '!'].indexOf(node.startToken.value) !== -1) {
+                        if (node.startToken.next.type === 'WhiteSpace') {
+                            removeToken(node.startToken.next);
+                        }
+                    }
                     break;
                 default:
                     break;
             }
         });
 
+        // process indent start
         var indentLevel = 0;
         var processIndent = function (token) {
             if (token.indentIncrease) {
@@ -397,6 +447,7 @@
             processIndent(token);
             token = token.next;
         }
+        // process indent end
 
         return _ast.toString();
     };
