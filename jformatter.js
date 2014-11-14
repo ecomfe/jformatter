@@ -117,6 +117,14 @@
         };
 
         /**
+         * @param token
+         * @returns {boolean}
+         */
+        var isLineComment = function (token) {
+            return token.type === 'LineComment';
+        };
+
+        /**
          * check if a token is white space
          * @param token
          * @returns {boolean}
@@ -378,7 +386,7 @@
                     }
                     break;
                 case 'VariableDeclarator':
-                    if (node.endToken.next && node.endToken.next.type === 'Punctuator' && node.endToken.next.value === ',') {
+                    if (node.endToken.next && node.endToken.next.type === 'Punctuator' && node.endToken.next.value === ',' && !isLineBreak(node.endToken.next.next)) {
                         insertAfter(node.endToken.next, whiteSpaceFactory());
                     }
                     break;
@@ -394,10 +402,12 @@
                 case 'BlockStatement':
                     node.startToken.indentIncrease = true;
                     node.endToken.indentDecrease = true;
-                    if (node.startToken.prev && node.startToken.prev.type !== 'WhiteSpace') {
+                    if (node.startToken.prev && !isWhiteSpace(node.startToken.prev) && !isLineBreak(node.startToken.prev)) {
                         insertBefore(node.startToken, whiteSpaceFactory());
                     }
-                    insertBefore(node.endToken, nextLineFactory());
+                    if (!isLineBreak(node.endToken.prev)) {
+                        insertBefore(node.endToken, nextLineFactory());
+                    }
                     break;
                 case 'ObjectExpression':
                     if (!isTypeBetween(node.startToken, node.endToken, ['WhiteSpace', 'LineBreak'])) {
@@ -488,6 +498,18 @@
             token = token.next;
         }
         // process indent end
+
+        var processComment = function (token) {
+            // 行尾注释保持跟前面的代码一个空格的距离
+            if (isLineComment(token) && token.prev && !isWhiteSpace(token.prev)) {
+                insertBefore(token, whiteSpaceFactory());
+            }
+        };
+        token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            processComment(token);
+            token = token.next;
+        }
 
         return _ast.toString();
     };
