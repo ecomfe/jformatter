@@ -306,22 +306,13 @@
 
         // start process
         // 这些关键词之后，必须无脑保证空白，其实return,delete等并不是必须要空白，但是应该没有傻逼这么写吧return(a);忽略这种情况
-        var INSERT_SPACE_AFTER_KEYWORD = {
-            'var': ' ',
-            'else': ' ',
-            'throw': ' ',
-            'return': ' ',
-            'delete': ' ',
-            'new': ' ',
-            'in': ' ',
-            'typeof': ' ',
-            'instanceof': ' ',
-            'case': ' ',
-            'void': ' '
-        };
+        // 如果这些关键词后面都不加空白，那就傻逼鉴定完毕 shit 所以不提供这种配置
+        var INSERT_SPACE_AFTER_KEYWORD = ['var', 'throw', 'return', 'delete', 'new', 'in', 'typeof', 'instanceof', 'case', 'void'];
         var processToken = function (token) {
             // 必须加空白的地方
-
+            if (token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD.indexOf(token.value) !== -1) {
+                insertAfter(token, whiteSpaceFactory());
+            }
 
             // check around = WhiteSpace
             if (token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
