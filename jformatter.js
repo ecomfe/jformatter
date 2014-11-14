@@ -260,10 +260,10 @@
                 remove = true;
 
                 // 跟在关键词后面的空白保留，以免出问题，但是要变成单个空白
-                if (token.prev && token.prev.type === 'Keyword') {
-                    remove = false;
-                    token.value = ' ';
-                }
+//                if (token.prev && token.prev.type === 'Keyword') {
+//                    remove = false;
+//                    token.value = ' ';
+//                }
                 // 空白前面是换行 && 后面是注释的不删除
                 if (token.prev && token.next && isLineBreak(token.prev) && isComment(token.next)) {
                     remove = false;
@@ -305,7 +305,24 @@
         // end clear
 
         // start process
+        // 这些关键词之后，必须无脑保证空白，其实return,delete等并不是必须要空白，但是应该没有傻逼这么写吧return(a);忽略这种情况
+        var INSERT_SPACE_AFTER_KEYWORD = {
+            'var': ' ',
+            'else': ' ',
+            'throw': ' ',
+            'return': ' ',
+            'delete': ' ',
+            'new': ' ',
+            'in': ' ',
+            'typeof': ' ',
+            'instanceof': ' ',
+            'case': ' ',
+            'void': ' '
+        };
         var processToken = function (token) {
+            // 必须加空白的地方
+
+
             // check around = WhiteSpace
             if (token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
                 guaranteeWhiteSpaceAround(token);
@@ -314,6 +331,8 @@
             if (token.type === 'Keyword' && token.value === 'in') {
                 guaranteeWhiteSpaceAround(token);
             }
+
+
             // 特殊处理finally，这货在ast里不是一个独立type节点
             if (token.type === 'Keyword' && token.value === 'finally') {
                 if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
