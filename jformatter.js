@@ -400,7 +400,18 @@
                     guaranteeNewLine(node);
                     break;
                 case 'IfStatement':
-                    guaranteeNewLine(node);
+                    if (node.parent.type !== 'IfStatement') {
+                        guaranteeNewLine(node);
+                    }
+                    if (node.consequent.type !== 'BlockStatement') {
+                        node.consequent.startToken.indentSelf = true;
+                        if (node.alternate) {
+                            insertAfter(node.consequent.endToken, nextLineFactory());
+                        }
+                    }
+                    if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
+                        node.alternate.startToken.indentSelf = true;
+                    }
                     break;
                 case 'ReturnStatement':
                     guaranteeNewLine(node);

@@ -1,6 +1,6 @@
 if (true) {
 
-} else {
+} else if (true) {
     callback(a,b);
 
 }
