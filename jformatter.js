@@ -125,10 +125,18 @@
             return token.type === 'WhiteSpace';
         };
 
+        /**
+         * @param token
+         * @returns {boolean}
+         */
+        var isLineBreak = function (token) {
+            return token.type === 'LineBreak';
+        };
+
         var SPACE_AROUND_PUNCTUATOR = [
             '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=', '&=', '^=', '|=',
             '==', '!=', '===', '!==', '>', '>=', '<', '<=',
-            '+', '-', '*', '/', '%', '++', '--',
+            '+', '-', '*', '/', '%',
             '&', '|', '^', '~', '<<', '>>', '>>>',
             '&&', '||'
         ];
@@ -148,19 +156,47 @@
             }
             return inline;
         };
+
+        /**
+         * check if only types between startToken and endToken
+         * @param {Object} startToken
+         * @param {Object} endToken
+         * @param {Array} types
+         * @returns {boolean}
+         */
+        var isTypeBetween = function (startToken, endToken, types) {
+            var is = true;
+            var token = startToken;
+            while (token.next && token.next !== endToken) {
+                token = token.next;
+                if (types.indexOf(token.type) === -1) {
+                    is = false;
+                    break;
+                }
+            }
+            return is;
+        };
+
         /**
          * 保证一个语句节点是在新起一行
          * @param node
          */
         var guaranteeNewLine = function (node) {
-            if (node.startToken.prev) {
-                // 新起一行只有两种情况，前面就是nl或者前面是空白，再前面是nl
-                if (node.startToken.prev.type === 'LineBreak' || (node.startToken.prev.prev && node.startToken.prev.prev.type === 'LineBreak')) {
-                } else {
-                    insertBefore(node.startToken, nextLineFactory());
-                }
-            } else {
-                // startToken前面没有token，说明是文件头部，那一定是新行，不用处理
+            if (node.startToken.prev && node.startToken.prev.type !== 'LineBreak') {
+                insertBefore(node.startToken, nextLineFactory());
+            }
+        };
+
+        /**
+         * 保证一个token两侧是空白符
+         * @param token
+         */
+        var guaranteeWhiteSpaceAround = function (token) {
+            if (token.prev.type !== 'WhiteSpace') {
+                insertBefore(token, whiteSpaceFactory());
+            }
+            if (token.next.type !== 'WhiteSpace') {
+                insertAfter(token, whiteSpaceFactory());
             }
         };
 
@@ -234,15 +270,16 @@
         var processToken = function (token) {
             // check around = WhiteSpace
             if (token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
-                if (token.prev.type === 'WhiteSpace') {
-                    token.prev.value = ' ';
-                } else {
-                    insertBefore(token, {type: 'WhiteSpace', value: ' '});
-                }
-                if (token.next.type === 'WhiteSpace') {
-                    token.next.value = ' ';
-                } else {
-                    insertAfter(token, {type: 'WhiteSpace', value: ' '});
+                guaranteeWhiteSpaceAround(token);
+            }
+            // 特殊处理in，这货两边必须保证空白
+            if (token.type === 'Keyword' && token.value === 'in') {
+                guaranteeWhiteSpaceAround(token);
+            }
+            // 特殊处理finally，这货在ast里不是一个独立type节点
+            if (token.type === 'Keyword' && token.value === 'finally') {
+                if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
+                    insertBefore(token, whiteSpaceFactory());
                 }
             }
         };
@@ -256,8 +293,59 @@
         // loop node
         _rocambole.recursive(_ast, function (node) {
             switch (node.type) {
-                case 'VariableDeclaration':
+                case 'ConditionalExpression':
+                    if (node.test && !isWhiteSpace(node.test.endToken)) {
+                        insertAfter(node.test.endToken, whiteSpaceFactory());
+                    }
+                    if (node.consequent && !isWhiteSpace(node.consequent.startToken)) {
+                        insertBefore(node.consequent.startToken, whiteSpaceFactory());
+                    }
+                    if (node.consequent && !isWhiteSpace(node.consequent.endToken)) {
+                        insertAfter(node.consequent.endToken, whiteSpaceFactory());
+                    }
+                    if (node.alternate && !isWhiteSpace(node.alternate.startToken)) {
+                        insertBefore(node.alternate.startToken, whiteSpaceFactory());
+                    }
+                    break;
+                case 'DoWhileStatement':
                     guaranteeNewLine(node);
+                    if (node.body.type === 'BlockStatement') {
+                        if (!isWhiteSpace(node.body.endToken.next)) {
+                            insertAfter(node.body.endToken, whiteSpaceFactory());
+                        }
+                    } else {
+                        if (isWhiteSpace(node.startToken.next)) {
+                            removeToken(node.startToken.next);
+                        }
+                        node.body.startToken.indentSelf = true;
+                        if (!isWhiteSpace(node.test.startToken.prev.prev)) {
+                            if (!isLineBreak(node.test.startToken.prev.prev.prev)) {
+                                insertBefore(node.test.startToken.prev.prev, nextLineFactory());
+                            }
+                            insertBefore(node.test.startToken.prev, whiteSpaceFactory());
+                        } else {
+                            if (!isLineBreak(node.test.startToken.prev.prev.prev.prev)) {
+                                insertBefore(node.test.startToken.prev.prev.prev, nextLineFactory());
+                            }
+                        }
+                    }
+                    break;
+                case 'ForStatement':
+                    guaranteeNewLine(node);
+                    if (node.test && !isWhiteSpace(node.test.startToken.prev)) {
+                        insertBefore(node.test.startToken, whiteSpaceFactory());
+                    }
+                    if (node.update && !isWhiteSpace(node.update.startToken.prev)) {
+                        insertBefore(node.update.startToken, whiteSpaceFactory());
+                    }
+                    break;
+                case 'ForInStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'VariableDeclaration':
+                    if (node.parent.type !== 'ForStatement' && node.parent.type !== 'ForInStatement') {
+                        guaranteeNewLine(node);
+                    }
                     break;
                 case 'VariableDeclarator':
                     if (node.endToken.next && node.endToken.next.type === 'Punctuator' && node.endToken.next.value === ',') {
@@ -276,13 +364,17 @@
                 case 'BlockStatement':
                     node.startToken.indentIncrease = true;
                     node.endToken.indentDecrease = true;
-                    insertBefore(node.startToken, whiteSpaceFactory());
+                    if (node.startToken.prev && node.startToken.prev.type !== 'WhiteSpace') {
+                        insertBefore(node.startToken, whiteSpaceFactory());
+                    }
                     insertBefore(node.endToken, nextLineFactory());
                     break;
                 case 'ObjectExpression':
-                    node.startToken.indentIncrease = true;
-                    node.endToken.indentDecrease = true;
-                    insertBefore(node.endToken, nextLineFactory());
+                    if (!isTypeBetween(node.startToken, node.endToken, ['WhiteSpace', 'LineBreak'])) {
+                        node.startToken.indentIncrease = true;
+                        node.endToken.indentDecrease = true;
+                        insertBefore(node.endToken, nextLineFactory());
+                    }
                     break;
                 case 'Property':
                     guaranteeNewLine(node);
@@ -296,6 +388,7 @@
                     });
                     break;
                 case 'FunctionExpression':
+                    insertAfter(node.startToken, whiteSpaceFactory());
                     node.params.forEach(function (param) {
                         if (param.endToken.next && param.endToken.next.type === 'Punctuator' && param.endToken.next.value === ',') {
                             insertAfter(param.endToken.next, whiteSpaceFactory());
@@ -315,6 +408,19 @@
                             removeToken(node.startToken.next);
                         }
                     }
+                    if (node.operator === 'void') {
+                        if (node.startToken.next.type !== 'WhiteSpace') {
+                            insertAfter(node.startToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'TryStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'CatchClause':
+                    if (_config.spaces.before.keywords && !isWhiteSpace(node.startToken.prev)) {
+                        insertBefore(node.startToken, whiteSpaceFactory());
+                    }
                     break;
                 default:
                     break;
@@ -327,15 +433,20 @@
             if (token.indentIncrease) {
                 indentLevel++;
             }
-            if (token.indentDecrease) {
-                indentLevel--;
-            }
             if (token.type === 'LineBreak') {
                 if (token.next && token.next.indentDecrease) {
                     indentLevel--;
                     token.next.indentDecrease = false;
                 }
                 insertAfter(token, indentFactory());
+            }
+            if (token.indentDecrease) {
+                indentLevel--;
+            }
+            if (token.indentSelf) {
+                indentLevel++;
+                insertBefore(token, indentFactory());
+                indentLevel--;
             }
         };
         token = _ast.startToken;

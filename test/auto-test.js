@@ -32,7 +32,7 @@ fs.readdir(ROOT + '/test.style/case', function (err, files) {
 });
 
 // test for code style config
-var setByNamespace = function (obj, namespace, value) {
+/*var setByNamespace = function (obj, namespace, value) {
     var props = namespace.split('.');
     var pointer = obj;
     try {
@@ -88,4 +88,4 @@ fs.readdir(ROOT + '/test.config/case', function (err, cases) {
             console.log('\nConfig: something wrong!\n');
         }
     });
-});
+});*/

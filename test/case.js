@@ -1,43 +1,12 @@
-var
-    // a
-    a = 10,
-    // b
-    b = 20,
-    /**
-     * c
-     */
-    c = 30;
+do {
+    if ( (elemLang = documentIsHTML ?
+    elem.lang :
+    elem.getAttribute("xml:lang") || elem.getAttribute("lang")) ) {
 
-foo = {
-  x: 10,
-  y: 20,
-  z: 30
-}
-
-/**
- * @param {string}
- */
-var e = function(){
-    return {
-        x: 10,
-        y: 20,
-        z: 30,
-        e: 40
+        elemLang = elemLang.toLowerCase();
     }
-};
+} while ( (elem = elem.parentNode) && elem.nodeType === 1 );
 
-var foo = {
-  x: 10,
-  y: 20,
-  z: 30,
-  a: {
-    b: 20,
-    c: 30,
-    d: 40,
-    e: {
-      f: 50,
-      g: 60,
-      h: 70
-    }
-  }
-};
+do
+    doSomething();
+while (true);
