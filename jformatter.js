@@ -245,16 +245,46 @@
 
         // start clear
         var clearToken = function (token) {
+            var remove;
             // 先去除空白
-            if (token.type === 'WhiteSpace' && token.prev && token.prev.type !== 'Keyword') {
-                removeToken(token);
-            } else if (token.type === 'WhiteSpace') {
-                token.value = ' ';
+            if (isWhiteSpace(token)) {
+                // 默认都要删除空白
+                remove = true;
+
+                // 跟在关键词后面的空白保留，以免出问题，但是要变成单个空白
+                if (token.prev && token.prev.type === 'Keyword') {
+                    remove = false;
+                    token.value = ' ';
+                }
+                // 空白前面是换行 && 后面是注释的不删除
+                if (token.prev && token.next && isLineBreak(token.prev) && isComment(token.next)) {
+                    remove = false;
+                }
+
+                if (remove) {
+                    removeToken(token);
+                }
             }
-            // 注释前后的换行一律保留，其他一律删除
             // TODO 独占整行的注释，要保留占用的空白，保留其原始位置：空白前面是换行后面是注释的不删除
-            if (token.type === 'LineBreak') {
-                if (token.prev && !isComment(token.prev) && token.next && !isComment(token.next)) {
+            // 注释前后的换行一律保留，其他一律删除
+            if (isLineBreak(token)) {
+                // 默认都要删除换行
+                remove = true;
+
+                // 注释前面的
+                if (token.next && isComment(token.next)) {
+                    remove = false;
+                }
+                // 注释后面的
+                if (token.prev && isComment(token.prev)) {
+                    remove = false;
+                }
+                // 注释前面空白再前面的，这种是有缩进且占整行的注释
+                if (token.next && token.next.next && isWhiteSpace(token.next) && isComment(token.next.next)) {
+                    remove = false;
+                }
+
+                if (remove) {
                     removeToken(token);
                 }
             }
@@ -434,11 +464,14 @@
                 indentLevel++;
             }
             if (token.type === 'LineBreak') {
-                if (token.next && token.next.indentDecrease) {
-                    indentLevel--;
-                    token.next.indentDecrease = false;
+                if (token.next && !isWhiteSpace(token.next)) { //
+                    // 如果下一个token是要减小缩进的，那它本身就是要减少缩进的
+                    if (token.next.indentDecrease) {
+                        indentLevel--;
+                        token.next.indentDecrease = false;
+                    }
+                    insertAfter(token, indentFactory());
                 }
-                insertAfter(token, indentFactory());
             }
             if (token.indentDecrease) {
                 indentLevel--;
