@@ -41,8 +41,6 @@
         }
     };
 
-
-
     /**
      * format given string and return formatted string
      * @param {string} string code string
@@ -218,6 +216,7 @@
                 token.value = ' ';
             }
             // 注释前后的换行一律保留，其他一律删除
+            // TODO 独占整行的注释，要保留占用的空白，保留其原始位置：空白前面是换行后面是注释的不删除
             if (token.type === 'LineBreak') {
                 if (token.prev && !isComment(token.prev) && token.next && !isComment(token.next)) {
                     removeToken(token);
@@ -287,6 +286,7 @@
                     break;
                 case 'Property':
                     guaranteeNewLine(node);
+                    insertBefore(node.value.startToken, whiteSpaceFactory());
                     break;
                 case 'CallExpression':
                     node.arguments.forEach(function (arg) {
