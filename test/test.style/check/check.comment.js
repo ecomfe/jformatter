@@ -28,7 +28,7 @@ doSomething(p1 //a
 , p2);/**
  */
 
-doSomething(p1, /* p2 */p2);/* do */
+doSomething(p1,/* p2 */ p2);/* do */
 
 /**
  * foo

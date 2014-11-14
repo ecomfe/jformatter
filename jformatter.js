@@ -320,6 +320,12 @@
                     insertBefore(token, whiteSpaceFactory());
                 }
             }
+            // 特殊处理else
+            if (token.type === 'Keyword' && token.value === 'else') {
+                if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
+                    insertBefore(token, whiteSpaceFactory());
+                }
+            }
         };
         token = _ast.startToken;
         while (token !== _ast.endToken.next) {
@@ -421,9 +427,9 @@
                     insertBefore(node.value.startToken, whiteSpaceFactory());
                     break;
                 case 'CallExpression':
-                    node.arguments.forEach(function (arg) {
-                        if (arg.endToken.next && arg.endToken.next.type === 'Punctuator' && arg.endToken.next.value === ',') {
-                            insertAfter(arg.endToken.next, whiteSpaceFactory());
+                    node.arguments.forEach(function (arg, i) {
+                        if (i !== 0) {
+                            insertBefore(arg.startToken, whiteSpaceFactory());
                         }
                     });
                     break;
