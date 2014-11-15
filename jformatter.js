@@ -307,10 +307,20 @@
         // start process
         // 这些关键词之后，必须无脑保证空白，其实return,delete等并不是必须要空白，但是应该没有傻逼这么写吧return(a);忽略这种情况
         // 如果这些关键词后面都不加空白，那就傻逼鉴定完毕 shit 所以不提供这种配置
-        var INSERT_SPACE_AFTER_KEYWORD = ['var', 'throw', 'return', 'delete', 'new', 'in', 'typeof', 'instanceof', 'case', 'void'];
+        var INSERT_SPACE_AFTER_KEYWORD = ['throw', 'return', 'delete', 'new', 'in', 'typeof', 'instanceof', 'case', 'void'];
+        // 这几个关键词属于同一类型，在它们后边可以加空白也可以不加，都不会出先语法错误
+        var INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG = ['if', 'for', 'while', 'switch', 'catch'];
         var processToken = function (token) {
             // 必须加空白的地方
             if (token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD.indexOf(token.value) !== -1) {
+                insertAfter(token, whiteSpaceFactory());
+            }
+            // 坑：var后面可以是换行，这时候就不需要空白
+            if (token.type === 'Keyword' && token.value === 'var' && !isLineBreak(token.next)) {
+                insertAfter(token, whiteSpaceFactory());
+            }
+
+            if (token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG.indexOf(token.value) !== -1) {
                 insertAfter(token, whiteSpaceFactory());
             }
 
@@ -332,9 +342,9 @@
             }
             // 特殊处理else
             if (token.type === 'Keyword' && token.value === 'else') {
-                if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
-                    insertBefore(token, whiteSpaceFactory());
-                }
+//                if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
+//                    insertBefore(token, whiteSpaceFactory());
+//                }
             }
         };
         token = _ast.startToken;
@@ -409,14 +419,23 @@
                 case 'ExpressionStatement':
                     guaranteeNewLine(node);
                     break;
+                case 'FunctionDeclaration':
+                    insertAfter(node.startToken, whiteSpaceFactory());
+                    break;
                 case 'IfStatement':
                     if (node.parent.type !== 'IfStatement') {
                         guaranteeNewLine(node);
+                    } else {
+                        insertBefore(node.startToken, whiteSpaceFactory());
                     }
                     if (node.consequent.type !== 'BlockStatement') {
                         node.consequent.startToken.indentSelf = true;
                         if (node.alternate) {
                             insertAfter(node.consequent.endToken, nextLineFactory());
+                        }
+                    } else {
+                        if (node.alternate) {
+                            insertAfter(node.consequent.endToken, whiteSpaceFactory());
                         }
                     }
                     if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
