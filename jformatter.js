@@ -363,6 +363,16 @@
         // loop node
         _rocambole.recursive(_ast, function (node) {
             switch (node.type) {
+                case 'ArrayExpression':
+                    node.startToken.indentIncrease = true;
+                    node.endToken.indentDecrease = true;
+                    node.elements.forEach(function (el) {
+                        el && guaranteeNewLine(el);
+                    });
+                    if (node.elements.length > 0 && !isLineBreak(node.endToken.prev)) {
+                        insertBefore(node.endToken, nextLineFactory());
+                    }
+                    break;
                 case 'BreakStatement':
                     guaranteeNewLine(node);
                     break;
