@@ -99,6 +99,12 @@
                 value: indentStr
             };
         };
+        var singleIndentFactory = function () {
+            return {
+                type: 'WhiteSpace',
+                value: INDENT
+            };
+        };
 
         var whiteSpaceFactory = function () {
             return {
@@ -357,6 +363,9 @@
         // loop node
         _rocambole.recursive(_ast, function (node) {
             switch (node.type) {
+                case 'BreakStatement':
+                    guaranteeNewLine(node);
+                    break;
                 case 'ConditionalExpression':
                     if (node.test && !isWhiteSpace(node.test.endToken)) {
                         insertAfter(node.test.endToken, whiteSpaceFactory());
@@ -370,6 +379,9 @@
                     if (node.alternate && !isWhiteSpace(node.alternate.startToken)) {
                         insertBefore(node.alternate.startToken, whiteSpaceFactory());
                     }
+                    break;
+                case 'ContinueStatement':
+                    guaranteeNewLine(node);
                     break;
                 case 'DoWhileStatement':
                     guaranteeNewLine(node);
@@ -423,12 +435,13 @@
                     insertAfter(node.startToken, whiteSpaceFactory());
                     break;
                 case 'IfStatement':
+                    // 坑：if statement 的 consequent 和 alternate 都是有可能不存在的
                     if (node.parent.type !== 'IfStatement') {
                         guaranteeNewLine(node);
                     } else {
                         insertBefore(node.startToken, whiteSpaceFactory());
                     }
-                    if (node.consequent.type !== 'BlockStatement') {
+                    if (node.consequent && node.consequent.type !== 'BlockStatement') {
                         node.consequent.startToken.indentSelf = true;
                         if (node.alternate) {
                             insertAfter(node.consequent.endToken, nextLineFactory());
@@ -500,6 +513,20 @@
                         }
                     }
                     break;
+                case 'WhileStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'SwitchStatement':
+                    node.discriminant.endToken.next.indentIncrease = true;
+                    insertAfter(node.discriminant.endToken.next, whiteSpaceFactory());
+                    node.endToken.indentDecrease = true;
+                    insertBefore(node.endToken, nextLineFactory());
+                    break;
+                case 'SwitchCase':
+                    guaranteeNewLine(node);
+                    node.startToken.indentIncrease = true;
+                    node.endToken.indentDecrease = true;
+                    break;
                 case 'TryStatement':
                     guaranteeNewLine(node);
                     break;
@@ -534,7 +561,7 @@
             }
             if (token.indentSelf) {
                 indentLevel++;
-                insertBefore(token, indentFactory());
+                insertBefore(token, singleIndentFactory());
                 indentLevel--;
             }
         };

@@ -1,6 +1,7 @@
-function foo() {
-
+while (document) {
+    doTest();
+    continue;
 }
-var bar = function () {
-
-};
+while (window) {
+    doTest();
+}
