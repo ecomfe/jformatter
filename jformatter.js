@@ -443,6 +443,11 @@
                     break;
                 case 'FunctionDeclaration':
                     insertAfter(node.startToken, whiteSpaceFactory());
+                    node.params.forEach(function (param, i) {
+                        if (i > 0) {
+                            insertBefore(param.startToken, whiteSpaceFactory());
+                        }
+                    });
                     break;
                 case 'IfStatement':
                     // 坑：if statement 的 consequent 和 alternate 都是有可能不存在的
