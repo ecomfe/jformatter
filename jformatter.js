@@ -340,12 +340,12 @@
                 insertAfter(token, whiteSpaceFactory());
             }
 
-            if (token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG.indexOf(token.value) !== -1) {
+            if (_config.spaces.before.parentheses && token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG.indexOf(token.value) !== -1) {
                 insertAfter(token, whiteSpaceFactory());
             }
 
             // check around = WhiteSpace
-            if (token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
+            if (_config.spaces.around.binaryOperators && token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
                 guaranteeWhiteSpaceAround(token);
             }
             // 特殊处理in，这货两边必须保证空白
@@ -391,7 +391,7 @@
                     guaranteeNewLine(node);
                     break;
                 case 'ConditionalExpression':
-                    if (node.test) {
+                    if (_config.spaces.around.ternaryOperators && node.test) {
                         (function () {
                             var token = node.test.endToken;
                             // 这样做到底安全不？
@@ -406,7 +406,7 @@
                             }
                         })();
                     }
-                    if (node.consequent) {
+                    if (_config.spaces.around.ternaryOperators && node.consequent) {
                         (function () {
                             var token = node.consequent.endToken;
                             while (!(token.value === ':' && token.type === 'Punctuator')) {
@@ -428,7 +428,7 @@
                     guaranteeNewLine(node);
                     if (node.body.type === 'BlockStatement') {
                         if (!isWhiteSpace(node.body.endToken.next)) {
-                            insertAfter(node.body.endToken, whiteSpaceFactory());
+                            _config.spaces.before.keywords && insertAfter(node.body.endToken, whiteSpaceFactory());
                         }
                     } else {
                         if (isWhiteSpace(node.startToken.next)) {
@@ -474,6 +474,9 @@
                     break;
                 case 'FunctionDeclaration':
                     insertAfter(node.startToken, whiteSpaceFactory());
+                    if (node.id) {
+                        _config.spaces.before.functionDeclarationParentheses && insertAfter(node.id.endToken, whiteSpaceFactory());
+                    }
                     node.params.forEach(function (param, i) {
                         if (i > 0) {
                             insertBefore(param.startToken, whiteSpaceFactory());
@@ -494,7 +497,7 @@
                         }
                     } else {
                         if (node.alternate) {
-                            insertAfter(node.consequent.endToken, whiteSpaceFactory());
+                            _config.spaces.before.keywords && insertAfter(node.consequent.endToken, whiteSpaceFactory());
                         }
                     }
                     if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
@@ -508,7 +511,7 @@
                     node.startToken.indentIncrease = true;
                     node.endToken.indentDecrease = true;
                     if (node.startToken.prev && !isWhiteSpace(node.startToken.prev) && !isLineBreak(node.startToken.prev)) {
-                        insertBefore(node.startToken, whiteSpaceFactory());
+                        _config.spaces.before.leftBrace && insertBefore(node.startToken, whiteSpaceFactory());
                     }
                     if (!isLineBreak(node.endToken.prev)) {
                         insertBefore(node.endToken, nextLineFactory());
@@ -523,7 +526,9 @@
                     break;
                 case 'Property':
                     guaranteeNewLine(node);
-                    insertBefore(node.value.startToken, whiteSpaceFactory());
+                    if (_config.spaces.other.afterPropertyNameValueSeparator) {
+                        insertBefore(node.value.startToken, whiteSpaceFactory());
+                    }
                     break;
                 case 'CallExpression':
                     node.arguments.forEach(function (arg, i) {
@@ -563,8 +568,9 @@
                     guaranteeNewLine(node);
                     break;
                 case 'SwitchStatement':
+                    guaranteeNewLine(node);
                     node.discriminant.endToken.next.indentIncrease = true;
-                    insertAfter(node.discriminant.endToken.next, whiteSpaceFactory());
+                    _config.spaces.before.leftBrace && insertAfter(node.discriminant.endToken.next, whiteSpaceFactory());
                     node.endToken.indentDecrease = true;
                     insertBefore(node.endToken, nextLineFactory());
                     break;
