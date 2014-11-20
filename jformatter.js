@@ -377,17 +377,34 @@
                     guaranteeNewLine(node);
                     break;
                 case 'ConditionalExpression':
-                    if (node.test && !isWhiteSpace(node.test.endToken)) {
-                        insertAfter(node.test.endToken, whiteSpaceFactory());
+                    if (node.test) {
+                        (function () {
+                            var token = node.test.endToken;
+                            // 这样做到底安全不？
+                            while (!(token.value === '?' && token.type === 'Punctuator')) {
+                                token = token.next;
+                            }
+                            if (!isWhiteSpace(token.prev)) {
+                                insertBefore(token, whiteSpaceFactory());
+                            }
+                            if (!isWhiteSpace(token.next)) {
+                                insertAfter(token, whiteSpaceFactory());
+                            }
+                        })();
                     }
-                    if (node.consequent && !isWhiteSpace(node.consequent.startToken)) {
-                        insertBefore(node.consequent.startToken, whiteSpaceFactory());
-                    }
-                    if (node.consequent && !isWhiteSpace(node.consequent.endToken)) {
-                        insertAfter(node.consequent.endToken, whiteSpaceFactory());
-                    }
-                    if (node.alternate && !isWhiteSpace(node.alternate.startToken)) {
-                        insertBefore(node.alternate.startToken, whiteSpaceFactory());
+                    if (node.consequent) {
+                        (function () {
+                            var token = node.consequent.endToken;
+                            while (!(token.value === ':' && token.type === 'Punctuator')) {
+                                token = token.next;
+                            }
+                            if (!isWhiteSpace(token.prev)) {
+                                insertBefore(token, whiteSpaceFactory());
+                            }
+                            if (!isWhiteSpace(token.next)) {
+                                insertAfter(token, whiteSpaceFactory());
+                            }
+                        })();
                     }
                     break;
                 case 'ContinueStatement':
