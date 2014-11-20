@@ -41,6 +41,25 @@
         }
     };
 
+    // defaults the config
+    var overwriteConfig = function (defaults, configure) {
+        for (var key in defaults) {
+            if (defaults.hasOwnProperty(key)) {
+                if (typeof defaults[key] === 'object') {
+                    //recursive
+                    if (typeof configure[key] === 'object') {
+                        overwriteConfig(defaults[key], configure[key]);
+                    }
+                } else {
+                    //copy directly
+                    if (typeof configure[key] !== 'undefined') {
+                        defaults[key] = configure[key];
+                    }
+                }
+            }
+        }
+    };
+
     /**
      * format given string and return formatted string
      * @param {string} string code string
@@ -50,33 +69,7 @@
     var format = function (string, userConfig) {
         userConfig = userConfig || {};
 
-        // defaults the config
-        var overwriteConfig = function (defaults, configure) {
-            for (var key in defaults) {
-                if (defaults.hasOwnProperty(key)) {
-                    if (typeof defaults[key] === 'object') {
-                        //recursive
-                        if (typeof configure[key] === 'object') {
-                            overwriteConfig(defaults[key], configure[key]);
-                        }
-                    } else {
-                        //copy directly
-                        if (typeof configure[key] !== 'undefined') {
-                            defaults[key] = configure[key];
-                        }
-                    }
-                }
-            }
-        };
         overwriteConfig(_config, userConfig); // overwrite codeStyle with user config
-
-        var nextLineFactory = function () {
-            return {
-                type: 'LineBreak',
-                value: _config.lineSeparator,
-                formatter: true
-            };
-        };
 
         // deal with indent (new Array(indent + 1)).join(' ')
         var INDENT = (function () {
@@ -89,6 +82,18 @@
             return indentStr;
         })();
 
+        /**
+         * create a LineBreak token
+         * @returns {{type: string, value: string, formatter: boolean}}
+         */
+        var nextLineFactory = function () {
+            return {
+                type: 'LineBreak',
+                value: _config.lineSeparator,
+                formatter: true
+            };
+        };
+
         var indentFactory = function () {
             var indentStr = '';
             for (var i = 0; i < indentLevel; i++) {
@@ -99,6 +104,7 @@
                 value: indentStr
             };
         };
+
         var singleIndentFactory = function () {
             return {
                 type: 'WhiteSpace',
@@ -146,14 +152,6 @@
         var isLineBreak = function (token) {
             return token.type === 'LineBreak';
         };
-
-        var SPACE_AROUND_PUNCTUATOR = [
-            '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=', '&=', '^=', '|=',
-            '==', '!=', '===', '!==', '>', '>=', '<', '<=',
-            '+', '-', '*', '/', '%',
-            '&', '|', '^', '~', '<<', '>>', '>>>',
-            '&&', '||'
-        ];
 
         /**
          * @param token
@@ -225,6 +223,7 @@
                 token.prev = insertion;
             }
         };
+
         var insertAfter = function (token, insertion) {
             if (!token.next) { // insert at last
                 token.next = insertion;
@@ -236,6 +235,7 @@
                 token.next = insertion;
             }
         };
+
         var replaceToken = function (token, replace) {
             for (var key in replace) {
                 if (replace.hasOwnProperty(key)) {
@@ -243,6 +243,7 @@
                 }
             }
         };
+
         var removeToken = function (token) {
             if (token.prev && token.next) {
                 token.prev.next = token.next;
@@ -254,7 +255,20 @@
             }
         };
 
+        var SPACE_AROUND_PUNCTUATOR = [
+            '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=', '&=', '^=', '|=',
+            '==', '!=', '===', '!==', '>', '>=', '<', '<=',
+            '+', '-', '*', '/', '%',
+            '&', '|', '^', '~', '<<', '>>', '>>>',
+            '&&', '||'
+        ];
+
+
         var _rocambole = require('rocambole');
+
+        string = require('./lib/fix').fix(string, _config.fix);
+//        console.log(string);
+
         var _ast = _rocambole.parse(string);
 
         // start clear
