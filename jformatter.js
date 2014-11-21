@@ -541,7 +541,9 @@
                     });
                     break;
                 case 'FunctionExpression':
-                    insertAfter(node.startToken, whiteSpaceFactory());
+                    if (_config.spaces.before.functionExpressionParentheses || node.id) {
+                        insertAfter(node.startToken, whiteSpaceFactory());
+                    }
                     node.params.forEach(function (param) {
                         if (param.endToken.next && param.endToken.next.type === 'Punctuator' && param.endToken.next.value === ',') {
                             insertAfter(param.endToken.next, whiteSpaceFactory());

@@ -1,6 +1,6 @@
 var foo = function () {
 };
-var bar = function() {
+var bar = function () {
 };
 var foo = function a() {
 };
