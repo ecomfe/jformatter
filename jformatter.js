@@ -36,6 +36,9 @@
                 functionDeclaration: 1, // TODO
                 other: 1 // TODO
             },
+            blankLines: {
+                keepMaxBlankLines: 1 // TODO
+            },
             other: {
                 keepArraySingleLine: false // TODO default formatted array multi line
             },
