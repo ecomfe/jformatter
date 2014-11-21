@@ -13,7 +13,7 @@
             },
             before: {
                 functionDeclarationParentheses: false, // done function foo() {
-                functionExpressionParentheses: true, // TODO has a bug var foo = function () {
+                functionExpressionParentheses: true, // done var foo = function () {
                 parentheses: true, // done if (), for (), while (), ...
                 leftBrace: true, // done function () {, if () {, do {, try { ...
                 keywords: true // done if {} else {}, do {} while (), try {} catch () {} finally
