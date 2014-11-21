@@ -1,37 +1,37 @@
 (function () {
     var _config = {
-        lineSeparator: '\n', //done
-        maxLength: 120, //TODO
-        wrapIfLong: false, //TODO
-        indent: 4, //done
-        useTabIndent: false, //done
+        lineSeparator: '\n', // done
+        maxLength: 120, // TODO
+        wrapIfLong: false, // TODO
+        indent: 4, // done
+        useTabIndent: false, // done
         spaces: {
             around: {
-                unaryOperators: false, //TODO
-                binaryOperators: true, //done
-                ternaryOperators: true //done
+                unaryOperators: false, // TODO
+                binaryOperators: true, // done
+                ternaryOperators: true // done
             },
             before: {
-                functionDeclarationParentheses: false, //done function foo() {
-                functionExpressionParentheses: true, //TODO has a bug var foo = function () {
-                parentheses: true, //done if (), for (), while (), ...
-                leftBrace: true, //done function () {, if () {, do {, try { ...
-                keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
+                functionDeclarationParentheses: false, // done function foo() {
+                functionExpressionParentheses: true, // TODO has a bug var foo = function () {
+                parentheses: true, // done if (), for (), while (), ...
+                leftBrace: true, // done function () {, if () {, do {, try { ...
+                keywords: true // done if {} else {}, do {} while (), try {} catch () {} finally
             },
             within: {
-                parentheses: false //TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+                parentheses: false // TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
             },
             other: {
                 beforePropertyNameValueSeparator: false, // done {key: value} {key : value} {key:value}
                 afterPropertyNameValueSeparator: true // done
             }
         },
-        bracesPlacement: { //1. same line 2. next line
-            functionDeclaration: 1, //TODO
-            other: 1 //TODO
+        bracesPlacement: { // 1. same line 2. next line
+            functionDeclaration: 1, // TODO
+            other: 1 // TODO
         },
         other: {
-            keepArraySingleLine: false //TODO default formatted array multi line
+            keepArraySingleLine: false // TODO default formatted array multi line
         },
         fix: {
             prefixSpaceToLineComment: false, // done
@@ -46,7 +46,7 @@
         for (var key in defaults) {
             if (defaults.hasOwnProperty(key)) {
                 if (typeof defaults[key] === 'object') {
-                    //recursive
+                    // recursive
                     if (typeof configure[key] === 'object') {
                         overwriteConfig(defaults[key], configure[key]);
                     }
