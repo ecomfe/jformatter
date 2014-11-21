@@ -25,7 +25,7 @@
                 },
                 within: {
                     // function call, function declaration, if, for, while, switch, catch
-                    parentheses: false // TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+                    parentheses: false // done
                 },
                 other: {
                     beforePropertyNameValueSeparator: false, // done {key: value} {key : value} {key:value}
