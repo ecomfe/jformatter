@@ -1,46 +1,54 @@
 (function () {
-    var _config = {
-        lineSeparator: '\n', // done
-        maxLength: 120, // TODO
-        wrapIfLong: false, // TODO
-        indent: 4, // done
-        useTabIndent: false, // done
-        spaces: {
-            around: {
-                unaryOperators: false, // TODO
-                binaryOperators: true, // done
-                ternaryOperators: true // done
+    /**
+     * returns default config
+     * @returns {Object}
+     */
+    var getDefaultConfig = function () {
+        return {
+            lineSeparator: '\n', // done
+            maxLength: 120, // TODO
+            wrapIfLong: false, // TODO
+            indent: 4, // done
+            useTabIndent: false, // done
+            spaces: {
+                around: {
+                    unaryOperators: false, // TODO
+                    binaryOperators: true, // done
+                    ternaryOperators: true // done
+                },
+                before: {
+                    functionDeclarationParentheses: false, // done function foo() {
+                    functionExpressionParentheses: true, // done var foo = function () {
+                    parentheses: true, // done if (), for (), while (), ...
+                    leftBrace: true, // done function () {, if () {, do {, try { ...
+                    keywords: true // done if {} else {}, do {} while (), try {} catch () {} finally
+                },
+                within: {
+                    // function call, function declaration, if, for, while, switch, catch
+                    parentheses: false // TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+                },
+                other: {
+                    beforePropertyNameValueSeparator: false, // done {key: value} {key : value} {key:value}
+                    afterPropertyNameValueSeparator: true // done
+                }
             },
-            before: {
-                functionDeclarationParentheses: false, // done function foo() {
-                functionExpressionParentheses: true, // done var foo = function () {
-                parentheses: true, // done if (), for (), while (), ...
-                leftBrace: true, // done function () {, if () {, do {, try { ...
-                keywords: true // done if {} else {}, do {} while (), try {} catch () {} finally
-            },
-            within: {
-                // function call, function declaration, if, for, while, switch, catch
-                parentheses: false // TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+            bracesPlacement: { // 1. same line 2. next line
+                functionDeclaration: 1, // TODO
+                other: 1 // TODO
             },
             other: {
-                beforePropertyNameValueSeparator: false, // done {key: value} {key : value} {key:value}
-                afterPropertyNameValueSeparator: true // done
+                keepArraySingleLine: false // TODO default formatted array multi line
+            },
+            fix: {
+                prefixSpaceToLineComment: false, // done
+                alterCommonBlockCommentToLineComment: false, // done
+                singleVariableDeclarator: false, // done
+                fixInvalidTypeof: false // done
             }
-        },
-        bracesPlacement: { // 1. same line 2. next line
-            functionDeclaration: 1, // TODO
-            other: 1 // TODO
-        },
-        other: {
-            keepArraySingleLine: false // TODO default formatted array multi line
-        },
-        fix: {
-            prefixSpaceToLineComment: false, // done
-            alterCommonBlockCommentToLineComment: false, // done
-            singleVariableDeclarator: false, // done
-            fixInvalidTypeof: false // done
-        }
+        };
     };
+
+    var _config = getDefaultConfig();
 
     // defaults the config
     var overwriteConfig = function (defaults, configure) {
@@ -456,6 +464,14 @@
                     if (node.update && !isWhiteSpace(node.update.startToken.prev)) {
                         insertBefore(node.update.startToken, whiteSpaceFactory());
                     }
+                    if (_config.spaces.within.parentheses) {
+                        if (node.init && !isWhiteSpace(node.init.startToken.prev)) {
+                            insertBefore(node.init.startToken, whiteSpaceFactory());
+                        } else {}
+                        if (node.update && !isWhiteSpace(node.update.endToken.next)) {
+                            insertAfter(node.update.endToken, whiteSpaceFactory());
+                        }
+                    }
                     break;
                 case 'ForInStatement':
                     guaranteeNewLine(node);
@@ -474,6 +490,7 @@
                     guaranteeNewLine(node);
                     break;
                 case 'FunctionDeclaration':
+                    guaranteeNewLine(node);
                     insertAfter(node.startToken, whiteSpaceFactory());
                     if (node.id) {
                         _config.spaces.before.functionDeclarationParentheses && insertAfter(node.id.endToken, whiteSpaceFactory());
@@ -483,6 +500,14 @@
                             insertBefore(param.startToken, whiteSpaceFactory());
                         }
                     });
+                    if (_config.spaces.within.parentheses && node.params.length > 0) {
+                        if (!isWhiteSpace(node.params[0].startToken.prev)) {
+                            insertBefore(node.params[0].startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.params[node.params.length - 1].endToken.next)) {
+                            insertAfter(node.params[node.params.length - 1].endToken, whiteSpaceFactory());
+                        }
+                    }
                     break;
                 case 'IfStatement':
                     // 坑：if statement 的 consequent 和 alternate 都是有可能不存在的
@@ -503,6 +528,14 @@
                     }
                     if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
                         node.alternate.startToken.indentSelf = true;
+                    }
+                    if (_config.spaces.within.parentheses && node.test) {
+                        if (!isWhiteSpace(node.test.startToken.prev)) {
+                            insertBefore(node.test.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.test.endToken.next)) {
+                            insertAfter(node.test.endToken, whiteSpaceFactory());
+                        }
                     }
                     break;
                 case 'ReturnStatement':
@@ -540,16 +573,32 @@
                             insertBefore(arg.startToken, whiteSpaceFactory());
                         }
                     });
+                    if (_config.spaces.within.parentheses && node.arguments.length > 0) {
+                        if (!isWhiteSpace(node.arguments[0].startToken.prev)) {
+                            insertBefore(node.arguments[0].startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.arguments[node.arguments.length - 1].endToken.next)) {
+                            insertAfter(node.arguments[node.arguments.length - 1].endToken, whiteSpaceFactory());
+                        }
+                    }
                     break;
                 case 'FunctionExpression':
                     if (_config.spaces.before.functionExpressionParentheses || node.id) {
                         insertAfter(node.startToken, whiteSpaceFactory());
                     }
-                    node.params.forEach(function (param) {
+                    node.params.forEach(function (param, i, array) {
                         if (param.endToken.next && param.endToken.next.type === 'Punctuator' && param.endToken.next.value === ',') {
                             insertAfter(param.endToken.next, whiteSpaceFactory());
                         }
                     });
+                    if (_config.spaces.within.parentheses && node.params.length > 0) {
+                        if (!isWhiteSpace(node.params[0].startToken.prev)) {
+                            insertBefore(node.params[0].startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.params[node.params.length - 1].endToken.next)) {
+                            insertAfter(node.params[node.params.length - 1].endToken, whiteSpaceFactory());
+                        }
+                    }
                     break;
                 case 'SequenceExpression':
                     node.expressions.forEach(function (exp) {
@@ -572,6 +621,14 @@
                     break;
                 case 'WhileStatement':
                     guaranteeNewLine(node);
+                    if (_config.spaces.within.parentheses && node.test) {
+                        if (!isWhiteSpace(node.test.startToken.prev)) {
+                            insertBefore(node.test.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.test.endToken.next)) {
+                            insertAfter(node.test.endToken, whiteSpaceFactory());
+                        }
+                    }
                     break;
                 case 'SwitchStatement':
                     guaranteeNewLine(node);
@@ -579,6 +636,14 @@
                     _config.spaces.before.leftBrace && insertAfter(node.discriminant.endToken.next, whiteSpaceFactory());
                     node.endToken.indentDecrease = true;
                     insertBefore(node.endToken, nextLineFactory());
+                    if (_config.spaces.within.parentheses && node.discriminant) {
+                        if (!isWhiteSpace(node.discriminant.startToken.prev)) {
+                            insertBefore(node.discriminant.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.discriminant.endToken.next)) {
+                            insertAfter(node.discriminant.endToken, whiteSpaceFactory());
+                        }
+                    }
                     break;
                 case 'SwitchCase':
                     guaranteeNewLine(node);
@@ -591,6 +656,14 @@
                 case 'CatchClause':
                     if (_config.spaces.before.keywords && !isWhiteSpace(node.startToken.prev)) {
                         insertBefore(node.startToken, whiteSpaceFactory());
+                    }
+                    if (_config.spaces.within.parentheses && node.param) {
+                        if (!isWhiteSpace(node.param.startToken.prev)) {
+                            insertBefore(node.param.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.param.endToken.next)) {
+                            insertAfter(node.param.endToken, whiteSpaceFactory());
+                        }
                     }
                     break;
                 default:
@@ -661,14 +734,6 @@
      */
     var version = function () {
         return require('./package.json').version;
-    };
-
-    /**
-     * returns default config
-     * @returns {Object}
-     */
-    var getDefaultConfig = function () {
-        return _config;
     };
 
     exports.format = format;
