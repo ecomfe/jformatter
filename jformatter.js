@@ -19,6 +19,7 @@
                 keywords: true // done if {} else {}, do {} while (), try {} catch () {} finally
             },
             within: {
+                // function call, function declaration, if, for, while, switch, catch
                 parentheses: false // TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
             },
             other: {
