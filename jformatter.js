@@ -22,8 +22,8 @@
                 parentheses: false //TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
             },
             other: {
-                beforePropertyNameValueSeparator: false, //TODO {key: value} {key : value} {key:value}
-                afterPropertyNameValueSeparator: true //done
+                beforePropertyNameValueSeparator: false, // done {key: value} {key : value} {key:value}
+                afterPropertyNameValueSeparator: true // done
             }
         },
         bracesPlacement: { //1. same line 2. next line
@@ -526,8 +526,11 @@
                     break;
                 case 'Property':
                     guaranteeNewLine(node);
+                    if (_config.spaces.other.beforePropertyNameValueSeparator) {
+                        !isWhiteSpace(node.key.endToken.next) && insertAfter(node.key.endToken, whiteSpaceFactory());
+                    }
                     if (_config.spaces.other.afterPropertyNameValueSeparator) {
-                        insertBefore(node.value.startToken, whiteSpaceFactory());
+                        !isWhiteSpace(node.value.startToken.prev) && insertBefore(node.value.startToken, whiteSpaceFactory());
                     }
                     break;
                 case 'CallExpression':
