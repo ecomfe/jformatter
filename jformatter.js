@@ -653,6 +653,9 @@
                     node.startToken.indentIncrease = true;
                     node.endToken.indentDecrease = true;
                     break;
+                case 'ThrowStatement':
+                    guaranteeNewLine(node);
+                    break;
                 case 'TryStatement':
                     guaranteeNewLine(node);
                     break;
