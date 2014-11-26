@@ -25,6 +25,11 @@ if (typeof targetFile !== 'string') {
     process.exit(1);
 }
 
+/**
+ * 递归寻找配置文件
+ * @param {string} targetFile
+ * @returns {Object}
+ */
 var getConfig = function (targetFile) {
     var config = {};
     var path = require('path');
