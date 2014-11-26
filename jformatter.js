@@ -1,3 +1,7 @@
+/**
+ * jformatter main
+ * @author ishowshao
+ */
 (function () {
     /**
      * returns default config

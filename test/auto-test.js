@@ -1,3 +1,7 @@
+/**
+ * auto test for `npm test`
+ * @author ishowshao
+ */
 var fs = require('fs');
 var jformatter = require('../jformatter.js');
 var differ = require('differ-cli/lib/differ');
