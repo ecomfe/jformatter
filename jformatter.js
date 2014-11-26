@@ -106,6 +106,10 @@
             };
         };
 
+        /**
+         * create a indent token with indent level
+         * @returns {Object}
+         */
         var indentFactory = function () {
             var indentStr = '';
             for (var i = 0; i < indentLevel; i++) {
@@ -117,6 +121,10 @@
             };
         };
 
+        /**
+         * create a indent token with only one indent
+         * @returns {Object}
+         */
         var singleIndentFactory = function () {
             return {
                 type: 'WhiteSpace',
@@ -124,6 +132,10 @@
             };
         };
 
+        /**
+         * create a single space token
+         * @returns {Object}
+         */
         var whiteSpaceFactory = function () {
             return {
                 type: 'WhiteSpace',
@@ -224,6 +236,11 @@
             }
         };
 
+        /**
+         * insert token before a token
+         * @param {Object} token
+         * @param {Object} insertion
+         */
         var insertBefore = function (token, insertion) {
             if (!token.prev) { // insert at first
                 token.prev = insertion;
@@ -236,6 +253,11 @@
             }
         };
 
+        /**
+         * insert token after a token
+         * @param {Object} token
+         * @param {Object} insertion
+         */
         var insertAfter = function (token, insertion) {
             if (!token.next) { // insert at last
                 token.next = insertion;
@@ -248,14 +270,10 @@
             }
         };
 
-        var replaceToken = function (token, replace) {
-            for (var key in replace) {
-                if (replace.hasOwnProperty(key)) {
-                    token[key] = replace[key];
-                }
-            }
-        };
-
+        /**
+         * remove token in tokens
+         * @param {Object} token
+         */
         var removeToken = function (token) {
             if (token.prev && token.next) {
                 token.prev.next = token.next;
@@ -267,6 +285,10 @@
             }
         };
 
+        /**
+         * 这堆操作符前后是要有空白的
+         * @type {string[]}
+         */
         var SPACE_AROUND_PUNCTUATOR = [
             '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=', '&=', '^=', '|=',
             '==', '!=', '===', '!==', '>', '>=', '<', '<=',
@@ -275,11 +297,10 @@
             '&&', '||'
         ];
 
-
         var _rocambole = require('rocambole');
 
+        // 先fix再format
         string = require('./lib/fix').fix(string, _config.fix);
-//        console.log(string);
 
         var _ast = _rocambole.parse(string);
 
@@ -291,11 +312,6 @@
                 // 默认都要删除空白
                 remove = true;
 
-                // 跟在关键词后面的空白保留，以免出问题，但是要变成单个空白
-//                if (token.prev && token.prev.type === 'Keyword') {
-//                    remove = false;
-//                    token.value = ' ';
-//                }
                 // 空白前面是换行 && 后面是注释的不删除
                 if (token.prev && token.next && isLineBreak(token.prev) && isComment(token.next)) {
                     remove = false;
@@ -365,18 +381,11 @@
                 guaranteeWhiteSpaceAround(token);
             }
 
-
             // 特殊处理finally，这货在ast里不是一个独立type节点
             if (token.type === 'Keyword' && token.value === 'finally') {
                 if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
                     insertBefore(token, whiteSpaceFactory());
                 }
-            }
-            // 特殊处理else
-            if (token.type === 'Keyword' && token.value === 'else') {
-//                if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
-//                    insertBefore(token, whiteSpaceFactory());
-//                }
             }
         };
         token = _ast.startToken;
@@ -406,7 +415,7 @@
                     if (_config.spaces.around.ternaryOperators && node.test) {
                         (function () {
                             var token = node.test.endToken;
-                            // 这样做到底安全不？
+                            // TODO 这样做到底安全不？
                             while (!(token.value === '?' && token.type === 'Punctuator')) {
                                 token = token.next;
                             }
@@ -678,13 +687,14 @@
         });
 
         // process indent start
+        // 缩进这块要单独拿出来处理，不然很容易混乱
         var indentLevel = 0;
         var processIndent = function (token) {
             if (token.indentIncrease) {
                 indentLevel++;
             }
             if (token.type === 'LineBreak') {
-                if (token.next && !isWhiteSpace(token.next)) { //
+                if (token.next && !isWhiteSpace(token.next)) {
                     // 如果下一个token是要减小缩进的，那它本身就是要减少缩进的
                     if (token.next.indentDecrease) {
                         indentLevel--;
@@ -709,6 +719,7 @@
         }
         // process indent end
 
+        // 单独的处理注释的逻辑
         var processComment = function (token) {
             // 行尾注释保持跟前面的代码一个空格的距离
             if (isLineComment(token) && token.prev && !isWhiteSpace(token.prev)) {
