@@ -41,7 +41,7 @@
                 other: 1 // TODO
             },
             blankLines: {
-                keepMaxBlankLines: 0 // TODO
+                keepMaxBlankLines: 0 // done
             },
             other: {
                 keepArraySingleLine: false // TODO default formatted array multi line
