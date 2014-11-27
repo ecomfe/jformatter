@@ -41,7 +41,7 @@
                 other: 1 // TODO
             },
             blankLines: {
-                keepMaxBlankLines: 1 // TODO
+                keepMaxBlankLines: 0 // TODO
             },
             other: {
                 keepArraySingleLine: false // TODO default formatted array multi line
@@ -341,6 +341,22 @@
                 }
                 // 注释前面空白再前面的，这种是有缩进且占整行的注释
                 if (token.next && token.next.next && isWhiteSpace(token.next) && isComment(token.next.next)) {
+                    remove = false;
+                }
+                if (token.prev && (token.prev.value === ';' || token.prev.value === '}') && isLineBreak(token)) {
+                    var keep = Number(_config.blankLines.keepMaxBlankLines);
+                    if (keep > 0) {
+                        var t = token;
+                        while (keep--) {
+                            if (t.next && isLineBreak(t.next)) {
+                                t.next.removeAble = false;
+                                t = t.next;
+                            }
+                        }
+                        remove = false;
+                    }
+                }
+                if (token.removeAble === false) {
                     remove = false;
                 }
 
