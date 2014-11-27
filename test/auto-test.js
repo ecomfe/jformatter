@@ -1,3 +1,7 @@
+/**
+ * auto test for `npm test`
+ * @author ishowshao
+ */
 var fs = require('fs');
 var jformatter = require('../jformatter.js');
 var differ = require('differ-cli/lib/differ');
@@ -44,7 +48,6 @@ var setByNamespace = function (obj, namespace, value) {
     }
 };
 fs.readdir(ROOT + '/test.config/case', function (err, cases) {
-    var defaultConfig = jformatter.getDefaultConfig();
     fs.readdir(ROOT + '/test.config/check', function (err, checks) {
         var allPass = true;
         cases.forEach(function (path) {
@@ -70,6 +73,7 @@ fs.readdir(ROOT + '/test.config/case', function (err, cases) {
                     configValue = Number(configValue);
                 }
 
+                var defaultConfig = jformatter.getDefaultConfig();
                 setByNamespace(defaultConfig, path.slice(7, -3), configValue);
 
                 var formattedString = jformatter.formatFile(ROOT + '/test.config/case/' + path, defaultConfig);

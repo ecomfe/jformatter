@@ -9,4 +9,4 @@ do {
 
 do
     doSomething();
-while (true);
+while(true);
