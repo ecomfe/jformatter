@@ -1,43 +1,78 @@
+/**
+ * jformatter main
+ * @author ishowshao
+ */
 (function () {
-    var config = {
-        lineSeparator: '\n', //done
-        maxLength: 120, //TODO
-        wrapIfLong: false, //TODO
-        indent: 4, //done
-        useTabIndent: false, //done
-        spaces: {
-            around: {
-                unaryOperators: false, //TODO
-                binaryOperators: true, //done
-                ternaryOperators: true //done
+    /**
+     * returns default config
+     * @returns {Object}
+     */
+    var getDefaultConfig = function () {
+        return {
+            lineSeparator: '\n', // done
+            maxLength: 120, // TODO
+            wrapIfLong: false, // TODO
+            indent: 4, // done
+            useTabIndent: false, // done
+            spaces: {
+                around: {
+                    unaryOperators: false, // TODO
+                    binaryOperators: true, // done
+                    ternaryOperators: true // done
+                },
+                before: {
+                    functionDeclarationParentheses: false, // done function foo() {
+                    functionExpressionParentheses: true, // done var foo = function () {
+                    parentheses: true, // done if (), for (), while (), ...
+                    leftBrace: true, // done function () {, if () {, do {, try { ...
+                    keywords: true // done if {} else {}, do {} while (), try {} catch () {} finally
+                },
+                within: {
+                    // function call, function declaration, if, for, while, switch, catch
+                    parentheses: false // done
+                },
+                other: {
+                    beforePropertyNameValueSeparator: false, // done {key: value} {key : value} {key:value}
+                    afterPropertyNameValueSeparator: true // done
+                }
             },
-            before: {
-                functionDeclarationParentheses: false, //done function foo() {
-                functionExpressionParentheses: true, //TODO has a bug var foo = function () {
-                parentheses: true, //done if (), for (), while (), ...
-                leftBrace: true, //done function () {, if () {, do {, try { ...
-                keywords: true //done if {} else {}, do {} while (), try {} catch () {} finally
+            bracesPlacement: { // 1. same line 2. next line
+                functionDeclaration: 1, // TODO
+                other: 1 // TODO
             },
-            within: {
-                parentheses: false //TODO this configure is complex ( a, b, c ) , if ( true ) or (a, b, c) , if (true)
+            blankLines: {
+                keepMaxBlankLines: 0 // done
             },
             other: {
-                beforePropertyNameValueSeparator: false, //TODO {key: value} {key : value} {key:value}
-                afterPropertyNameValueSeparator: true //done
+                keepArraySingleLine: false // TODO default formatted array multi line
+            },
+            fix: {
+                prefixSpaceToLineComment: false, // done
+                alterCommonBlockCommentToLineComment: false, // done
+                singleVariableDeclarator: false, // done
+                fixInvalidTypeof: false // done
             }
-        },
-        bracesPlacement: { //1. same line 2. next line
-            functionDeclaration: 1, //TODO
-            other: 1 //TODO
-        },
-        other: {
-            keepArraySingleLine: false //TODO default formatted array multi line
-        },
-        fix: {
-            prefixSpaceToLineComment: false, // done
-            alterCommonBlockCommentToLineComment: false, // done
-            singleVariableDeclarator: false, // done
-            fixInvalidTypeof: false // done
+        };
+    };
+
+    var _config = getDefaultConfig();
+
+    // defaults the config
+    var overwriteConfig = function (defaults, configure) {
+        for (var key in defaults) {
+            if (defaults.hasOwnProperty(key)) {
+                if (typeof defaults[key] === 'object') {
+                    // recursive
+                    if (typeof configure[key] === 'object') {
+                        overwriteConfig(defaults[key], configure[key]);
+                    }
+                } else {
+                    //copy directly
+                    if (typeof configure[key] !== 'undefined') {
+                        defaults[key] = configure[key];
+                    }
+                }
+            }
         }
     };
 
@@ -50,229 +85,70 @@
     var format = function (string, userConfig) {
         userConfig = userConfig || {};
 
-        //defaults the config
-        var overwriteConfig = function (defaults, configure) {
-            for (var key in defaults) {
-                if (defaults.hasOwnProperty(key)) {
-                    if (typeof defaults[key] === 'object') {
-                        //recursive
-                        if (typeof configure[key] === 'object') {
-                            overwriteConfig(defaults[key], configure[key]);
-                        }
-                    } else {
-                        //copy directly
-                        if (typeof configure[key] !== 'undefined') {
-                            defaults[key] = configure[key];
-                        }
-                    }
-                }
-            }
-        };
-        overwriteConfig(config, userConfig); // overwrite codeStyle with user config
-
-        var NEXT_LINE = {
-            type: 'LineBreak',
-            value: config.lineSeparator,
-            formatter: true
-        };
+        overwriteConfig(_config, userConfig); // overwrite codeStyle with user config
 
         // deal with indent (new Array(indent + 1)).join(' ')
         var INDENT = (function () {
             var indentStr = '';
-            var space = config.useTabIndent ? '\t' : ' ';
-            var indent = config.indent ? Number(config.indent) : 4;
+            var space = _config.useTabIndent ? '\t' : ' ';
+            var indent = _config.indent ? Number(_config.indent) : 4;
             while (indent--) {
                 indentStr += space;
             }
             return indentStr;
         })();
 
-        var indentLevel = 0;
-
-        var buffer = [];
-
-        var bufferPush = function (token) {
-            if (token === ' ') {
-                token = {
-                    type: 'WhiteSpace',
-                    value: ' ',
-                    formatter: true
-                };
-            }
-            buffer.push(token);
-        };
-
-        var bufferPop = function () {
-            return buffer.pop();
-        };
-
-        var obIndent = function () {
-            var token = {
-                type: 'Indent',
-                value: '',
+        /**
+         * create a LineBreak token
+         * @returns {{type: string, value: string, formatter: boolean}}
+         */
+        var nextLineFactory = function () {
+            return {
+                type: 'LineBreak',
+                value: _config.lineSeparator,
                 formatter: true
             };
+        };
+
+        /**
+         * create a indent token with indent level
+         * @returns {Object}
+         */
+        var indentFactory = function () {
+            var indentStr = '';
             for (var i = 0; i < indentLevel; i++) {
-                token.value += INDENT;
+                indentStr += INDENT;
             }
-            bufferPush(token);
+            return {
+                type: 'WhiteSpace',
+                value: indentStr
+            };
         };
 
         /**
-         * recursive walk all nodes
-         * @param {object} node
+         * create a indent token with only one indent
+         * @returns {Object}
          */
-        var recursive = function (node) {
-            onEnterNode(node);
-            for (var key in node) {
-                if (node.hasOwnProperty(key) && !/parent|prev|next|depth|toString|startToken|endToken/.test(key)) {
-                    if (node[key] && node[key].type) {
-                        recursive(node[key]);
-                    } else {
-                        if (Object.prototype.toString.call(node[key]) === '[object Array]') {
-                            node[key].forEach(function (sub) {
-                                if (sub && sub.type) {
-                                    recursive(sub);
-                                }
-                            });
-                        }
-                    }
-                }
-            }
-            onExitNode(node);
+        var singleIndentFactory = function () {
+            return {
+                type: 'WhiteSpace',
+                value: INDENT
+            };
         };
 
         /**
-         * don't write token except here
-         * @param token
+         * create a single space token
+         * @returns {Object}
          */
-        var doStuffWithToken = function (token) {
-            switch (token.type) {
-                case 'LineComment':
-                    break;
-                case 'BlockComment':
-                    break;
-                case 'WhiteSpace':
-                    break;
-                case 'LineBreak':
-                    break;
-                default:
-                    if (buffer[buffer.length - 1] === NEXT_LINE) {
-                        obIndent();
-                    }
-                    insertFlag && doInsertBefore(token);
-                    bufferPush(token);
-                    insertFlag && doInsertAfter(token);
-            }
-        };
-        //only operator of UnaryExpression use this flag
-        var insertFlag = true;
-
-        /**
-         * move all tokens to buffer before this node
-         * @param {object} node
-         */
-        var toPrevToken = function (node) {
-            var range = node.range;
-            for (var token; tokenIndex < tokenLen; tokenIndex++) {
-                token = tokens[tokenIndex];
-
-                if (token.range[1] > range[0]) {
-                    break;
-                }
-
-                doStuffWithToken(token);
-            }
+        var whiteSpaceFactory = function () {
+            return {
+                type: 'WhiteSpace',
+                value: ' '
+            };
         };
 
         /**
-         * move all tokens of this node to buffer, then tokenIndex points to the next token
-         * @param {object} node
-         */
-        var toNextToken_ = function (node) {
-            var range = node.range;
-            for (var token; tokenIndex < tokenLen; tokenIndex++) {
-                token = tokens[tokenIndex];
-
-                if (token.range[1] > range[1]) {
-                    break;
-                }
-
-                doStuffWithToken(token);
-            }
-        };
-        var toNextToken = function (node) {
-            var token = node.startToken;
-            while (token !== tokens[tokenIndex]) {
-                token = token.next;
-            }
-            while (token !== node.endToken.next) {
-                tokenIndex++;
-                doStuffWithToken(token);
-                token = token.next;
-            }
-        };
-
-        var toLastToken_ = function (node) {
-            var range = node.range;
-            for (var token; tokenIndex < tokenLen; tokenIndex++) {
-                token = tokens[tokenIndex];
-
-                if (token.range[1] >= range[1]) {
-                    break;
-                }
-
-                doStuffWithToken(token);
-            }
-        };
-        var toLastToken = function (node) {
-            var token = node.startToken;
-            while (token !== tokens[tokenIndex]) {
-                token = token.next;
-            }
-            while (token !== node.endToken) {
-                tokenIndex++;
-                doStuffWithToken(token);
-                token = token.next;
-            }
-        };
-
-        var forwardToken = function () {
-            var token = tokens[tokenIndex];
-            doStuffWithToken(token);
-            tokenIndex++;
-            return token;
-        };
-
-        var forwardTokenUntil = function (type, value) {
-            var token;
-            do {
-                token = tokens[tokenIndex];
-                doStuffWithToken(token);
-                tokenIndex++;
-            } while (token.type !== type || token.value !== value);
-            return token;
-        };
-
-        var backwardToken = function () {
-            tokenIndex--;
-            var last = bufferPop();
-            while (last.formatter) { //remove tokens created by formatter
-                last = bufferPop();
-            }
-            return last;
-        };
-
-        /*var backwardTokenUntil = function (type, value) {
-            var token;
-            do {
-                token = backwardToken();
-            } while (token.type !== type || token.value !== value);
-            return token;
-        };*/
-
-        /**
-         * if a token is comment
+         * check if a token is comment
          * @param token
          * @returns {boolean}
          */
@@ -280,655 +156,603 @@
             return token.type === 'LineComment' || token.type === 'BlockComment';
         };
 
-        var enterHandlers = {
-            'CallExpression': function (node) {
-                node['arguments'].forEach(function (arg, index, arr) {
-                    arg.onExit = function () {
-                        toLastToken(arg);
-                        var token;
-                        while (token = forwardToken()) {
-                            if (token.value === ',') {
-                                bufferPush(' ');
-                                break;
-                            }
-                        }
-                    };
+        /**
+         * @param token
+         * @returns {boolean}
+         */
+        var isLineComment = function (token) {
+            return token.type === 'LineComment';
+        };
 
-                    if (index === arr.length - 1) {
-                        arg.onExit = null;
-                    }
-                });
-            },
-            'ConditionalExpression': function (node) {
-                if (config.spaces.around.ternaryOperators) {
-                    node.test.onExit = function () {
-                        toLastToken(node.test);
-                        var token;
-                        while (true) {
-                            token = forwardToken();
-                            if (token.value === '?') {
-                                backwardToken();
-                                bufferPush(' ');
-                                forwardToken();
-                                bufferPush(' ');
-                                break;
-                            }
-                        }
-                    };
+        /**
+         * check if a token is white space
+         * @param token
+         * @returns {boolean}
+         */
+        var isWhiteSpace = function (token) {
+            return token.type === 'WhiteSpace';
+        };
 
-                    node.consequent.onExit = function () {
-                        toLastToken(node.consequent);
-                        var token;
-                        while (true) {
-                            token = forwardToken();
-                            if (token.value === ':') {
-                                backwardToken();
-                                bufferPush(' ');
-                                forwardToken();
-                                bufferPush(' ');
-                                break;
-                            }
-                        }
-                    };
-                }
-            },
-            'DoWhileStatement': function (node) {
-                if (node.body && node.body.type === 'BlockStatement') {
-                    node.body.onExit = function () {
-                        if (config.spaces.before.keywords) {
-                            forwardToken();
-                            bufferPush(' ');
-                        }
-                    };
-                } else if (node.body) {
-                    forwardToken();
-                    indentLevel++;
-                    bufferPush(NEXT_LINE);
-                    node.body.onExit = function () {
-                        indentLevel--;
-                    };
-                }
-            },
-            'ForStatement': function (node) {
-                if (node.test) {
-                    node.test.onBeforeEnter = function () {
-                        bufferPush(' ');
-                    };
-                }
+        /**
+         * @param token
+         * @returns {boolean}
+         */
+        var isLineBreak = function (token) {
+            return token.type === 'LineBreak';
+        };
 
-                if (node.update) {
-                    node.update.onBeforeEnter = function () {
-                        bufferPush(' ');
-                    };
+        /**
+         * @param token
+         * @returns {boolean}
+         */
+        var isInlineComment = function (token) {
+            var inline = false;
+            if (token) {
+                if (token.type === 'LineComment') {
+                    inline = true;
+                } else if (token.type === 'BlockComment') {
+                    inline = (token.value.indexOf('\n') === -1);
                 }
-            },
-            'VariableDeclaration': function (node) {
-                if (node.declarations.length > 0) {
-                    node.declarations[node.declarations.length - 1].isLastDeclaration = true;
-                }
-            },
-            'FunctionDeclaration': function (node) {
-                if (config.spaces.before.functionDeclarationParentheses) {
-                    node.id.onExit = function () {
-                        toNextToken(node.id);
-                        bufferPush(' ');
-                    };
-                }
-                node.params.forEach(function (param, index, arr) {
-                    param.onExit = function () {
-                        toLastToken(param);
-                        var token;
-                        while (true) {
-                            token = forwardToken();
-                            if (token.value === ',') {
-                                bufferPush(' ');
-                                break;
-                            }
-                        }
-                    };
-                    if (index === arr.length - 1) {
-                        param.onExit = null;
-                    }
-                });
-            },
-            'FunctionExpression': function (node) {
-                //if node has id function keyword must have space after
-                if (!config.spaces.before.functionExpressionParentheses && node.id) {
-                    node.id.onExit = function () {
-                        bufferPush(' ');
-                    };
-                }
-                node.params.forEach(function (param, index, arr) {
-                    param.onExit = function () {
-                        toLastToken(param);
-                        var token;
-                        while (true) {
-                            token = forwardToken();
-                            if (token.value === ',') { //TODO here maybe a bug
-                                bufferPush(' ');
-                                break;
-                            }
-                        }
-                    };
-                    if (index === arr.length - 1) {
-                        param.onExit = null;
-                    }
-                });
-            },
-            'BlockStatement': function (node) {
-                if (node.body.length > 0) {
-                    indentLevel++;
-                }
+            }
+            return inline;
+        };
 
-                if (!node.isIfStatementAlternate) {
-                    //here push space before { and then forward { then next line
-                    if (config.spaces.before.leftBrace) {
-                        bufferPush(' ');
-                    }
+        /**
+         * check if only types between startToken and endToken
+         * @param {Object} startToken
+         * @param {Object} endToken
+         * @param {Array} types
+         * @returns {boolean}
+         */
+        var isTypeBetween = function (startToken, endToken, types) {
+            var is = true;
+            var token = startToken;
+            while (token.next && token.next !== endToken) {
+                token = token.next;
+                if (types.indexOf(token.type) === -1) {
+                    is = false;
+                    break;
                 }
-                forwardToken();
-                bufferPush(NEXT_LINE);
-            },
-            'IfStatement': function (node) {
-                if (node.alternate) {
-                    /**
-                     * @usage BlockStatement
-                     * @type {boolean}
-                     */
-                    node.alternate.isIfStatementAlternate = true;
-                }
+            }
+            return is;
+        };
 
-                //if if has alternate, should insert space after consequent(before else)
-                if (node.consequent && node.consequent.type === 'BlockStatement') {
-                    if (config.spaces.before.keywords) {
-                        node.consequent.onExit = function () {
-                            toNextToken(node.consequent);
-                            node.alternate && bufferPush(' ');
-                        };
-                    }
-                }
-
-                //if consequent is not a block, should insert next line before it
-                if (node.consequent && node.consequent.type !== 'BlockStatement') {
-                    node.consequent.onBeforeEnter = function () {
-                        bufferPush(NEXT_LINE);
-                        indentLevel++;
-                    };
-                    node.consequent.onExit = function () {
-                        indentLevel--;
-                    };
-                }
-                //if alternate is not a block, should insert next line before it
-                if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
-                    node.alternate.onBeforeEnter = function () {
-                        bufferPush(NEXT_LINE);
-                        indentLevel++;
-                    };
-                    node.alternate.onExit = function () {
-                        indentLevel--;
-                    };
-                }
-            },
-            'ObjectExpression': function (node) {
-                //go to { and next line
-                if (node.properties.length > 0) {
-                    forwardToken();
-                    bufferPush(NEXT_LINE);
-                }
-                indentLevel++;
-                if (node.properties.length > 0) {
-                    node.properties[node.properties.length - 1].isLastObjectProperty = true;
-                }
-            },
-            'Property': function (node) {
-                node.key.onExit = function () {
-                    toNextToken(node.key);
-                    forwardToken();
-                    if (config.spaces.other.afterPropertyNameValueSeparator) {
-                        bufferPush(' ');
-                    }
-                };
-            },
-            'ArrayExpression': function (node) {
-                if (node.elements.length > 0) {
-                    forwardToken(); //[
-                    bufferPush(NEXT_LINE);
-                    indentLevel++;
-
-                    //[1, 2, ,,,,] this is legal，makes some null elements of array in ast, what a fuck
-                    node.elements.forEach(function (e, index, arr) {
-                        if (e) {
-                            e.onExit = function () {
-                                toNextToken(e);
-                                if (index !== arr.length - 1) { //here is ,
-                                    forwardTokenUntil('Punctuator', ',');
-                                } else {
-                                    forwardTokenUntil('Punctuator', ']');
-                                    backwardToken();
-                                }
-                                bufferPush(NEXT_LINE);
-                            };
-                        }
-                    });
-                }
-            },
-            'SwitchStatement': function (node) {
-                node.discriminant.onExit = function () {
-                    indentLevel++;
-                    toNextToken(node.discriminant);
-                    var token;
-                    while (true) {
-                        token = forwardToken();
-                        if (tokens[tokenIndex].value.charAt(0) === '{') {
-                            if (config.spaces.before.leftBrace) {
-                                bufferPush(' ');
-                            }
-                            forwardToken();
-                            bufferPush(NEXT_LINE);
-                            break;
-                        }
-                    }
-                };
-
-                node.cases.forEach(function (c) {
-                    c.onExit = function () {
-                        indentLevel--;
-                    };
-                });
-            },
-            'SwitchCase': function (node) {
-                if (node.test) {
-                    node.test.onExit = function () {
-                        toNextToken(node.test);
-                        forwardToken();
-                        bufferPush(NEXT_LINE);
-                        indentLevel++;
-                    };
-                } else {
-                    forwardToken();
-                    forwardToken();
-                    bufferPush(NEXT_LINE);
-                    indentLevel++;
-                }
-            },
-            'UnaryExpression': function (node) {
-                insertFlag = ['+', '-', '!'].indexOf(node.operator) === -1;
-                forwardToken(); // must this operator？
-                insertFlag = true;
-            },
-            'SequenceExpression': function (node) {
-                for (var i = 0; i < node.expressions.length - 1; i++) {
-                    node.expressions[i].onExit = (function (i) {
-                        return function () {
-                            toNextToken(node.expressions[i]);
-                            forwardToken();
-                            bufferPush(' ');
-                        }
-                    })(i);
-                }
+        /**
+         * 保证一个语句节点是在新起一行
+         * @param node
+         */
+        var guaranteeNewLine = function (node) {
+            if (node.startToken.prev && node.startToken.prev.type !== 'LineBreak') {
+                insertBefore(node.startToken, nextLineFactory());
             }
         };
 
-        var exitHandlers = {
-            'ContinueStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'DoWhileStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'ForStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'ForInStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'VariableDeclaration': function (node) {
-                toNextToken(node);
-                if (node.parent.type !== 'ForStatement' && node.parent.type !== 'ForInStatement') {
-                    bufferPush(NEXT_LINE); //todo bug var a = {} check if redundant \n
-                }
-            },
-            'VariableDeclarator': function (node) {
-                if (!node.isLastDeclaration) {
-                    toNextToken(node);
-                    forwardToken();
-                    bufferPush(' ');
-                }
-            },
-            'BlockStatement': function (node) {
-                toLastToken(node);
-                if (node.body.length > 0) {
-                    indentLevel--;
-                }
-            },
-            'IfStatement': function (node) {
-                if (!node.isIfStatementAlternate) {
-                    toNextToken(node);
-                    bufferPush(NEXT_LINE);
-                }
-            },
-            'ExpressionStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'ThrowStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'ReturnStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'WhileStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'BreakStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'ObjectExpression': function (node) {
-                indentLevel--;
-
-                if (node.properties.length > 0) {
-                    toLastToken(node);
-                    bufferPush(NEXT_LINE);
-                }
-            },
-            'Property': function (node) {
-                toNextToken(node);
-                if (!node.isLastObjectProperty) {
-                    var token = forwardToken();
-                    while (!(token.type === 'Punctuator' && token.value === ',')) {
-                        token = forwardToken();
-                    }
-                    bufferPush(NEXT_LINE);
-                }
-            },
-            'ArrayExpression': function (node) {
-                if (node.elements.length > 0) {
-                    indentLevel--;
-                }
-            },
-            'FunctionDeclaration': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'TryStatement': function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            },
-            'SwitchStatement': function (node) {
-                indentLevel--;
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            }/*,
-            FunctionExpression: function (node) {
-                toNextToken(node);
-                bufferPush(NEXT_LINE);
-            }*/
-        };
-
-        var insertBefore = {
-            'Keyword': {
-                'in': ' ',
-                'instanceof': ' ',
-                'catch': config.spaces.before.keywords ? ' ' : '',
-                'finally': config.spaces.before.keywords ? ' ' : ''
-            },
-            'Punctuator': {
-                '=': ' ', //Assignment operators
-                '+=': ' ',
-                '-=': ' ',
-                '*=': ' ',
-                '/=': ' ',
-                '%=': ' ',
-                '<<=': ' ',
-                '>>=': ' ',
-                '>>>=': ' ',
-                '&=': ' ',
-                '^=': ' ',
-                '|=': ' ',
-                '==': ' ', //Comparison operators
-                '!=': ' ',
-                '===': ' ',
-                '!==': ' ',
-                '>': ' ',
-                '>=': ' ',
-                '<': ' ',
-                '<=': ' ',
-                '+': ' ', //Arithmetic operators
-                '-': ' ',
-                '*': ' ',
-                '/': ' ',
-                '%': ' ',
-                '++': '',
-                '--': '',
-                '&': ' ', //Bitwise operators
-                '|': ' ',
-                '^': ' ',
-                '~': ' ',
-                '<<': ' ',
-                '>>': ' ',
-                '>>>': ' ',
-                '&&': ' ', //Logical operators
-                '||': ' ',
-                '!': ''
+        /**
+         * 保证一个token两侧是空白符
+         * @param token
+         */
+        var guaranteeWhiteSpaceAround = function (token) {
+            if (token.prev.type !== 'WhiteSpace') {
+                insertBefore(token, whiteSpaceFactory());
             }
-        };
-        var insertAfter = {
-            'Keyword': {
-                'var': ' ',
-                'if': config.spaces.before.parentheses ? ' ' : '',
-                'else': ' ',
-                'function': config.spaces.before.functionExpressionParentheses ? ' ' : '',
-                'throw': ' ',
-                'return': ' ',
-                'delete': ' ',
-                'for': config.spaces.before.parentheses ? ' ' : '',
-                'while': config.spaces.before.parentheses ? ' ' : '',
-                'new': ' ',
-                'in': ' ',
-                'typeof': ' ',
-                'instanceof': ' ',
-                'catch': config.spaces.before.parentheses ? ' ' : '',
-                'switch': config.spaces.before.parentheses ? ' ' : '',
-                'case': ' ',
-                'void': ' '
-            },
-            'Punctuator': {
-                '=': ' ', //Assignment operators
-                '+=': ' ',
-                '-=': ' ',
-                '*=': ' ',
-                '/=': ' ',
-                '%=': ' ',
-                '<<=': ' ',
-                '>>=': ' ',
-                '>>>=': ' ',
-                '&=': ' ',
-                '^=': ' ',
-                '|=': ' ',
-                '==': ' ', //Comparison operators
-                '!=': ' ',
-                '===': ' ',
-                '!==': ' ',
-                '>': ' ',
-                '>=': ' ',
-                '<': ' ',
-                '<=': ' ',
-                '+': ' ', //Arithmetic operators
-                '-': ' ',
-                '*': ' ',
-                '/': ' ',
-                '%': ' ',
-                '++': '',
-                '--': '',
-                '&': ' ', //Bitwise operators
-                '|': ' ',
-                '^': ' ',
-                '~': ' ',
-                '<<': ' ',
-                '>>': ' ',
-                '>>>': ' ',
-                '&&': ' ', //Logical operators
-                '||': ' ',
-                '!': ''
+            if (token.next.type !== 'WhiteSpace') {
+                insertAfter(token, whiteSpaceFactory());
             }
         };
 
-        //codeStyle
-        if (!config.spaces.around.binaryOperators) {
-            delete insertBefore.Punctuator;
-            delete insertAfter.Punctuator;
-        }
-
-        var doInsertBefore = function (token) {
-            if (insertBefore[token.type] && insertBefore[token.type][token.value]) {
-                bufferPush({
-                    type: 'WhiteSpace',
-                    value: insertBefore[token.type][token.value]
-                });
-            }
-        };
-        var doInsertAfter = function (token) {
-            if (insertAfter[token.type] && insertAfter[token.type][token.value]) {
-                bufferPush({
-                    type: 'WhiteSpace',
-                    value: insertAfter[token.type][token.value]
-                });
+        /**
+         * insert token before a token
+         * @param {Object} token
+         * @param {Object} insertion
+         */
+        var insertBefore = function (token, insertion) {
+            if (!token.prev) { // insert at first
+                token.prev = insertion;
+                insertion.next = token;
+            } else {
+                token.prev.next = insertion;
+                insertion.prev = token.prev;
+                insertion.next = token;
+                token.prev = insertion;
             }
         };
 
-        // 在处理此节点和子节点之前进行的逻辑
-        var onEnterNode = function (node) {
-            toPrevToken(node);
-
-            if (node.onBeforeEnter) {
-                node.onBeforeEnter();
+        /**
+         * insert token after a token
+         * @param {Object} token
+         * @param {Object} insertion
+         */
+        var insertAfter = function (token, insertion) {
+            if (!token.next) { // insert at last
+                token.next = insertion;
+                insertion.prev = token;
+            } else {
+                token.next.prev = insertion;
+                insertion.next = token.next;
+                insertion.prev = token;
+                token.next = insertion;
             }
+        };
 
-            if (enterHandlers[node.type]) {
-                enterHandlers[node.type](node);
+        /**
+         * remove token in tokens
+         * @param {Object} token
+         */
+        var removeToken = function (token) {
+            if (token.prev && token.next) {
+                token.prev.next = token.next;
+                token.next.prev = token.prev;
+            } else if (token.prev) {
+                token.prev.next = undefined;
+            } else if (token.next) {
+                token.next.prev = undefined;
             }
         };
 
-        // logic after this node and all sub node
-        var onExitNode = function (node) {
-            if (exitHandlers[node.type]) {
-                exitHandlers[node.type](node);
-            }
-            if (node.onExit) {
-                node.onExit();
-            }
-        };
+        /**
+         * 这堆操作符前后是要有空白的
+         * @type {string[]}
+         */
+        var SPACE_AROUND_PUNCTUATOR = [
+            '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=', '&=', '^=', '|=',
+            '==', '!=', '===', '!==', '>', '>=', '<', '<=',
+            '+', '-', '*', '/', '%',
+            '&', '|', '^', '~', '<<', '>>', '>>>',
+            '&&', '||'
+        ];
 
         var _rocambole = require('rocambole');
-        string = require('./lib/fix').fix(string, config.fix);
+
+        // 先fix再format
+        string = require('./lib/fix').fix(string, _config.fix);
 
         var _ast = _rocambole.parse(string);
-        var tokens = _ast.tokens;
-        var tokenIndex = 0;
-        var tokenLen = tokens.length;
 
-        if (_ast.type === 'Program') {
-            _ast.body.forEach(function (node) {
-                recursive(node);
-            });
-        }
+        // start clear
+        var clearToken = function (token) {
+            var remove;
+            // 先去除空白
+            if (isWhiteSpace(token)) {
+                // 默认都要删除空白
+                remove = true;
 
-        // before here, buffer has no comment tokens, following logic link comment tokens to buffer
-        var output = [];
-        var token;
-        var i = 0;
+                // 空白前面是换行 && 后面是注释的不删除
+                if (token.prev && token.next && isLineBreak(token.prev) && isComment(token.next)) {
+                    remove = false;
+                }
 
-        // 如果token序列里最前面是若干注释，先把这些注释直接挪到output
-        token = tokens[i];
-        while (token.type === 'LineComment' || token.type === 'BlockComment' || token.type === 'LineBreak' || token.type === 'WhiteSpace') {
-            output.push(token);
-            i++;
-            token = tokens[i];
-        }
-        if (tokens[i].type === 'LineBreak') {
-            output.push(token[i]);
-            i++;
-        }
-        for (var j = 0; i < tokenLen && j < buffer.length; i++) {
-            token = tokens[i];
-            if (token.type === 'WhiteSpace' || token.type === 'LineBreak') {
-                continue;
+                if (remove) {
+                    removeToken(token);
+                }
             }
-            if (isComment(token)) {
-                if (token.prev) {
-                    switch (token.prev.type) {
-                        case 'WhiteSpace':
-                            if (token.prev.prev && token.prev.prev.type === 'LineBreak') {
-                                output.push(NEXT_LINE);
-                                output.push(token.prev);
-                            } else {
-                                output.push(token.prev);
+            // TODO 独占整行的注释，要保留占用的空白，保留其原始位置：空白前面是换行后面是注释的不删除
+            // 注释前后的换行一律保留，其他一律删除
+            if (isLineBreak(token)) {
+                // 默认都要删除换行
+                remove = true;
+
+                // 注释前面的
+                if (token.next && isComment(token.next)) {
+                    remove = false;
+                }
+                // 注释后面的
+                if (token.prev && isComment(token.prev)) {
+                    remove = false;
+                }
+                // 注释前面空白再前面的，这种是有缩进且占整行的注释
+                if (token.next && token.next.next && isWhiteSpace(token.next) && isComment(token.next.next)) {
+                    remove = false;
+                }
+                if (token.prev && (token.prev.value === ';' || token.prev.value === '}') && isLineBreak(token)) {
+                    var keep = Number(_config.blankLines.keepMaxBlankLines);
+                    if (keep > 0) {
+                        var t = token;
+                        while (keep--) {
+                            if (t.next && isLineBreak(t.next)) {
+                                t.next.removeAble = false;
+                                t = t.next;
                             }
-                            break;
-                        case 'LineBreak':
-                            output.push(NEXT_LINE);
-                            break;
-                        default:
-                            break;
+                        }
+                        remove = false;
                     }
                 }
-                output.push(token);
-                if (token.type === 'LineComment') {
-                    //LineComment don't need look right
-                    if (!(buffer[j] && buffer[j].type === 'LineBreak')) {
-                        output.push(NEXT_LINE);
+                if (token.removeAble === false) {
+                    remove = false;
+                }
+
+                if (remove) {
+                    removeToken(token);
+                }
+            }
+        };
+        var token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            clearToken(token);
+            token = token.next;
+        }
+        // end clear
+
+        // start process
+        // 这些关键词之后，必须无脑保证空白，其实return,delete等并不是必须要空白，但是应该没有傻逼这么写吧return(a);忽略这种情况
+        // 如果这些关键词后面都不加空白，那就傻逼鉴定完毕 shit 所以不提供这种配置
+        var INSERT_SPACE_AFTER_KEYWORD = ['throw', 'return', 'delete', 'new', 'in', 'typeof', 'instanceof', 'case', 'void'];
+        // 这几个关键词属于同一类型，在它们后边可以加空白也可以不加，都不会出先语法错误
+        var INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG = ['if', 'for', 'while', 'switch', 'catch'];
+        var processToken = function (token) {
+            // 必须加空白的地方
+            if (token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD.indexOf(token.value) !== -1) {
+                insertAfter(token, whiteSpaceFactory());
+            }
+            // 坑：var后面可以是换行，这时候就不需要空白
+            if (token.type === 'Keyword' && token.value === 'var' && !isLineBreak(token.next)) {
+                insertAfter(token, whiteSpaceFactory());
+            }
+
+            if (_config.spaces.before.parentheses && token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG.indexOf(token.value) !== -1) {
+                insertAfter(token, whiteSpaceFactory());
+            }
+
+            // check around = WhiteSpace
+            if (_config.spaces.around.binaryOperators && token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
+                guaranteeWhiteSpaceAround(token);
+            }
+            // 特殊处理in，这货两边必须保证空白
+            if (token.type === 'Keyword' && token.value === 'in') {
+                guaranteeWhiteSpaceAround(token);
+            }
+
+            // 特殊处理finally，这货在ast里不是一个独立type节点
+            if (token.type === 'Keyword' && token.value === 'finally') {
+                if (_config.spaces.before.keywords && !isWhiteSpace(token.prev)) {
+                    insertBefore(token, whiteSpaceFactory());
+                }
+            }
+        };
+        token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            processToken(token);
+            token = token.next;
+        }
+        // end process
+
+        // loop node
+        _rocambole.recursive(_ast, function (node) {
+            switch (node.type) {
+                case 'ArrayExpression':
+                    node.startToken.indentIncrease = true;
+                    node.endToken.indentDecrease = true;
+                    node.elements.forEach(function (el) {
+                        el && guaranteeNewLine(el);
+                    });
+                    if (node.elements.length > 0 && !isLineBreak(node.endToken.prev)) {
+                        insertBefore(node.endToken, nextLineFactory());
                     }
-                } else {
-                    //BlockComment
-                    if (token.next) {
-                        if (token.next.type === 'WhiteSpace') {
-                            output.push(token.next);
-                            if (token.next.next && token.next.next.type === 'LineBreak') {
-                                if (!(buffer[j] && buffer[j].type === 'LineBreak')) {
-                                    output.push(NEXT_LINE);
-                                }
+                    break;
+                case 'BreakStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'ConditionalExpression':
+                    if (_config.spaces.around.ternaryOperators && node.test) {
+                        (function () {
+                            var token = node.test.endToken;
+                            // TODO 这样做到底安全不？
+                            while (!(token.value === '?' && token.type === 'Punctuator')) {
+                                token = token.next;
                             }
-                        } else if (token.next.type === 'LineBreak') {
-                            if (!(buffer[j] && buffer[j].type === 'LineBreak')) {
-                                output.push(NEXT_LINE);
+                            if (!isWhiteSpace(token.prev)) {
+                                insertBefore(token, whiteSpaceFactory());
+                            }
+                            if (!isWhiteSpace(token.next)) {
+                                insertAfter(token, whiteSpaceFactory());
+                            }
+                        })();
+                    }
+                    if (_config.spaces.around.ternaryOperators && node.consequent) {
+                        (function () {
+                            var token = node.consequent.endToken;
+                            while (!(token.value === ':' && token.type === 'Punctuator')) {
+                                token = token.next;
+                            }
+                            if (!isWhiteSpace(token.prev)) {
+                                insertBefore(token, whiteSpaceFactory());
+                            }
+                            if (!isWhiteSpace(token.next)) {
+                                insertAfter(token, whiteSpaceFactory());
+                            }
+                        })();
+                    }
+                    break;
+                case 'ContinueStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'DoWhileStatement':
+                    guaranteeNewLine(node);
+                    if (node.body.type === 'BlockStatement') {
+                        if (!isWhiteSpace(node.body.endToken.next)) {
+                            _config.spaces.before.keywords && insertAfter(node.body.endToken, whiteSpaceFactory());
+                        }
+                    } else {
+                        if (isWhiteSpace(node.startToken.next)) {
+                            removeToken(node.startToken.next);
+                        }
+                        node.body.startToken.indentSelf = true;
+                        if (!isWhiteSpace(node.test.startToken.prev.prev)) {
+                            if (!isLineBreak(node.test.startToken.prev.prev.prev)) {
+                                insertBefore(node.test.startToken.prev.prev, nextLineFactory());
+                            }
+                            insertBefore(node.test.startToken.prev, whiteSpaceFactory());
+                        } else {
+                            if (!isLineBreak(node.test.startToken.prev.prev.prev.prev)) {
+                                insertBefore(node.test.startToken.prev.prev.prev, nextLineFactory());
                             }
                         }
                     }
-                }
-            } else {
-                while (buffer[j].type !== token.type || buffer[j].value !== token.value) {
-                    output.push(buffer[j]);
-                    j++;
-                }
-                output.push(buffer[j]);
-                j++;
+                    break;
+                case 'ForStatement':
+                    guaranteeNewLine(node);
+                    if (node.test && !isWhiteSpace(node.test.startToken.prev)) {
+                        insertBefore(node.test.startToken, whiteSpaceFactory());
+                    }
+                    if (node.update && !isWhiteSpace(node.update.startToken.prev)) {
+                        insertBefore(node.update.startToken, whiteSpaceFactory());
+                    }
+                    if (_config.spaces.within.parentheses) {
+                        if (node.init && !isWhiteSpace(node.init.startToken.prev)) {
+                            insertBefore(node.init.startToken, whiteSpaceFactory());
+                        } else {}
+                        if (node.update && !isWhiteSpace(node.update.endToken.next)) {
+                            insertAfter(node.update.endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'ForInStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'VariableDeclaration':
+                    if (node.parent.type !== 'ForStatement' && node.parent.type !== 'ForInStatement') {
+                        guaranteeNewLine(node);
+                    }
+                    break;
+                case 'VariableDeclarator':
+                    if (node.endToken.next && node.endToken.next.type === 'Punctuator' && node.endToken.next.value === ',' && !isLineBreak(node.endToken.next.next)) {
+                        insertAfter(node.endToken.next, whiteSpaceFactory());
+                    }
+                    break;
+                case 'ExpressionStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'FunctionDeclaration':
+                    guaranteeNewLine(node);
+                    insertAfter(node.startToken, whiteSpaceFactory());
+                    if (node.id) {
+                        _config.spaces.before.functionDeclarationParentheses && insertAfter(node.id.endToken, whiteSpaceFactory());
+                    }
+                    node.params.forEach(function (param, i) {
+                        if (i > 0) {
+                            insertBefore(param.startToken, whiteSpaceFactory());
+                        }
+                    });
+                    if (_config.spaces.within.parentheses && node.params.length > 0) {
+                        if (!isWhiteSpace(node.params[0].startToken.prev)) {
+                            insertBefore(node.params[0].startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.params[node.params.length - 1].endToken.next)) {
+                            insertAfter(node.params[node.params.length - 1].endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'IfStatement':
+                    // 坑：if statement 的 consequent 和 alternate 都是有可能不存在的
+                    if (node.parent.type !== 'IfStatement') {
+                        guaranteeNewLine(node);
+                    } else {
+                        insertBefore(node.startToken, whiteSpaceFactory());
+                    }
+                    if (node.consequent && node.consequent.type !== 'BlockStatement') {
+                        node.consequent.startToken.indentSelf = true;
+                        if (node.alternate) {
+                            insertAfter(node.consequent.endToken, nextLineFactory());
+                        }
+                    } else {
+                        if (node.alternate) {
+                            _config.spaces.before.keywords && insertAfter(node.consequent.endToken, whiteSpaceFactory());
+                        }
+                    }
+                    if (node.alternate && node.alternate.type !== 'BlockStatement' && node.alternate.type !== 'IfStatement') {
+                        node.alternate.startToken.indentSelf = true;
+                    }
+                    if (_config.spaces.within.parentheses && node.test) {
+                        if (!isWhiteSpace(node.test.startToken.prev)) {
+                            insertBefore(node.test.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.test.endToken.next)) {
+                            insertAfter(node.test.endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'ReturnStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'BlockStatement':
+                    node.startToken.indentIncrease = true;
+                    node.endToken.indentDecrease = true;
+                    if (node.startToken.prev && !isWhiteSpace(node.startToken.prev) && !isLineBreak(node.startToken.prev)) {
+                        _config.spaces.before.leftBrace && insertBefore(node.startToken, whiteSpaceFactory());
+                    }
+                    if (!isLineBreak(node.endToken.prev)) {
+                        insertBefore(node.endToken, nextLineFactory());
+                    }
+                    break;
+                case 'ObjectExpression':
+                    if (!isTypeBetween(node.startToken, node.endToken, ['WhiteSpace', 'LineBreak'])) {
+                        node.startToken.indentIncrease = true;
+                        node.endToken.indentDecrease = true;
+                        insertBefore(node.endToken, nextLineFactory());
+                    }
+                    break;
+                case 'Property':
+                    guaranteeNewLine(node);
+                    if (_config.spaces.other.beforePropertyNameValueSeparator) {
+                        !isWhiteSpace(node.key.endToken.next) && insertAfter(node.key.endToken, whiteSpaceFactory());
+                    }
+                    if (_config.spaces.other.afterPropertyNameValueSeparator) {
+                        !isWhiteSpace(node.value.startToken.prev) && insertBefore(node.value.startToken, whiteSpaceFactory());
+                    }
+                    break;
+                case 'CallExpression':
+                    node.arguments.forEach(function (arg, i) {
+                        if (i !== 0) {
+                            insertBefore(arg.startToken, whiteSpaceFactory());
+                        }
+                    });
+                    if (_config.spaces.within.parentheses && node.arguments.length > 0) {
+                        if (!isWhiteSpace(node.arguments[0].startToken.prev)) {
+                            insertBefore(node.arguments[0].startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.arguments[node.arguments.length - 1].endToken.next)) {
+                            insertAfter(node.arguments[node.arguments.length - 1].endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'FunctionExpression':
+                    if (_config.spaces.before.functionExpressionParentheses || node.id) {
+                        insertAfter(node.startToken, whiteSpaceFactory());
+                    }
+                    node.params.forEach(function (param, i, array) {
+                        if (param.endToken.next && param.endToken.next.type === 'Punctuator' && param.endToken.next.value === ',') {
+                            insertAfter(param.endToken.next, whiteSpaceFactory());
+                        }
+                    });
+                    if (_config.spaces.within.parentheses && node.params.length > 0) {
+                        if (!isWhiteSpace(node.params[0].startToken.prev)) {
+                            insertBefore(node.params[0].startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.params[node.params.length - 1].endToken.next)) {
+                            insertAfter(node.params[node.params.length - 1].endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'SequenceExpression':
+                    node.expressions.forEach(function (exp) {
+                        if (exp.endToken.next && exp.endToken.next.type === 'Punctuator' && exp.endToken.next.value === ',') {
+                            insertAfter(exp.endToken.next, whiteSpaceFactory());
+                        }
+                    });
+                    break;
+                case 'UnaryExpression':
+                    if (['+', '-', '!'].indexOf(node.startToken.value) !== -1) {
+                        if (node.startToken.next.type === 'WhiteSpace') {
+                            removeToken(node.startToken.next);
+                        }
+                    }
+                    if (node.operator === 'void') {
+                        if (node.startToken.next.type !== 'WhiteSpace') {
+                            insertAfter(node.startToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'WhileStatement':
+                    guaranteeNewLine(node);
+                    if (_config.spaces.within.parentheses && node.test) {
+                        if (!isWhiteSpace(node.test.startToken.prev)) {
+                            insertBefore(node.test.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.test.endToken.next)) {
+                            insertAfter(node.test.endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'SwitchStatement':
+                    guaranteeNewLine(node);
+                    node.discriminant.endToken.next.indentIncrease = true;
+                    _config.spaces.before.leftBrace && insertAfter(node.discriminant.endToken.next, whiteSpaceFactory());
+                    node.endToken.indentDecrease = true;
+                    insertBefore(node.endToken, nextLineFactory());
+                    if (_config.spaces.within.parentheses && node.discriminant) {
+                        if (!isWhiteSpace(node.discriminant.startToken.prev)) {
+                            insertBefore(node.discriminant.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.discriminant.endToken.next)) {
+                            insertAfter(node.discriminant.endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                case 'SwitchCase':
+                    guaranteeNewLine(node);
+                    node.startToken.indentIncrease = true;
+                    node.endToken.indentDecrease = true;
+                    break;
+                case 'ThrowStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'TryStatement':
+                    guaranteeNewLine(node);
+                    break;
+                case 'CatchClause':
+                    if (_config.spaces.before.keywords && !isWhiteSpace(node.startToken.prev)) {
+                        insertBefore(node.startToken, whiteSpaceFactory());
+                    }
+                    if (_config.spaces.within.parentheses && node.param) {
+                        if (!isWhiteSpace(node.param.startToken.prev)) {
+                            insertBefore(node.param.startToken, whiteSpaceFactory());
+                        }
+                        if (!isWhiteSpace(node.param.endToken.next)) {
+                            insertAfter(node.param.endToken, whiteSpaceFactory());
+                        }
+                    }
+                    break;
+                default:
+                    break;
             }
+        });
+
+        // process indent start
+        // 缩进这块要单独拿出来处理，不然很容易混乱
+        var indentLevel = 0;
+        var processIndent = function (token) {
+            if (token.indentIncrease) {
+                indentLevel++;
+            }
+            if (token.type === 'LineBreak') {
+                if (token.next && !isWhiteSpace(token.next)) {
+                    // 如果下一个token是要减小缩进的，那它本身就是要减少缩进的
+                    if (token.next.indentDecrease) {
+                        indentLevel--;
+                        token.next.indentDecrease = false;
+                    }
+                    insertAfter(token, indentFactory());
+                }
+            }
+            if (token.indentDecrease) {
+                indentLevel--;
+            }
+            if (token.indentSelf) {
+                indentLevel++;
+                insertBefore(token, singleIndentFactory());
+                indentLevel--;
+            }
+        };
+        token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            processIndent(token);
+            token = token.next;
         }
-        while (j < buffer.length) {
-            output.push(buffer[j]);
-            j++;
+        // process indent end
+
+        // 单独的处理注释的逻辑
+        var processComment = function (token) {
+            // 行尾注释保持跟前面的代码一个空格的距离
+            if (isLineComment(token) && token.prev && !isWhiteSpace(token.prev)) {
+                insertBefore(token, whiteSpaceFactory());
+            }
+        };
+        token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            processComment(token);
+            token = token.next;
         }
 
-//        output = buffer;
-        var formattedString = '';
-        var bufferLength = output.length;
-        for (i = 0; i < bufferLength; i++) {
-            var bufferI = output[i];
-            if (bufferI.type === 'LineComment' || bufferI.type === 'BlockComment') {
-                formattedString += output[i].raw;
-            } else {
-                formattedString += output[i].value;
-            }
-        }
-        return formattedString;
+        return _ast.toString();
     };
 
     /**
@@ -947,14 +771,6 @@
      */
     var version = function () {
         return require('./package.json').version;
-    };
-
-    /**
-     * returns default config
-     * @returns {Object}
-     */
-    var getDefaultConfig = function () {
-        return config;
     };
 
     exports.format = format;

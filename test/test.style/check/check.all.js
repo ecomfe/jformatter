@@ -14,9 +14,9 @@ switch (doSomething()) {
 var obj = {
     IdeaName: {
         exMaxLength: langUnit.UNIT_NAME_MAX_LENTH,
-        required: 1    /* test */,
-        requiredErrorMessage: '创意名称不能为空' /*
-        test*/ ,
+        required: 1/* test */,
+        requiredErrorMessage: '创意名称不能为空'/*
+        test*/,
         exMaxLengthErrorMessage: '创意名称不能超过30个字符'
     },
     'key': {}
@@ -46,7 +46,7 @@ var f = 'a\
 var p = +d; //test
 d = d === "true" ? !0 : d === "false" ? !1 : d === "null" ? null : +d + "" === d ? +d : H.test(d) ? p.parseJSON(d) : d;
 d = d === "true" ? !0 : d === "false" ? !1 : d === "null" ? null : +2 + "" === d ? +2 : H.test(d) ? p.parseJSON(d) : d;
-var a = -1, b = 0x2, c = +3, /* test */  f = String('f'), g;
+var a = -1, b = 0x2, c = +3, /* test */f = String('f'), g;
 var cd = (0 > 1) ? 1 + 1 : 2 / 2;
 var cd2 = 0 > 1 ? ((((1 + 1)) + 1)) : (2 > 3 ? 2 : 3);
 var cd3 = 0 > 1 ? {
@@ -72,12 +72,13 @@ var d = null, e = {};
 var fs = require('fs')
 temp = +(temp.slice(0, point) + temp.slice(point + 1)) + '';
 var array = [
-    1 /* a */,
+    1/* a */,
     2, //fuck
 ];
 var array = [
     2, //what a fuck
-,,];
+    ,,
+];
 fs.readFile('tokens.json', function (err, data) { //aa
     //ab
     if (err) { //bb

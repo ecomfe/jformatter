@@ -14,7 +14,7 @@ if (process.argv.length < 2) {
 }
 
 var targetFile = null;
-process.argv.forEach(function(arg, index) {
+process.argv.forEach(function (arg, index) {
     if (index === 2) {
         targetFile = arg;
     }
@@ -25,6 +25,11 @@ if (typeof targetFile !== 'string') {
     process.exit(1);
 }
 
+/**
+ * 递归寻找配置文件
+ * @param {string} targetFile
+ * @returns {Object}
+ */
 var getConfig = function (targetFile) {
     var config = {};
     var path = require('path');

@@ -77,8 +77,13 @@ fixed a bug cause syntax error
 
 ### next
 
-* v0.3 在合适的位置增加空行/研究保留空行
-* v0.3 完成space相关配置
+* make all config work
+
+### v1.0.0 (2014/11/27)
+
+* all new architecture with rocambole
+* more config work
+* fix a bug in auto-fixer
 
 ### v0.2.0 (2014/11/05)
 

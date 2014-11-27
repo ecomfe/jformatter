@@ -1,3 +1,14 @@
-//var a
-// var a
-var a;
+var foo =
+
+function (a, b) {
+
+    throw new Error
+
+    ('err');
+}
+
+
+
+
+
+;

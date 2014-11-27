@@ -1,31 +1,34 @@
 var
     //a
- a,
+a,
     //b
- b, //c
- c; //d
+b, //c
+c; //d
+
 //0
 if (doSomething()) //1
- { //2
+{ //2
     doSomething() //3
 } //4
- else //5
- { //6
+else //5
+{ //6
     //7
 } //8
+
 /**
  * test
  */
-if (doSomething()/*  */) {//1
+if (doSomething()/*  */) { //1
     //j1k
     //jjj
-} else {//3
+} else { //3
     //5
-} /* */
+}/* */
 doSomething(p1 //a
-, p2); /**
+, p2);/**
  */
-doSomething(p1, /* p2 */  p2); /* do */
+doSomething(p1,/* p2 */ p2);/* do */
+
 /**
  * foo
  * @param p1

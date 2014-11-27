@@ -1,3 +1,7 @@
+/**
+ * test tool
+ * @author ishowshao
+ */
 var jformatter = require('../jformatter.js');
 
 function showUsage() {
