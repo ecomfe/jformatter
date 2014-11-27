@@ -14,7 +14,7 @@ if (process.argv.length < 2) {
 }
 
 var targetFile = null;
-process.argv.forEach(function(arg, index) {
+process.argv.forEach(function (arg, index) {
     if (index === 2) {
         targetFile = arg;
     }
