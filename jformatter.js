@@ -67,7 +67,7 @@
                         overwriteConfig(defaults[key], configure[key]);
                     }
                 } else {
-                    //copy directly
+                    // copy directly
                     if (typeof configure[key] !== 'undefined') {
                         defaults[key] = configure[key];
                     }
