@@ -83,6 +83,11 @@ fixed a bug cause syntax error
 
 * make all config work
 
+### v1.0.1 (2014/11/28)
+
+* keep blank line after file doc
+* keep blank line after `},`
+
 ### v1.0.0 (2014/11/27)
 
 * all new architecture with rocambole
