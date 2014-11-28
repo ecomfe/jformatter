@@ -1,8 +1,24 @@
-var a = 1;
+/**
+ * @param a
+ * @param b
+ */
+
+var foo = function (a, b) {
+    throw new Error('err');
+    if (a) {
+    }
 
 
-if (a) {
-}
+    if (b) {
+    }
+};
 
 
-var c = 3;
+var obj = {
+    test: function () {
+    },
+
+
+    test2: function () {
+    }
+};

@@ -1,17 +1,40 @@
-var a = 1;
+/**
+ * @param a
+ * @param b
+ */
+
+var foo =
+
+function (a, b) {
+
+    throw new Error
+
+    ('err');
+    if (a) {
+
+    }
 
 
 
 
-if (a) {
+    if (b) {
+
+    }
+};
 
 
 
 
-}
+var obj = {
+    test: function () {
+
+    },
 
 
 
 
 
-var c = 3;
+    test2: function () {
+
+    }
+};

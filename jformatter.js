@@ -343,7 +343,9 @@
                 if (token.next && token.next.next && isWhiteSpace(token.next) && isComment(token.next.next)) {
                     remove = false;
                 }
-                if (token.prev && (token.prev.value === ';' || token.prev.value === '}') && isLineBreak(token)) {
+                if (token.prev &&
+                    (token.prev.value === ';' || token.prev.value === '}' || (token.prev.value === ',' && token.prev.prev && token.prev.prev.value === '}')) &&
+                    isLineBreak(token)) {
                     var keep = Number(_config.blankLines.keepMaxBlankLines);
                     if (keep > 0) {
                         var t = token;
@@ -354,6 +356,12 @@
                             }
                         }
                         remove = false;
+                    }
+                }
+                if (token.prev && !token.prev.prev && Number(_config.blankLines.keepMaxBlankLines) > 0 && isComment(token.prev) && token.prev.value.charAt(0) === '*') {
+                    if (token.next && isLineBreak(token.next)) {
+                        token.next.removeAble = false;
+                        token.next.next.removeAble = false;
                     }
                 }
                 if (token.removeAble === false) {
@@ -587,7 +595,9 @@
                     if (!isTypeBetween(node.startToken, node.endToken, ['WhiteSpace', 'LineBreak'])) {
                         node.startToken.indentIncrease = true;
                         node.endToken.indentDecrease = true;
-                        insertBefore(node.endToken, nextLineFactory());
+                        if (!isLineBreak(node.endToken.prev)) {
+                            insertBefore(node.endToken, nextLineFactory());
+                        }
                     }
                     break;
                 case 'Property':
@@ -714,7 +724,7 @@
                 indentLevel++;
             }
             if (token.type === 'LineBreak') {
-                if (token.next && !isWhiteSpace(token.next)) {
+                if (token.next && !isWhiteSpace(token.next) && !isLineBreak(token.next)) {
                     // 如果下一个token是要减小缩进的，那它本身就是要减少缩进的
                     if (token.next.indentDecrease) {
                         indentLevel--;
