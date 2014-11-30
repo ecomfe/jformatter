@@ -74,9 +74,7 @@ Default config, developing, not stable
 
 ## Important Note
 
-please update to `>=v0.1.6`, see version change log
-
-fixed a bug cause syntax error
+please update to `>=v1.0.0`, see version change log
 
 ## Changelog
 
