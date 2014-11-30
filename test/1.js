@@ -41,7 +41,7 @@
                 other: 1 // TODO
             },
             blankLines: {
-                keepMaxBlankLines: 0, // done
+                keepMaxBlankLines: 1, // done
                 atEndOfFile: true
             },
             other: {
