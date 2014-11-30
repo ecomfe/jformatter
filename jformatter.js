@@ -336,7 +336,7 @@
             _rocambole.recursive(_ast, function (node) {
                 var keep = 0;
                 var t;
-                if (/Declaration|Statement/.test(node.type) && node.type !== 'BlockStatement') {
+                if (/Declaration|Statement/.test(node.type) && node.type !== 'BlockStatement' && !(node.type === 'VariableDeclaration' && node.parent.type === 'ForStatement')) {
                     keep = Number(_config.blankLines.keepMaxBlankLines);
                     if (node.endToken.next && isLineBreak(node.endToken.next)) {
                         t = node.endToken.next;
