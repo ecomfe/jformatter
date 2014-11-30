@@ -42,7 +42,7 @@
             },
             blankLines: {
                 keepMaxBlankLines: 1, // done
-                atEndOfFile: true
+                atEndOfFile: true // done
             },
             other: {
                 keepArraySingleLine: false // TODO default formatted array multi line
@@ -810,7 +810,7 @@
                 formattedString += _config.lineSeparator;
             }
         } else {
-            formattedString.trim();
+            formattedString = formattedString.trim();
         }
         return formattedString;
     };
