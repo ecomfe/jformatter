@@ -58,7 +58,8 @@ Default config, developing, not stable
             other: 1 // TODO
         },
         blankLines: {
-            keepMaxBlankLines: 0 // done
+            keepMaxBlankLines: 1, // done
+            atEndOfFile: true // done
         },
         other: {
             keepArraySingleLine: false // TODO default formatted array multi line
@@ -82,6 +83,13 @@ fixed a bug cause syntax error
 ### next
 
 * make all config work
+
+### v1.0.2 (2014/11/30)
+
+* new and safe logic of keeping blank line
+* config for blank line at end of file
+* keep 1 blank line default
+* test case update
 
 ### v1.0.1 (2014/11/28)
 

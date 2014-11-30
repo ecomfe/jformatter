@@ -30,7 +30,8 @@
         "other": 1
     },
     "blankLines": {
-        "keepMaxBlankLines": 0
+        "keepMaxBlankLines": 1,
+        "atEndOfFile": true
     },
     "other": {
         "keepArraySingleLine": false
