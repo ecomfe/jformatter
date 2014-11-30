@@ -41,7 +41,7 @@
                 other: 1 // TODO
             },
             blankLines: {
-                keepMaxBlankLines: 1, // done
+                keepMaxBlankLines: 0, // done
                 atEndOfFile: true
             },
             other: {
@@ -295,11 +295,40 @@
          * @type {string[]}
          */
         var SPACE_AROUND_PUNCTUATOR = [
-            '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=', '&=', '^=', '|=',
-            '==', '!=', '===', '!==', '>', '>=', '<', '<=',
-            '+', '-', '*', '/', '%',
-            '&', '|', '^', '~', '<<', '>>', '>>>',
-            '&&', '||'
+            '=',
+            '+=',
+            '-=',
+            '*=',
+            '/=',
+            '%=',
+            '<<=',
+            '>>=',
+            '>>>=',
+            '&=',
+            '^=',
+            '|=',
+            '==',
+            '!=',
+            '===',
+            '!==',
+            '>',
+            '>=',
+            '<',
+            '<=',
+            '+',
+            '-',
+            '*',
+            '/',
+            '%',
+            '&',
+            '|',
+            '^',
+            '~',
+            '<<',
+            '>>',
+            '>>>',
+            '&&',
+            '||'
         ];
 
         var _rocambole = require('rocambole');
@@ -422,9 +451,25 @@
         // start process
         // 这些关键词之后，必须无脑保证空白，其实return,delete等并不是必须要空白，但是应该没有傻逼这么写吧return(a);忽略这种情况
         // 如果这些关键词后面都不加空白，那就傻逼鉴定完毕 shit 所以不提供这种配置
-        var INSERT_SPACE_AFTER_KEYWORD = ['throw', 'return', 'delete', 'new', 'in', 'typeof', 'instanceof', 'case', 'void'];
+        var INSERT_SPACE_AFTER_KEYWORD = [
+            'throw',
+            'return',
+            'delete',
+            'new',
+            'in',
+            'typeof',
+            'instanceof',
+            'case',
+            'void'
+        ];
         // 这几个关键词属于同一类型，在它们后边可以加空白也可以不加，都不会出先语法错误
-        var INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG = ['if', 'for', 'while', 'switch', 'catch'];
+        var INSERT_SPACE_AFTER_KEYWORD_WITH_CONFIG = [
+            'if',
+            'for',
+            'while',
+            'switch',
+            'catch'
+        ];
         var processToken = function (token) {
             // 必须加空白的地方
             if (token.type === 'Keyword' && INSERT_SPACE_AFTER_KEYWORD.indexOf(token.value) !== -1) {
@@ -546,7 +591,8 @@
                     if (_config.spaces.within.parentheses) {
                         if (node.init && !isWhiteSpace(node.init.startToken.prev)) {
                             insertBefore(node.init.startToken, whiteSpaceFactory());
-                        } else {}
+                        } else {
+                        }
                         if (node.update && !isWhiteSpace(node.update.endToken.next)) {
                             insertAfter(node.update.endToken, whiteSpaceFactory());
                         }
@@ -631,7 +677,10 @@
                     }
                     break;
                 case 'ObjectExpression':
-                    if (!isTypeBetween(node.startToken, node.endToken, ['WhiteSpace', 'LineBreak'])) {
+                    if (!isTypeBetween(node.startToken, node.endToken, [
+                        'WhiteSpace',
+                        'LineBreak'
+                    ])) {
                         node.startToken.indentIncrease = true;
                         node.endToken.indentDecrease = true;
                         if (!isLineBreak(node.endToken.prev)) {
@@ -689,7 +738,11 @@
                     });
                     break;
                 case 'UnaryExpression':
-                    if (['+', '-', '!'].indexOf(node.startToken.value) !== -1) {
+                    if ([
+                        '+',
+                        '-',
+                        '!'
+                    ].indexOf(node.startToken.value) !== -1) {
                         if (node.startToken.next.type === 'WhiteSpace') {
                             removeToken(node.startToken.next);
                         }
@@ -752,6 +805,7 @@
                     break;
                 default:
                     break;
+
             }
         });
 
@@ -827,3 +881,4 @@
     exports.version = version;
     exports.getDefaultConfig = getDefaultConfig;
 })();
+
