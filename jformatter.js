@@ -41,7 +41,8 @@
                 other: 1 // TODO
             },
             blankLines: {
-                keepMaxBlankLines: 0 // done
+                keepMaxBlankLines: 0, // done
+                atEndOfFile: true
             },
             other: {
                 keepArraySingleLine: false // TODO default formatted array multi line
@@ -309,12 +310,11 @@
         var _ast = _rocambole.parse(string);
 
         // start clear
-        var clearToken = function (token) {
-            var remove;
-            // 先去除空白
+        // 先去除空白
+        var clearWhiteSpace = function (token) {
             if (isWhiteSpace(token)) {
                 // 默认都要删除空白
-                remove = true;
+                var remove = true;
 
                 // 空白前面是换行 && 后面是注释的不删除
                 if (token.prev && token.next && isLineBreak(token.prev) && isComment(token.next)) {
@@ -325,11 +325,50 @@
                     removeToken(token);
                 }
             }
-            // TODO 独占整行的注释，要保留占用的空白，保留其原始位置：空白前面是换行后面是注释的不删除
+        };
+        var token = _ast.startToken;
+        while (token !== _ast.endToken.next) {
+            clearWhiteSpace(token);
+            token = token.next;
+        }
+
+        if (_config.blankLines.keepMaxBlankLines > 0) {
+            _rocambole.recursive(_ast, function (node) {
+                var keep = 0;
+                var t;
+                if (/.+Declaration|Statement/.test(node.type) && node.type !== 'BlockStatement') {
+                    keep = Number(_config.blankLines.keepMaxBlankLines);
+                    if (node.endToken.next && isLineBreak(node.endToken.next)) {
+                        t = node.endToken.next;
+                        t.removeAble = false;
+                        while (keep--) {
+                            if (t.next && isLineBreak(t.next)) {
+                                t.next.removeAble = false;
+                                t = t.next;
+                            }
+                        }
+                    }
+                }
+                if (node.type === 'Property') {
+                    keep = Number(_config.blankLines.keepMaxBlankLines);
+                    if (node.startToken.prev && isLineBreak(node.startToken.prev)) {
+                        t = node.startToken.prev;
+                        t.removeAble = false;
+                        while (keep--) {
+                            if (t.prev && isLineBreak(t.prev)) {
+                                t.prev.removeAble = false;
+                                t = t.prev;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        var clearLineBreak = function (token) {
             // 注释前后的换行一律保留，其他一律删除
             if (isLineBreak(token)) {
                 // 默认都要删除换行
-                remove = true;
+                var remove = true;
 
                 // 注释前面的
                 if (token.next && isComment(token.next)) {
@@ -343,9 +382,9 @@
                 if (token.next && token.next.next && isWhiteSpace(token.next) && isComment(token.next.next)) {
                     remove = false;
                 }
-                if (token.prev &&
+                /*if (token.prev && token.next &&
                     (token.prev.value === ';' || token.prev.value === '}' || (token.prev.value === ',' && token.prev.prev && token.prev.prev.value === '}')) &&
-                    isLineBreak(token)) {
+                    isLineBreak(token.next)) {
                     var keep = Number(_config.blankLines.keepMaxBlankLines);
                     if (keep > 0) {
                         var t = token;
@@ -357,7 +396,7 @@
                         }
                         remove = false;
                     }
-                }
+                }*/
                 if (token.prev && !token.prev.prev && Number(_config.blankLines.keepMaxBlankLines) > 0 && isComment(token.prev) && token.prev.value.charAt(0) === '*') {
                     if (token.next && isLineBreak(token.next)) {
                         token.next.removeAble = false;
@@ -373,9 +412,9 @@
                 }
             }
         };
-        var token = _ast.startToken;
+        token = _ast.startToken;
         while (token !== _ast.endToken.next) {
-            clearToken(token);
+            clearLineBreak(token);
             token = token.next;
         }
         // end clear
