@@ -5,12 +5,10 @@ try {
 } finally {
     doSomething();
 }
-
 try {
     doSomething();
 } catch (e) {
 }
-
 try {
 } catch (e) {
 }

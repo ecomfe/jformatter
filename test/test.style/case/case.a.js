@@ -7,13 +7,11 @@ var
      * c
      */
     c = 30;
-
 foo = {
   x: 10,
   y: 20,
   z: 30
 }
-
 /**
  * @param {string}
  */
@@ -25,7 +23,6 @@ var e = function(){
         e: 40
     }
 };
-
 var foo = {
   x: 10,
   y: 20,

@@ -11,7 +11,6 @@ switch (doSomething()) {
     default:
         doSomething();
 }
-
 var obj = {
     IdeaName: {
         exMaxLength: langUnit.UNIT_NAME_MAX_LENTH,
@@ -21,10 +20,8 @@ var obj = {
         exMaxLengthErrorMessage: '创意名称不能超过30个字符'
     },
     'key': {
-
     }
 };
-
 if (true) {
 } else {
     doSomething();
@@ -42,19 +39,13 @@ if (true) {
         //accountTree.refresh(0, 'user', true);
     });
 }
-
-
-
-
 var f = 'a\
         //a\
         ';
 var p = +d ; //test
 d = d === "true" ? !0 : d === "false" ? !1 : d === "null" ? null : +d + "" === d ? +d : H.test(d) ? p.parseJSON(d) : d;
 d = d === "true" ? !0 : d === "false" ? !1 : d === "null" ? null : +2 + "" === d ? +2 : H.test(d) ? p.parseJSON(d) : d;
-
 var a = -1, b = 0x2, c = +3, /* test */ f = String('f'), g;
-
 var cd = (0 > 1) ? 1 + 1 : 2 / 2;
 var cd2 = 0 > 1 ? ((((1 + 1)) + 1)) : (2 > 3 ? 2 : 3);
 var cd3 = 0 > 1 ? {
@@ -62,9 +53,7 @@ var cd3 = 0 > 1 ? {
 } : function (a, b, c) {
     return a.apply(([]), b);
 };
-
 (function(func){func(1)})(function(arg){console.log(arg)});
-
 /**
  * something
  * @param p1
@@ -74,9 +63,7 @@ var cd3 = 0 > 1 ? {
 function doSomething(p1, p2) {
     return p2;
 }
-
 var d = null, e = {};
-
 var fs = require('fs')
 temp = +(temp.slice(0, point) + temp.slice(point + 1)) + '';
 var array = [
@@ -86,13 +73,11 @@ var array = [
 var array = [
     2, //what a fuck
 ,,];
-
 fs.readFile('tokens.json', function (err, data) { //aa
     //ab
     if (err) { //bb
         throw err; //
     }
-
     //TODO:多个else if 会有多换行的bug
     //TODO:多个else if 会有多换行的bug
     if (fs) {
@@ -108,15 +93,12 @@ fs.readFile('tokens.json', function (err, data) { //aa
     } else if (a > b) {
         console.log('else');
     }
-
     do {
         doSomething();
     } while (a > b);
-
     if (fs) {
     } else {
     }
-
     /**
      *
      * @type {{key: string, key2: {key3: string}}}
@@ -127,22 +109,17 @@ fs.readFile('tokens.json', function (err, data) { //aa
             key3: 'k3'
         }
     };
-
     var obj = ({
         whatAFuck: 'wtf'
     });
-
     window.globalVar = 'global';
-
     var f, g = func2(), h; //a11
     var aa, ab = function () {
     };
     var x, y = {
         z: 'z'
     }, z;
-
     var ac = x > 0 ? 1 : 2;
-
     try {
         if (ac > 0) {
             console.log(x > 0 ? 1 : 2)
@@ -150,7 +127,6 @@ fs.readFile('tokens.json', function (err, data) { //aa
     } catch (e) {
         console.log(e);
     }
-
     var whatAFuck = {
         method: x > 0 ? function () {
             doSomething(this, 2);
@@ -161,11 +137,9 @@ fs.readFile('tokens.json', function (err, data) { //aa
             doSomething();
         }
     };
-
     var number = 0;
     var obj = {};
     var str = '';
-
     var array = [];
     var array2 = [1, 2, 3, '4', NaN, '5'];
     var array3 = [
@@ -176,13 +150,10 @@ fs.readFile('tokens.json', function (err, data) { //aa
                 b: 'c'
             }
         ], func2(), function () {
-
         }, func(), [1, 2, 3, 4, '5']
     ];
-
     var func = function (obj, callback) {
     };
-
     func({
         key: 'value'
     }, function () {
@@ -190,7 +161,6 @@ fs.readFile('tokens.json', function (err, data) { //aa
     }, function () {
 
     });
-
     /**
      *
      * @param data
@@ -202,35 +172,26 @@ fs.readFile('tokens.json', function (err, data) { //aa
         array2.push(map.key);
         return data + 'func2 return';
     };
-
     for (var i = 0; i < number; i++) {
         str += 'str';
         if (array.length > 0) {
             obj['abc'] = 'abc';
             obj.def = 'def';
-
             break;
         }
-
         if (array.length > 0) {
             continue;
         }
-
         func();
-
         delete map.key;
     }
-
     while (number > 0) {
         func();
         func2();
     }
-
     if ((function () {
         doSomething(1, 2);
     })()) {
-
     }
-
     //assss
 });

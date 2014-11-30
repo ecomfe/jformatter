@@ -597,7 +597,7 @@
                     }
                     if (node.consequent && node.consequent.type !== 'BlockStatement') {
                         node.consequent.startToken.indentSelf = true;
-                        if (node.alternate) {
+                        if (node.alternate && node.consequent.endToken.next && !isLineBreak(node.consequent.endToken.next)) {
                             insertAfter(node.consequent.endToken, nextLineFactory());
                         }
                     } else {
@@ -716,7 +716,9 @@
                     node.discriminant.endToken.next.indentIncrease = true;
                     _config.spaces.before.leftBrace && insertAfter(node.discriminant.endToken.next, whiteSpaceFactory());
                     node.endToken.indentDecrease = true;
-                    insertBefore(node.endToken, nextLineFactory());
+                    if (!isLineBreak(node.endToken.prev)) {
+                        insertBefore(node.endToken, nextLineFactory());
+                    }
                     if (_config.spaces.within.parentheses && node.discriminant) {
                         if (!isWhiteSpace(node.discriminant.startToken.prev)) {
                             insertBefore(node.discriminant.startToken, whiteSpaceFactory());
@@ -801,7 +803,16 @@
             token = token.next;
         }
 
-        return _ast.toString();
+
+        var formattedString = _ast.toString();
+        if (_config.blankLines.atEndOfFile) {
+            if (formattedString.charAt(formattedString.length - 1) !== _config.lineSeparator) {
+                formattedString += _config.lineSeparator;
+            }
+        } else {
+            formattedString.trim();
+        }
+        return formattedString;
     };
 
     /**
