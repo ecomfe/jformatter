@@ -1,48 +1,24 @@
-/**
- * @param a
- * @param b
- */
+var a = 1;
+
+var b = 2
+;
+
+var c = 3
+
+
+
+;
 
 var foo = function (a, b) {
-    throw new Error('err');
-    if (a) {
-    }
-
-    if (b) {
-    }
-};
-
-var obj = {
-    test: function () {
-    },
-
-    test2: function () {
-    }
-};
-
-function a() {
-
+    console.log(a)
+    return a + b
 }
 
+foo(1, 2), foo(2, 2)    ;
 
-var b = function () {
 
-};
+foo(2, 4)
 
-obj.foo(
-    'test',
 
-    function (n) {
-    }
 
-);
-
-if (a()) {
-
-}
-
-for (var i = 0
-
-; i < 100; i++) {
-
-}
+var d =2

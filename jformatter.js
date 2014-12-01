@@ -51,7 +51,9 @@
                 prefixSpaceToLineComment: false, // done
                 alterCommonBlockCommentToLineComment: false, // done
                 singleVariableDeclarator: false, // done
-                fixInvalidTypeof: false // done
+                fixInvalidTypeof: false, // done
+                removeEmptyStatement: true, // done
+                autoSemicolon: true // done
             }
         };
     };
