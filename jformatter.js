@@ -53,7 +53,8 @@
                 singleVariableDeclarator: false, // done
                 fixInvalidTypeof: false, // done
                 removeEmptyStatement: true, // done
-                autoSemicolon: true // done
+                autoSemicolon: true, // done
+                singleQuotes: true
             }
         };
     };
