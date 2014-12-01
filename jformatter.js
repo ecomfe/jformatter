@@ -54,7 +54,8 @@
                 fixInvalidTypeof: false, // done
                 removeEmptyStatement: true, // done
                 autoSemicolon: true, // done
-                singleQuotes: true
+                singleQuotes: true,
+                eqeqeq: true
             }
         };
     };
