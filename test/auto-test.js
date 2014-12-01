@@ -7,6 +7,7 @@ var jformatter = require('../jformatter.js');
 var differ = require('differ-cli/lib/differ');
 var ROOT = require('path').dirname(__filename);
 
+var autoTestPass = true;
 // test for default code style
 console.log('Testing code style cases ...\n');
 fs.readdir(ROOT + '/test.style/case', function (err, files) {
@@ -31,6 +32,7 @@ fs.readdir(ROOT + '/test.style/case', function (err, files) {
     if (allPass) {
         console.log('\nCode style: everything is ok.\n');
     } else {
+        autoTestPass = false;
         console.log('\nCode style: something wrong!\n');
     }
 });
@@ -89,7 +91,11 @@ fs.readdir(ROOT + '/test.config/case', function (err, cases) {
         if (allPass) {
             console.log('\nConfig: everything is ok.\n');
         } else {
+            autoTestPass = false;
             console.log('\nConfig: something wrong!\n');
         }
+
+        console.log(autoTestPass ? 'all pass.' : 'some fail.');
     });
+
 });
