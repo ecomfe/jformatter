@@ -55,7 +55,8 @@
                 removeEmptyStatement: true, // done
                 autoSemicolon: true, // done
                 singleQuotes: true,
-                eqeqeq: true
+                eqeqeq: true,
+                invalidConstructor: true
             }
         };
     };

@@ -1,8 +1,3 @@
-if (a == b) {
-}
-if (a == 1) {
-}
-if (a != 1) {
-}
-if (a > 1) {
-}
+var a = new Number(1);
+var b = new String(a);
+var c = new Boolean(false);
