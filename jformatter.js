@@ -52,11 +52,11 @@
                 alterCommonBlockCommentToLineComment: false, // done
                 singleVariableDeclarator: false, // done
                 fixInvalidTypeof: false, // done
-                removeEmptyStatement: true, // done
-                autoSemicolon: true, // done
-                singleQuotes: true,
-                eqeqeq: true,
-                invalidConstructor: true
+                removeEmptyStatement: false, // done
+                autoSemicolon: false, // done
+                singleQuotes: false, // done
+                eqeqeq: false, // done
+                invalidConstructor: false // done
             }
         };
     };
@@ -756,6 +756,9 @@
                             insertAfter(node.param.endToken, whiteSpaceFactory());
                         }
                     }
+                    break;
+                case 'EmptyStatement':
+                    guaranteeNewLine(node);
                     break;
                 default:
                     break;
