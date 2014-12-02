@@ -28,7 +28,7 @@ After you've done that you should be able to use the `jformatter` program.
 
 When use jformatter in terminal, it will try to load `.jformatterrc`.
 
-Jformatter will start looking for this file in the same directory as the file that's being formatted. If not found, it will move one level up the directory tree all the way up to the filesystem root.
+JFormatter will start looking for this file in the same directory as the file that's being formatted. If not found, it will move one level up the directory tree all the way up to the filesystem root.
 
 Default config, developing, not stable.
 
