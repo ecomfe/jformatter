@@ -8,7 +8,7 @@
     "url": "https://github.com/ishowshao/jformatter"
   },
   "bin": {
-    "jformatter": "./bin/jformat.js"
+    "jformatter": "./bin/jformatter.js"
   },
   "directories": {
     "test": "test"
