@@ -2,20 +2,17 @@
 
 A JavaScript formatter
 
-    Install:
-        npm -g install jformatter
+## Basic usage
 
+The easiest way to use JFormatter is to install it as a Node program.
 
-Github: <https://github.com/ishowshao/jformatter>
+    npm -g install jformatter
 
-## API
+After you've done that you should be able to use the `jformatter` program.
 
-    require('jformatter').format(code, [configObj]) : string
-    require('jformatter').formatFile(filePath, [configObj]) : string
-    require('jformatter').version() : string
-    require('jformatter').getDefaultConfig() : configObj
+    jformatter file.js
 
-## Command Line
+## Command in Terminal
 
 ```
   Usage: jformatter [options] <file>
@@ -27,9 +24,13 @@ Github: <https://github.com/ishowshao/jformatter>
     -d, --diff     Show difference between source and formatted
 ```
 
-## Config
+## Configuration
 
-Default config, developing, not stable
+When use jformatter in terminal, it will try to load `.jformatterrc`.
+
+Jformatter will start looking for this file in the same directory as the file that's being formatted. If not found, it will move one level up the directory tree all the way up to the filesystem root.
+
+Default config, developing, not stable.
 
     {
         lineSeparator: '\n', // done
@@ -77,6 +78,14 @@ Default config, developing, not stable
             fixInvalidTypeof: false // done
         }
     }
+
+## API
+
+    require('jformatter').format(code, [configObj]) : string
+    require('jformatter').formatFile(filePath, [configObj]) : string
+    require('jformatter').version() : string
+    require('jformatter').getDefaultConfig() : configObj
+
 
 ## Important Note
 
