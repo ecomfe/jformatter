@@ -13,9 +13,10 @@ Github: <https://github.com/ishowshao/jformatter>
 
 ## API
 
-    require('jformatter').format(code, configObj);
-    require('jformatter').formatFile(filePath, configObj);
-    require('jformatter').version();
+    require('jformatter').format(code, [configObj]) : string
+    require('jformatter').formatFile(filePath, [configObj]) : string
+    require('jformatter').version() : string
+    require('jformatter').getDefaultConfig() : configObj
 
 ## Command Line
 
