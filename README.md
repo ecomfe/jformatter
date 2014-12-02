@@ -19,7 +19,15 @@ Github: <https://github.com/ishowshao/jformatter>
 
 ## Command Line
 
-    jformatter yourFile.js  //will load .jformatterrc
+```
+  Usage: jformatter [options] <file>
+
+  Options:
+
+    -h, --help     output usage information
+    -v, --version  output the version number
+    -d, --diff     Show difference between source and formatted
+```
 
 ## Config
 
