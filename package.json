@@ -1,34 +1,35 @@
 {
-    "name": "jformatter",
-    "version": "1.0.2",
-    "description": "A JavaScript formatter",
-    "main": "jformatter.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/ishowshao/jformatter"
-    },
-    "bin": {
-        "jformatter": "./bin/jformat.js"
-    },
-    "directories": {
-        "test": "test"
-    },
-    "scripts": {
-        "test": "node test/auto-test.js"
-    },
-    "dependencies": {
-        "rocambole": "0.3.6",
-        "differ-cli": "0.2.2"
-    },
-    "devDependencies": {
-        "rocambole": "0.3.6"
-    },
-    "keywords": [
-        "javascript",
-        "formatter",
-        "ast",
-        "code style"
-    ],
-    "author": "ishowshao",
-    "license": "BSD-2-Clause"
+  "name": "jformatter",
+  "version": "1.0.2",
+  "description": "A JavaScript formatter",
+  "main": "jformatter.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ishowshao/jformatter"
+  },
+  "bin": {
+    "jformatter": "./bin/jformat.js"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/auto-test.js"
+  },
+  "dependencies": {
+    "commander": "^2.5.0",
+    "differ-cli": "0.2.2",
+    "rocambole": "0.3.6"
+  },
+  "devDependencies": {
+    "rocambole": "0.3.6"
+  },
+  "keywords": [
+    "javascript",
+    "formatter",
+    "ast",
+    "code style"
+  ],
+  "author": "ishowshao",
+  "license": "BSD-2-Clause"
 }
