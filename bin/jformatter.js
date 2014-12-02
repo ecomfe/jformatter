@@ -45,7 +45,7 @@ var program = require('commander');
 program.usage('[options] <file>');
 program.option('-v, --version', 'output the version number');
 program.option('-d, --diff', 'Show difference between source and formatted');
-program.option('-o, --output <file>', 'Place the output into <file>. Defaults to stdout.');
+//program.option('-o, --output <file>', 'Place the output into <file>. Defaults to stdout.');
 
 program.parse(process.argv);
 
