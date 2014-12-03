@@ -448,8 +448,8 @@
             if (_config.spaces.around.binaryOperators && token.type === 'Punctuator' && SPACE_AROUND_PUNCTUATOR.indexOf(token.value) !== -1) {
                 guaranteeWhiteSpaceAround(token);
             }
-            // 特殊处理in，这货两边必须保证空白
-            if (token.type === 'Keyword' && token.value === 'in') {
+            // 特殊处理in/instanceof，这货两边必须保证空白
+            if (token.type === 'Keyword' && ['in', 'instanceof'].indexOf(token.value) !== -1) {
                 guaranteeWhiteSpaceAround(token);
             }
 

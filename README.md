@@ -102,6 +102,10 @@ please update to `>=v1.0.0`, see version change log
 
 * make all config work
 
+### v1.0.5 (2014/12/03)
+
+* fix bug: lost space before `instanceof`
+
 ### v1.0.4 (2014/12/03)
 
 * fix bug: autoSemicolon add semicolon in for statement

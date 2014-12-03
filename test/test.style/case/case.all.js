@@ -193,5 +193,7 @@ fs.readFile('tokens.json', function (err, data) { //aa
         doSomething(1, 2);
     })()) {
     }
+    if (a instanceof Date) {
+    }
     //assss
 });
