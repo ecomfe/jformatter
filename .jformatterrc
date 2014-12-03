@@ -40,6 +40,11 @@
         "prefixSpaceToLineComment": false,
         "alterCommonBlockCommentToLineComment": false,
         "singleVariableDeclarator": false,
-        "fixInvalidTypeof": false
+        "fixInvalidTypeof": false,
+        "removeEmptyStatement": false,
+        "autoSemicolon": false,
+        "singleQuotes": false,
+        "eqeqeq": false,
+        "invalidConstructor": false
     }
 }

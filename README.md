@@ -75,7 +75,12 @@ Default config, developing, not stable.
             prefixSpaceToLineComment: false, // done
             alterCommonBlockCommentToLineComment: false, // done
             singleVariableDeclarator: false, // done
-            fixInvalidTypeof: false // done
+            fixInvalidTypeof: false, // done
+            removeEmptyStatement: false, // done
+            autoSemicolon: false, // done
+            singleQuotes: false, // done
+            eqeqeq: false, // done
+            invalidConstructor: false // done
         }
     }
 
@@ -96,6 +101,12 @@ please update to `>=v1.0.0`, see version change log
 ### next
 
 * make all config work
+
+### v1.0.3 (2014/12/03)
+
+* add 5 auto fix, please see `config.fix`
+* improve command line tool, please see document
+* test case update
 
 ### v1.0.2 (2014/11/30)
 
