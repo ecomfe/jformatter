@@ -102,6 +102,10 @@ please update to `>=v1.0.0`, see version change log
 
 * make all config work
 
+### v1.0.4 (2014/12/03)
+
+* fix bug: autoSemicolon add semicolon in for statement
+
 ### v1.0.3 (2014/12/03)
 
 * add 5 auto fix, please see `config.fix`
