@@ -94,7 +94,7 @@ Default config, developing, not stable.
 
 ## Important Note
 
-please update to `>=v1.0.0`, see version change log
+please update to `>=v1.0.5`, see version change log
 
 ## Changelog
 
