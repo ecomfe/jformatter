@@ -101,6 +101,7 @@ please update to `>=v1.0.5`, see version change log
 ### next
 
 * make all config work
+* 调整注释缩进
 
 ### v1.0.5 (2014/12/03)
 

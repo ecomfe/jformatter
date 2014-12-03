@@ -1,8 +1,8 @@
 #!/bin/sh
-for i in `find temp -name "*.js"`;
+for i in `find src -name "*.js"`;
     do
         echo $i
-        jformatter $i > tempjs
+        ../bin/jformatter.js $i > tempjs
         cp tempjs $i
     done
 rm tempjs

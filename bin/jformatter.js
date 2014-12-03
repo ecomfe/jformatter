@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
-var jformatter = require('jformatter');
+var jformatter = require('../jformatter');
 var differ = require('differ-cli/lib/differ');
 
 /**
