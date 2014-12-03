@@ -241,7 +241,7 @@
             if (token.prev.type !== 'WhiteSpace') {
                 insertBefore(token, whiteSpaceFactory());
             }
-            if (token.next.type !== 'WhiteSpace') {
+            if (token.next.type !== 'WhiteSpace' && token.next.type !== 'LineBreak') {
                 insertAfter(token, whiteSpaceFactory());
             }
         };
