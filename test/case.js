@@ -1,24 +1,6 @@
-var a = 1;
+for (var i = 0; i < 1; i++) {
 
-var b = 2
-;
-
-var c = 3
-
-
-
-;
-
-var foo = function (a, b) {
-    console.log(a)
-    return a + b
 }
+for (var k in a) {
 
-foo(1, 2), foo(2, 2)    ;
-
-
-foo(2, 4)
-
-
-
-var d =2
+}
