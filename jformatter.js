@@ -5,6 +5,7 @@
 (function () {
     /**
      * returns default config
+     *
      * @returns {Object}
      */
     var getDefaultConfig = function () {
@@ -84,8 +85,9 @@
 
     /**
      * format given string and return formatted string
-     * @param {string} string code string
-     * @param {Object} [userConfig] config object
+     *
+     * @param {string} string - code string
+     * @param {Object} [userConfig] - config object
      * @returns {string}
      */
     var format = function (string, userConfig) {
@@ -106,6 +108,7 @@
 
         /**
          * create a LineBreak token
+         *
          * @returns {{type: string, value: string, formatter: boolean}}
          */
         var nextLineFactory = function () {
@@ -118,6 +121,7 @@
 
         /**
          * create a indent token with indent level
+         *
          * @returns {Object}
          */
         var indentFactory = function () {
@@ -133,6 +137,7 @@
 
         /**
          * create a indent token with only one indent
+         *
          * @returns {Object}
          */
         var singleIndentFactory = function () {
@@ -144,6 +149,7 @@
 
         /**
          * create a single space token
+         *
          * @returns {Object}
          */
         var whiteSpaceFactory = function () {
@@ -155,7 +161,8 @@
 
         /**
          * check if a token is comment
-         * @param token
+         *
+         * @param {Object} token - the token to check
          * @returns {boolean}
          */
         var isComment = function (token) {
@@ -163,7 +170,9 @@
         };
 
         /**
-         * @param token
+         * check if a token is comment LineComment
+         *
+         * @param {Object} token - the token to check
          * @returns {boolean}
          */
         var isLineComment = function (token) {
@@ -172,7 +181,8 @@
 
         /**
          * check if a token is white space
-         * @param token
+         *
+         * @param {Object} token - the token to check
          * @returns {boolean}
          */
         var isWhiteSpace = function (token) {
@@ -180,7 +190,9 @@
         };
 
         /**
-         * @param token
+         * check if a token is line break
+         *
+         * @param {Object} token - the token to check
          * @returns {boolean}
          */
         var isLineBreak = function (token) {
@@ -188,7 +200,9 @@
         };
 
         /**
-         * @param token
+         * check if a token is comment in one line
+         *
+         * @param {Object} token - the token to check
          * @returns {boolean}
          */
         var isInlineComment = function (token) {
@@ -205,9 +219,10 @@
 
         /**
          * check if only types between startToken and endToken
-         * @param {Object} startToken
-         * @param {Object} endToken
-         * @param {Array} types
+         *
+         * @param {Object} startToken - the token to start check
+         * @param {Object} endToken - the token to end check
+         * @param {Array} types - allow types array
          * @returns {boolean}
          */
         var isTypeBetween = function (startToken, endToken, types) {
@@ -225,7 +240,8 @@
 
         /**
          * 保证一个语句节点是在新起一行
-         * @param node
+         *
+         * @param {Object} node - target node
          */
         var guaranteeNewLine = function (node) {
             if (node.startToken.prev && node.startToken.prev.type !== 'LineBreak') {
@@ -235,7 +251,8 @@
 
         /**
          * 保证一个token两侧是空白符
-         * @param token
+         *
+         * @param {Object} token - target token
          */
         var guaranteeWhiteSpaceAround = function (token) {
             if (token.prev.type !== 'WhiteSpace') {
@@ -248,8 +265,9 @@
 
         /**
          * insert token before a token
-         * @param {Object} token
-         * @param {Object} insertion
+         *
+         * @param {Object} token - target token
+         * @param {Object} insertion - a token to insert
          */
         var insertBefore = function (token, insertion) {
             if (!token.prev) { // insert at first
@@ -265,8 +283,9 @@
 
         /**
          * insert token after a token
-         * @param {Object} token
-         * @param {Object} insertion
+         *
+         * @param {Object} token - target token
+         * @param {Object} insertion - a token to insert
          */
         var insertAfter = function (token, insertion) {
             if (!token.next) { // insert at last
@@ -282,7 +301,8 @@
 
         /**
          * remove token in tokens
-         * @param {Object} token
+         *
+         * @param {Object} token - target token
          */
         var removeToken = function (token) {
             if (token.prev && token.next) {
@@ -297,6 +317,7 @@
 
         /**
          * 这堆操作符前后是要有空白的
+         *
          * @type {string[]}
          */
         var SPACE_AROUND_PUNCTUATOR = [
@@ -387,21 +408,7 @@
                 if (token.next && token.next.next && isWhiteSpace(token.next) && isComment(token.next.next)) {
                     remove = false;
                 }
-                /*if (token.prev && token.next &&
-                    (token.prev.value === ';' || token.prev.value === '}' || (token.prev.value === ',' && token.prev.prev && token.prev.prev.value === '}')) &&
-                    isLineBreak(token.next)) {
-                    var keep = Number(_config.blankLines.keepMaxBlankLines);
-                    if (keep > 0) {
-                        var t = token;
-                        while (keep--) {
-                            if (t.next && isLineBreak(t.next)) {
-                                t.next.removeAble = false;
-                                t = t.next;
-                            }
-                        }
-                        remove = false;
-                    }
-                }*/
+
                 if (token.prev && !token.prev.prev && Number(_config.blankLines.keepMaxBlankLines) > 0 && isComment(token.prev) && token.prev.value.charAt(0) === '*') {
                     if (token.next && isLineBreak(token.next)) {
                         token.next.removeAble = false;
@@ -825,8 +832,9 @@
 
     /**
      * format given file and returns formatted code
-     * @param {string} file file path
-     * @param {Object} [config] config object
+     *
+     * @param {string} file - file path
+     * @param {Object} [config] - config object
      * @returns {string}
      */
     var formatFile = function (file, config) {
@@ -835,6 +843,7 @@
 
     /**
      * returns version string
+     *
      * @returns {string}
      */
     var version = function () {
