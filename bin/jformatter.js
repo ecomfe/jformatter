@@ -17,9 +17,9 @@ var getConfig = function (targetFile) {
     var currentDir = path.dirname(absolutePath);
     var configPath = null;
 
-    while (currentDir !== '/') {
-        if (fs.existsSync(currentDir + '/.jformatterrc')) {
-            configPath = currentDir + '/.jformatterrc';
+    while (currentDir !== path.dirname(currentDir)) {
+        if (fs.existsSync(currentDir + path.sep + '.jformatterrc')) {
+            configPath = currentDir + path.sep + '.jformatterrc';
             break;
         }
         currentDir = path.dirname(currentDir);
