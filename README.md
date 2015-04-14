@@ -103,6 +103,10 @@ please update to `>=v1.0.5`, see version change log
 * make all config work
 * 调整注释缩进
 
+### v1.0.7 (2015/04/14)
+
+* fix bug: for windows environment
+
 ### v1.0.6 (2014/12/03)
 
 * fix bug: single quotes auto-fix bugs
