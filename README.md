@@ -2,6 +2,8 @@
 
 A JavaScript formatter
 
+![jformatter](http://img.shields.io/npm/dm/jformatter.svg)
+
 ## Basic usage
 
 The easiest way to use JFormatter is to install it as a Node program.
