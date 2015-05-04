@@ -91,6 +91,11 @@
      * @returns {string}
      */
     var format = function (string, userConfig) {
+        // 空文件会导致错误
+        if (string.trim() === '') {
+            return '';
+        }
+
         userConfig = userConfig || {};
 
         overwriteConfig(_config, userConfig); // overwrite codeStyle with user config
@@ -333,7 +338,11 @@
         // 先fix再format
         string = require('./lib/fix').fix(string, _config.fix);
 
-        var _ast = _rocambole.parse(string);
+        try {
+            var _ast = _rocambole.parse(string);
+        } catch (e) {
+            return string;
+        }
 
         // start clear
         // 先去除空白
