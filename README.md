@@ -108,7 +108,7 @@ please update to `>=v1.0.5`, see version change log
 ### v1.0.8 (2015/05/04)
 
 * fix bug: fix error when format empty file
-* fix bug: catch error when esprima parse syntax error files
+* catch error when esprima parse syntax error files
 
 ### v1.0.7 (2015/04/14)
 
