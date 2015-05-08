@@ -782,8 +782,28 @@
         });
 
         // loop again
+        token = _ast.startToken;
+        var lines = [];
+        var line = [];
+        while (token !== _ast.endToken.next) {
+            line.push(token);
+            if (token.type === 'LineBreak') {
+                lines.push(line);
+                line = [];
+            }
+            token = token.next;
+        }
+        lines.forEach(function (l) {
+            var length = 0;
+            l.forEach(function (token) {
+                length += String(token.value).length;
+            });
+            console.log(length);
+        });
 
-        
+        process.exit();
+
+
         // process indent start
         // 缩进这块要单独拿出来处理，不然很容易混乱
         var indentLevel = 0;
