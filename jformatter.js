@@ -58,7 +58,8 @@
                 singleQuotes: false, // done
                 eqeqeq: false, // done
                 invalidConstructor: false, // done
-                addCurly: false // done
+                addCurly: false, // done
+                removeDebugger: true
             }
         };
     };
