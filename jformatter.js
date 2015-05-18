@@ -57,7 +57,9 @@
                 autoSemicolon: false, // done
                 singleQuotes: false, // done
                 eqeqeq: false, // done
-                invalidConstructor: false // done
+                invalidConstructor: false, // done
+                addCurly: false, // done
+                removeDebugger: false // done
             }
         };
     };

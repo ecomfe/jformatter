@@ -45,6 +45,7 @@
         "autoSemicolon": false,
         "singleQuotes": false,
         "eqeqeq": false,
-        "invalidConstructor": false
+        "invalidConstructor": false,
+        "addCurly": false
     }
 }
