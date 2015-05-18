@@ -46,6 +46,7 @@
         "singleQuotes": false,
         "eqeqeq": false,
         "invalidConstructor": false,
-        "addCurly": false
+        "addCurly": false,
+        "removeDebugger": false
     }
 }
