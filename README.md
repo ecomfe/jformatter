@@ -82,7 +82,9 @@ Default config, developing, not stable.
             autoSemicolon: false, // done
             singleQuotes: false, // done
             eqeqeq: false, // done
-            invalidConstructor: false // done
+            invalidConstructor: false, // done
+            addCurly: false, // done
+            removeDebugger: false // done
         }
     }
 
@@ -104,6 +106,11 @@ please update to `>=v1.0.5`, see version change log
 
 * make all config work
 * 调整注释缩进
+
+### v1.0.9 (2015/05/18)
+
+* auto fix: addCurly, add curly for if/while/for statement
+* auto fix: removeDebugger, remove debugger statement
 
 ### v1.0.8 (2015/05/04)
 
