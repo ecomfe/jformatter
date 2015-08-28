@@ -59,7 +59,8 @@
                 eqeqeq: false, // done
                 invalidConstructor: false, // done
                 addCurly: false, // done
-                removeDebugger: false // done
+                removeDebugger: false, // done
+                noElseReturn: true
             }
         };
     };

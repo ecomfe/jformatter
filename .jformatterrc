@@ -47,6 +47,7 @@
         "eqeqeq": false,
         "invalidConstructor": false,
         "addCurly": false,
-        "removeDebugger": false
+        "removeDebugger": false,
+        "noElseReturn": true
     }
 }
