@@ -188,6 +188,16 @@
         };
 
         /**
+         * check if a token is comment BlockComment
+         *
+         * @param {Object} token - the token to check
+         * @returns {boolean}
+         */
+        var isBlockComment = function (token) {
+            return token.type === 'BlockComment';
+        };
+
+        /**
          * check if a token is white space
          *
          * @param {Object} token - the token to check
@@ -362,6 +372,18 @@
                 if (remove) {
                     removeToken(token);
                 }
+            }
+
+            if (isLineComment(token)) {
+                token.raw = token.raw.trimRight();
+            }
+
+            if (isBlockComment(token)) {
+                var rawArray = token.raw.split(_config.lineSeparator);
+                rawArray.forEach(function (line, i) {
+                    rawArray[i] = line.trimRight();
+                });
+                token.raw = rawArray.join(_config.lineSeparator);
             }
         };
         var token = _ast.startToken;

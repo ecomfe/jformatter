@@ -1,21 +1,10 @@
-function test() {
-    if (1) {
-        alert(1);
-        return true;
-    } else {
-        alert(2);
-        return true;
-    }
-}
-
-function test2() {
-    if (1) {
-        alert(1);
-        return true;
-    } else
-        return true;
-}
-
-if (1) {
-
-}
+var a = 1;
+/**
+ * a 
+ */
+var b = 2;
+/**
+ * 
+ * @type {number}
+ */
+var c = 3;
