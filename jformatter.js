@@ -60,7 +60,7 @@
                 invalidConstructor: false, // done
                 addCurly: false, // done
                 removeDebugger: false, // done
-                noElseReturn: true
+                noElseReturn: false
             }
         };
     };

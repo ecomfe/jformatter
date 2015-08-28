@@ -48,6 +48,6 @@
         "invalidConstructor": false,
         "addCurly": false,
         "removeDebugger": false,
-        "noElseReturn": true
+        "noElseReturn": false
     }
 }
