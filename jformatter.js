@@ -477,7 +477,11 @@
                 insertAfter(token, whiteSpaceFactory());
             }
             // 坑：var后面可以是换行，这时候就不需要空白
-            if (token.type === 'Keyword' && (token.value === 'var' || token.value === 'let') && !isLineBreak(token.next)) {
+            if (
+                token.type === 'Keyword'
+                && (token.value === 'var' || token.value === 'let' || token.value === 'const')
+                && !isLineBreak(token.next)
+            ) {
                 insertAfter(token, whiteSpaceFactory());
             }
 
